@@ -29,6 +29,9 @@ const Header = () => {
           <Link to="/news" className="hover:text-yellow-700 transition">
             Tin tức
           </Link>
+          <Link to="/blogs" className="hover:text-yellow-700 transition">
+            Blogs
+          </Link>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -80,6 +83,13 @@ const Header = () => {
               className="hover:text-yellow-700"
             >
               Tin tức
+            </Link>
+            <Link
+              to="/blogs"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
+              Blog
             </Link>
             <Link to="/signin" onClick={toggleMenu}>
               <button className="bg-yellow-500 w-full text-white px-4 py-2 rounded mt-2">
