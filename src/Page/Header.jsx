@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react"; // icon nếu đã cài lucide-react hoặc dùng Heroicons nếu thích
+import { Menu, X } from "lucide-react";
+import { AuthContext } from '../Services/AuthContext'; // Adjust the import path as necessary
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { token, logout } = useContext(AuthContext);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
@@ -41,18 +43,29 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Actions */}
+        {/* Actions (Desktop) */}
         <div className="hidden md:flex space-x-3">
-          <Link to="/signin">
-            <button className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-4 py-2 rounded">
-              Đăng nhập
+          {token ? (
+            <button
+              onClick={logout}
+              className="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded"
+            >
+              Đăng xuất
             </button>
-          </Link>
-          <Link to="/register">
-            <button className="border border-yellow-500 text-yellow-500 hover:bg-yellow-50 text-sm px-4 py-2 rounded">
-              Đăng ký
-            </button>
-          </Link>
+          ) : (
+            <>
+              <Link to="/signin">
+                <button className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-4 py-2 rounded">
+                  Đăng nhập
+                </button>
+              </Link>
+              <Link to="/register">
+                <button className="border border-yellow-500 text-yellow-500 hover:bg-yellow-50 text-sm px-4 py-2 rounded">
+                  Đăng ký
+                </button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
@@ -91,16 +104,30 @@ const Header = () => {
             >
               Blog
             </Link>
-            <Link to="/signin" onClick={toggleMenu}>
-              <button className="bg-yellow-500 w-full text-white px-4 py-2 rounded mt-2">
-                Đăng nhập
+            {token ? (
+              <button
+                onClick={() => {
+                  logout();
+                  toggleMenu();
+                }}
+                className="bg-red-500 w-full text-white px-4 py-2 rounded mt-2"
+              >
+                Đăng xuất
               </button>
-            </Link>
-            <Link to="/register" onClick={toggleMenu}>
-              <button className="border border-yellow-500 w-full text-yellow-500 px-4 py-2 rounded mt-1">
-                Đăng ký
-              </button>
-            </Link>
+            ) : (
+              <>
+                <Link to="/signin" onClick={toggleMenu}>
+                  <button className="bg-yellow-500 w-full text-white px-4 py-2 rounded mt-2">
+                    Đăng nhập
+                  </button>
+                </Link>
+                <Link to="/register" onClick={toggleMenu}>
+                  <button className="border border-yellow-500 w-full text-yellow-500 px-4 py-2 rounded mt-1">
+                    Đăng ký
+                  </button>
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       )}
