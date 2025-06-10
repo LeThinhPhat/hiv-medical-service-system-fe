@@ -11,13 +11,16 @@ import ListDoctor from "./Components/Customer/Listdoctor";
 import DetailDoctor from "./Components/Customer/Detaildoctor";
 import BlogList from "./Components/Customer/BlogList";
 import BlogDetail from "./Components/Customer/BlogDetail";
+import { AuthProvider } from "./Services/AuthContext";
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <Banner />
       <Header />
 
       <main>
+       
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/blogs" element={<BlogList />} />
@@ -30,9 +33,9 @@ function App() {
           <Route path="/news/:id" element={<DetailDoctor />} />
         </Routes>
       </main>
-
       <Footer />
     </Router>
+    </AuthProvider>
   );
 }
 
