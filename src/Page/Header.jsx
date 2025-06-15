@@ -1,13 +1,19 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { AuthContext } from '../Services/AuthContext'; // Adjust the import path as necessary
+import { AuthContext } from "../Services/AuthContext"; // Điều chỉnh đường dẫn nếu cần
+import { IconButton, Menu as MuiMenu, MenuItem } from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { token, logout } = useContext(AuthContext);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
+  const handleProfileMenuOpen = (event) => setAnchorEl(event.currentTarget);
+  const handleProfileMenuClose = () => setAnchorEl(null);
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -34,6 +40,9 @@ const Header = () => {
           <Link to="/blogs" className="hover:text-yellow-700 transition">
             Blogs
           </Link>
+          <Link to="/test" className="hover:text-yellow-700 transition">
+            Test
+          </Link>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -43,29 +52,37 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Actions (Desktop) */}
-        <div className="hidden md:flex space-x-3">
-          {token ? (
-            <button
-              onClick={logout}
-              className="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded"
-            >
-              Đăng xuất
-            </button>
-          ) : (
-            <>
-              <Link to="/signin">
-                <button className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-4 py-2 rounded">
-                  Đăng nhập
-                </button>
-              </Link>
-              <Link to="/register">
-                <button className="border border-yellow-500 text-yellow-500 hover:bg-yellow-50 text-sm px-4 py-2 rounded">
-                  Đăng ký
-                </button>
-              </Link>
-            </>
-          )}
+        {/* Profile Icons */}
+        <div className="hidden md:flex space-x-2">
+          {/* Xem Profile */}
+          <IconButton component={Link} to="/profile">
+            <PersonSearchIcon fontSize="large" sx={{ color: "#F59E0B" }} />
+          </IconButton>
+
+          {/* Menu tài khoản */}
+          <IconButton onClick={handleProfileMenuOpen}>
+            <AccountCircleIcon fontSize="large" sx={{ color: "#F59E0B" }} />
+          </IconButton>
+
+          {/* Dropdown Menu */}
+          <MuiMenu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleProfileMenuClose}
+          >
+            {token ? (
+              <MenuItem onClick={logout}>Đăng xuất</MenuItem>
+            ) : (
+              <>
+                <MenuItem onClick={handleProfileMenuClose}>
+                  <Link to="/signin">Đăng nhập</Link>
+                </MenuItem>
+                <MenuItem onClick={handleProfileMenuClose}>
+                  <Link to="/register">Đăng ký</Link>
+                </MenuItem>
+              </>
+            )}
+          </MuiMenu>
         </div>
       </div>
 
@@ -102,7 +119,14 @@ const Header = () => {
               onClick={toggleMenu}
               className="hover:text-yellow-700"
             >
-              Blog
+              Blogs
+            </Link>
+            <Link
+              to="/test"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
+              Test
             </Link>
             {token ? (
               <button

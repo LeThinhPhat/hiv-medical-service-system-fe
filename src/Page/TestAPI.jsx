@@ -1,43 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import docService from "../Services/CusService/docterListService"; // Assuming docService is in the same directory
 
-const doctors = [
-  {
-    id: 1,
-    name: "Dr. Nguyễn Văn A",
-    specialty: "Khoa Nội Tổng Quát",
-    avatar: "https://nguoinoitieng.tv/images/nnt/107/0/bjur.jpg",
-  },
-  {
-    id: 2,
-    name: "Dr. Trần Thị B",
-    specialty: "Khoa Nhi",
-    avatar: "https://nguoinoitieng.tv/images/nnt/107/0/bjur.jpg",
-  },
-  {
-    id: 3,
-    name: "Dr. Lê Văn C",
-    specialty: "Khoa Da Liễu",
-    avatar: "https://nguoinoitieng.tv/images/nnt/107/0/bjur.jpg",
-  },
-  {
-    id: 4,
-    name: "Dr. Phạm Thị D",
-    specialty: "Khoa Chấn Thương",
-    avatar: "https://nguoinoitieng.tv/images/nnt/107/0/bjur.jpg",
-  },
-];
-
-const ListDoctor = () => {
+const TestAPI = () => {
+  const [doctors, setDoctors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("Tất cả bác sĩ");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Extract unique specializations for the department filter
   const departments = [
-    "Khoa Nội Tổng Quát",
-    "Khoa Nhi",
-    "Khoa Da Liễu",
-    "Khoa Chấn Thương",
+    "Tất cả bác sĩ",
+    ...new Set(doctors.map((doctor) => doctor.specialty)),
   ];
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        setLoading(true);
+        const response = await docService.getAllDoctors();
+        console.log("API response:", response); // Log for debugging
+        // Handle case where response might be wrapped in { data: [...] }
+        const data = Array.isArray(response.data) ? response.data : response;
+        // Map API data to match the component's expected structure
+        const mappedDoctors = data.map((doctor) => ({
+          id: doctor._id,
+          name:
+            doctor.userID?.name ||
+            `Dr. ${doctor.userID?._id?.slice(-6) || "Unknown"}`, // Use userID.name with fallback
+          specialty: doctor.specializations || "Không có chuyên khoa", // Handle specializations as string
+          avatar: "https://nguoinoitieng.tv/images/nnt/107/0/bjur.jpg", // Placeholder avatar
+        }));
+        setDoctors(mappedDoctors);
+      } catch (err) {
+        setError("Không thể tải danh sách bác sĩ. Vui lòng thử lại sau.");
+        console.error("Error fetching doctors:", err); // Log error for debugging
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDoctors();
+  }, []);
 
   const filteredDoctors = doctors.filter(
     (doctor) =>
@@ -78,29 +82,6 @@ const ListDoctor = () => {
             </button>
           </div>
           <div>
-            <button
-              onClick={() => setSelectedDepartment("Tất cả bác sĩ")}
-              className={`flex justify-between items-center w-full text-left py-2 border-b ${
-                selectedDepartment === "Tất cả bác sĩ"
-                  ? "text-green-600"
-                  : "text-gray-600"
-              }`}
-            >
-              <span>Tất cả bác sĩ</span>
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
             {departments.map((dept, index) => (
               <button
                 key={index}
@@ -132,31 +113,47 @@ const ListDoctor = () => {
 
         {/* Doctor List */}
         <section className="w-3/4">
-          <h2 className="text-xl font-semibold mb-4">{selectedDepartment}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDoctors.map((doctor) => (
-              <div
-                key={doctor.id}
-                className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-all duration-300 border border-gray-200"
-              >
-                <img
-                  src={doctor.avatar}
-                  alt={doctor.name}
-                  className="w-full h-40 object-cover rounded-lg mb-4"
-                />
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {doctor.name}
-                </h3>
-                <p className="text-sm text-gray-600">{doctor.specialty}</p>
-                <Link
-                  to={`/news/${doctor.id}`}
-                  className="mt-4 inline-block px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all"
-                >
-                  Xem Chi Tiết
-                </Link>
+          {loading ? (
+            <p className="text-gray-600">Đang tải...</p>
+          ) : error ? (
+            <p className="text-red-600">{error}</p>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold mb-4">
+                {selectedDepartment}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredDoctors.length > 0 ? (
+                  filteredDoctors.map((doctor) => (
+                    <div
+                      key={doctor.id}
+                      className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-all duration-300 border border-gray-200"
+                    >
+                      <img
+                        src={doctor.avatar}
+                        alt={doctor.name}
+                        className="w-full h-40 object-cover rounded-lg mb-4"
+                      />
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {doctor.name}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {doctor.specialty}
+                      </p>
+                      <Link
+                        to={`/test/${doctor.id}`} // Updated route to match doctor context
+                        className="mt-4 inline-block px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all"
+                      >
+                        Xem Chi Tiết
+                      </Link>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-600">Không tìm thấy bác sĩ nào.</p>
+                )}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </section>
       </main>
 
@@ -197,4 +194,4 @@ const ListDoctor = () => {
   );
 };
 
-export default ListDoctor;
+export default TestAPI;
