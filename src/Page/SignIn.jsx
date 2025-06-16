@@ -10,14 +10,25 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Hook for navigation
+ 
   const navigate = useNavigate();
 
-  // Effect to handle navigation when token is set
+  
   useEffect(() => {
     if (token) {
-      navigate("/");
-    }
+      console.log("Response", token.data.data.user.role.name);
+       if(token.data.data.user.role.name === "CUSTOMER_ROLE"){
+         navigate("/");
+       }else if (token.data.data.user.role.name === "STAFF_ROLE"){
+         navigate("/staff");
+       }  else if (token.data.data.user.role.name === "DOCTOR_ROLE"){
+         navigate("/doctor");
+       }else if (token.data.data.user.role.name === "ADMIN_ROLE"){
+         navigate("/admin");
+       } else if (token.data.data.user.role.name === "MANAGER_ROLE"){
+         navigate("/manager");
+       }
+  }
   }, [token, navigate]);
 
   // Handle form submission
@@ -28,10 +39,12 @@ const SignIn = () => {
 
     try {
       const response = await authService.signin({ email, password });
+      console.log("Login response:", response);
       const accessToken = response.data.data.access_token;
+      
       localStorage.setItem("token", accessToken);
-      setToken(accessToken); 
-      // Update state to trigger useEffect
+      setToken(response); 
+     
     } catch (err) {
       console.error("Login error:", err);
       setError(err.response?.data?.message || "Login failed. Please try again.");
