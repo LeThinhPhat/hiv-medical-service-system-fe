@@ -34,8 +34,8 @@ const Header = () => {
           <Link to="/booking" className="hover:text-yellow-700 transition">
             Đặt lịch khám
           </Link>
-          <Link to="/news" className="hover:text-yellow-700 transition">
-            Tin tức
+          <Link to="/docs" className="hover:text-yellow-700 transition">
+            Đội ngũ bác sĩ
           </Link>
           <Link to="/blogs" className="hover:text-yellow-700 transition">
             Blogs

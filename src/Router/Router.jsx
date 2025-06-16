@@ -9,8 +9,8 @@ import ListDoctor from "../Components/Customer/Listdoctor";
 import DetailDoctor from "../Components/Customer/DetailDoctor";
 import BlogList from "../Components/Customer/BlogList";
 import BlogDetail from "../Components/Customer/BlogDetail";
-import TestAPI from "../Page/TestAPI";
-import TestAPI2 from "../Page/TestAPI2";
+// import TestAPI from "../Page/TestAPI";
+// import TestAPI2 from "../Page/TestAPI2";
 import Profile from "../Page/Profile";
 import About from "../Page/About";
 import Staff from "../Page/Staff/Staff";
@@ -31,14 +31,14 @@ const Router = createBrowserRouter([
       { path: "signin", element: <SignIn /> },
       { path: "register", element: <SignUp /> },
       { path: "forgot-password", element: <ForgotPassword /> },
-      { path: "news", element: <ListDoctor /> },
-      { path: "doctor", element: <Doctor/> },
-      { path: "staff", element: <Staff/> },
-      { path: "manager", element: <Manager/> },
-      { path: "admin", element: <Admin/> },
-      { path: "news/:id", element: <DetailDoctor /> },
-      { path: "test", element: <TestAPI /> },
-      { path: "test/:id", element: <TestAPI2 /> },
+      { path: "docs", element: <ListDoctor /> },
+      { path: "doctor", element: <Doctor /> },
+      { path: "staff", element: <Staff /> },
+      { path: "manager", element: <Manager /> },
+      { path: "admin", element: <Admin /> },
+      { path: "docs/:id", element: <DetailDoctor /> },
+      // { path: "test", element: <TestAPI /> },
+      // { path: "test/:id", element: <TestAPI2 /> },
     ],
   },
   { path: "*", element: <div>Not Found</div> },
