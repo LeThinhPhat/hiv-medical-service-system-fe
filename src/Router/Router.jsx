@@ -13,6 +13,10 @@ import TestAPI from "../Page/TestAPI";
 import TestAPI2 from "../Page/TestAPI2";
 import Profile from "../Page/Profile";
 import About from "../Page/About";
+import Staff from "../Page/Staff/Staff";
+import Doctor from "../Page/Doctor/Doctor";
+import Manager from "../Page/Manager/Manager";
+import Admin from "../Page/Admin/Admin";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -28,6 +32,10 @@ const Router = createBrowserRouter([
       { path: "register", element: <SignUp /> },
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "news", element: <ListDoctor /> },
+      { path: "doctor", element: <Doctor/> },
+      { path: "staff", element: <Staff/> },
+      { path: "manager", element: <Manager/> },
+      { path: "admin", element: <Admin/> },
       { path: "news/:id", element: <DetailDoctor /> },
       { path: "test", element: <TestAPI /> },
       { path: "test/:id", element: <TestAPI2 /> },
