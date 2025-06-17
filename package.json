@@ -12,10 +12,11 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^7.1.0",
+    "@mui/icons-material": "^7.1.1",
     "@mui/material": "^7.1.0",
-    "@mui/x-date-pickers": "^8.4.0",
+    "@mui/x-date-pickers": "^8.5.2",
     "axios": "^1.9.0",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.511.0",
