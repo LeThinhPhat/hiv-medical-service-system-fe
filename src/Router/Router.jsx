@@ -1,5 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
+
+// Layouts
 import Layout from "../Page/Layout";
+import AdminLayout from "../Components/Admin/AdminLayout";
+import StaffLayout from "../Components/Staff/StaffLayout";
+import ManagerLayout from "../Components/Manager/ManagerLayout";
+import DoctorLayout from "../Components/Doctor/DoctorLayout";
+
+// Customer Pages
 import Homepage from "../Components/Customer/Homepage";
 import Booking from "../Components/Customer/Booking";
 import SignIn from "../Page/SignIn";
@@ -9,14 +17,15 @@ import ListDoctor from "../Components/Customer/Listdoctor";
 import DetailDoctor from "../Components/Customer/DetailDoctor";
 import BlogList from "../Components/Customer/BlogList";
 import BlogDetail from "../Components/Customer/BlogDetail";
-// import TestAPI from "../Page/TestAPI";
-// import TestAPI2 from "../Page/TestAPI2";
 import Profile from "../Page/Profile";
 import About from "../Page/About";
-import Staff from "../Page/Staff/Staff";
-import Doctor from "../Page/Doctor/Doctor";
-import Manager from "../Page/Manager/Manager";
-import Admin from "../Page/Admin/Admin";
+
+// Admin/Staff/Manager/Doctor main pages
+import Admin from "../Components/Admin//Admin";
+import Staff from "../Components/Staff/Staff";
+import Manager from "../Components/Manager/Manager";
+import Doctor from "../Components/Doctor/Doctor";
+
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -32,16 +41,45 @@ const Router = createBrowserRouter([
       { path: "register", element: <SignUp /> },
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "docs", element: <ListDoctor /> },
-      { path: "doctor", element: <Doctor /> },
-      { path: "staff", element: <Staff /> },
-      { path: "manager", element: <Manager /> },
-      { path: "admin", element: <Admin /> },
       { path: "docs/:id", element: <DetailDoctor /> },
-      // { path: "test", element: <TestAPI /> },
-      // { path: "test/:id", element: <TestAPI2 /> },
     ],
   },
-  { path: "*", element: <div>Not Found</div> },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      { path: "", element: <Admin /> },
+      // Add admin child routes here if needed
+    ],
+  },
+  {
+    path: "/staff",
+    element: <StaffLayout />,
+    children: [
+      { path: "", element: <Staff /> },
+      // Add staff child routes here if needed
+    ],
+  },
+  {
+    path: "/manager",
+    element: <ManagerLayout />,
+    children: [
+      { path: "", element: <Manager /> },
+      // Add manager child routes here if needed
+    ],
+  },
+  {
+    path: "/doctor",
+    element: <DoctorLayout />,
+    children: [
+      { path: "", element: <Doctor /> },
+      // Add doctor child routes here if needed
+    ],
+  },
+  {
+    path: "*",
+    element: <div>Not Found</div>,
+  },
 ]);
 
 export default Router;
