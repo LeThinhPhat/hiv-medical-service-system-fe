@@ -8,7 +8,7 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
-
+import BookingStepper from "../Customer/BookingStepper";
 const HomePage = () => {
   return (
     <div className="font-sans">
@@ -70,6 +70,7 @@ const HomePage = () => {
           full range of medical services using modern technology.
         </p>
       </div>
+      <BookingStepper />
     </div>
   );
 };

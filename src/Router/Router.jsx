@@ -19,12 +19,14 @@ import BlogList from "../Components/Customer/BlogList";
 import BlogDetail from "../Components/Customer/BlogDetail";
 import Profile from "../Page/Profile";
 import About from "../Page/About";
+import BookingApm from "../Components/Customer/BookingApm";
 
 // Admin/Staff/Manager/Doctor main pages
 import Admin from "../Components/Admin//Admin";
 import Staff from "../Components/Staff/Staff";
 import Manager from "../Components/Manager/Manager";
 import Doctor from "../Components/Doctor/Doctor";
+import Appointment from "../Components/Doctor/Appointment";
 
 const Router = createBrowserRouter([
   {
@@ -42,6 +44,7 @@ const Router = createBrowserRouter([
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "docs", element: <ListDoctor /> },
       { path: "docs/:id", element: <DetailDoctor /> },
+      { path: "book", element: <BookingApm /> },
     ],
   },
   {
@@ -73,7 +76,7 @@ const Router = createBrowserRouter([
     element: <DoctorLayout />,
     children: [
       { path: "", element: <Doctor /> },
-      // Add doctor child routes here if needed
+      { path: "appointments", element: <Appointment /> },
     ],
   },
   {

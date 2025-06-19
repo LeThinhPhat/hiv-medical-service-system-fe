@@ -2,7 +2,7 @@ import { matchPath, Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import Banner from "./Banner";
-import BookingStepper from "../Components/Customer/BookingStepper";
+import Appointment from "../Components/Doctor/Appointment";
 function Layout() {
   const location = useLocation();
   const pathname = location.pathname;
@@ -24,7 +24,6 @@ function Layout() {
       </main>
       {!hideHeaderFooter && (
         <footer>
-          <BookingStepper />
           <Footer />
         </footer>
       )}
