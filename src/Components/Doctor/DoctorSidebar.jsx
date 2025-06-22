@@ -12,9 +12,9 @@ import { MdDashboard } from "react-icons/md";
 import { IoMdPeople } from "react-icons/io";
 import { AiFillIdcard } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
-
 const DoctorSidebar = () => {
   const location = useLocation();
+  const doctorId = localStorage.getItem("doctorId");
 
   const menuItems = [
     {
@@ -37,11 +37,11 @@ const DoctorSidebar = () => {
       icon: <FaCalendarAlt />,
       path: "/doctor/appointments",
     },
-    { label: "My Patients", icon: <IoMdPeople />, path: "/my-patients" },
+    { label: "My Patients", icon: <IoMdPeople />, path: "/doctor/my-patients" },
     {
       label: "Patient Profile",
       icon: <AiFillIdcard />,
-      path: "/patient-profile",
+      path: "/doctor/patient-profile",
     },
     {
       label: "Doctors Dashboard",
@@ -50,8 +50,16 @@ const DoctorSidebar = () => {
     },
     { label: "Doctors Grid", icon: <FaThLarge />, path: "/doctors-grid" },
     { label: "Doctors Cards", icon: <FaUserMd />, path: "/doctors-cards" },
-    { label: "Doctors Profile", icon: <FaUser />, path: "/doctors-profile" },
-    { label: "Add Doctor", icon: <FaPlus />, path: "/add-doctor" },
+    {
+      label: "Doctors Profile",
+      icon: <FaUser />,
+      path: "doctor/doctors-profile",
+    },
+    {
+      label: "Doctor",
+      icon: <FaPlus />,
+      path: `/doctor/profile-doctor/${localStorage.getItem("doctorId")}`,
+    },
     { label: "Edit Doctor", icon: <FaEdit />, path: "/edit-doctor" },
     {
       label: "Patients Dashboard",

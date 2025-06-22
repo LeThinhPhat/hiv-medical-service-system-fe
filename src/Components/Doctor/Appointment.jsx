@@ -1,202 +1,162 @@
 import React, { useState } from "react";
-import {
-  FaPhone,
-  FaEnvelope,
-  FaVideo,
-  FaCalendarAlt,
-  FaCheck,
-  FaTimes,
-  FaComments,
-} from "react-icons/fa";
-import { AiOutlineSearch } from "react-icons/ai";
-import { FiGrid, FiList } from "react-icons/fi";
-
-const appointmentsData = [
+import { FiSearch } from "react-icons/fi";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import Overview from "./Overview";
+import ProfileDoctor from "./ProfileDoctor";
+const appointments = [
   {
     id: "APT009",
     name: "Mcdowell",
-    method: "Direct Visit",
+    type: "Direct Visit",
     time: "10:30AM",
     email: "mcdowell@test.com",
     phone: "9876543210",
-    status: "Paid",
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
+    payment: "Paid",
+    avatar: "https://randomuser.me/api/portraits/men/10.jpg",
   },
   {
     id: "APT242",
     name: "Johana",
-    method: "Video Consultation",
+    type: "Video Consultation",
     time: "11:00AM",
     email: "johana@test.com",
     phone: "9876543210",
-    status: "Paid",
-    image: "https://randomuser.me/api/portraits/women/65.jpg",
+    payment: "Paid",
+    avatar: "https://randomuser.me/api/portraits/women/10.jpg",
   },
   {
     id: "APT037",
     name: "Braun",
-    method: "Direct Visit",
+    type: "Direct Visit",
     time: "11:30AM",
     email: "braun@test.com",
     phone: "9876543210",
-    status: "Paid",
-    image: "https://randomuser.me/api/portraits/men/45.jpg",
+    payment: "Paid",
+    avatar: "https://randomuser.me/api/portraits/men/20.jpg",
   },
   {
     id: "APT028",
     name: "Raymon",
-    method: "Video Consultation",
+    type: "Video Consultation",
     time: "12:00PM",
     email: "raymon@test.com",
     phone: "9876543210",
-    status: "Paid",
-    image: "https://randomuser.me/api/portraits/men/52.jpg",
+    payment: "Paid",
+    avatar: "https://randomuser.me/api/portraits/men/30.jpg",
   },
   {
     id: "APT024",
     name: "Jerald",
-    method: "Video Consultation",
+    type: "Video Consultation",
     time: "12:30PM",
     email: "jerald@test.com",
     phone: "9876543210",
-    status: "Pending",
-    image: "https://randomuser.me/api/portraits/men/60.jpg",
+    payment: "Pending",
+    avatar: "https://randomuser.me/api/portraits/men/40.jpg",
   },
 ];
 
-const Appointment = () => {
+const AppointmentPage = () => {
   const [search, setSearch] = useState("");
 
-  const filteredAppointments = appointmentsData.filter((a) =>
-    a.name.toLowerCase().includes(search.toLowerCase())
+  const filteredAppointments = appointments.filter((appt) =>
+    appt.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="text-sm text-gray-500 flex items-center gap-2">
-        <FaCalendarAlt /> <span>/ Appointments</span>
-      </div>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      {/* <Overview /> */}
+      <ProfileDoctor />
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-800">Appointments</h2>
 
-      {/* Doctor Info */}
-      <div className="bg-white p-6 rounded-xl shadow flex flex-col md:flex-row justify-between items-center gap-6">
-        <div className="flex items-center gap-4">
-          <img
-            src="https://images.pexels.com/photos/6749779/pexels-photo-6749779.jpeg"
-            className="w-32 h-32 rounded-lg object-cover"
-            alt="doctor"
-          />
-          <div>
-            <span className="text-xs text-green-600 font-semibold bg-green-100 px-2 py-1 rounded">
-              Available
-            </span>
-            <h2 className="text-xl font-bold text-gray-800 mt-1">
-              Dr. Ashley Henson
-            </h2>
-            <p className="text-gray-600 text-sm">
-              MBBS, MS - General Physician
-            </p>
-            <p className="text-gray-500 text-sm">
-              Speaks: English, French, and Spanish <br />
-              Location: 9 E 2nd St, New York, NY 30003, USA
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-col items-center space-y-2">
-          <span className="text-sm text-gray-600">
-            Online Consultation Available
-          </span>
-          <div className="flex gap-2 text-sm">
-            <button className="px-3 py-1 bg-slate-100 rounded">
-              <FaComments /> Chat
-            </button>
-            <button className="px-3 py-1 bg-slate-100 rounded">
-              <FaPhone /> Audio
-            </button>
-            <button className="px-3 py-1 bg-slate-100 rounded">
-              <FaVideo /> Video
-            </button>
-          </div>
-          <button className="px-4 py-1 bg-teal-500 text-white text-sm rounded">
-            My Patient List
-          </button>
-        </div>
-      </div>
-
-      {/* Filter + Search */}
-      <div className="flex justify-between items-center">
-        <div className="space-x-2">
-          <button className="bg-blue-100 text-blue-700 px-3 py-1 rounded">
-            Upcoming 9
-          </button>
-          <button className="bg-red-100 text-red-600 px-3 py-1 rounded">
-            Cancelled 2
-          </button>
-          <button className="bg-green-100 text-green-600 px-3 py-1 rounded">
-            Completed 21
-          </button>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <AiOutlineSearch className="absolute top-2.5 left-2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search"
-              className="pl-8 pr-3 py-1 border rounded"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <FiList className="text-gray-600 text-xl cursor-pointer" />
-          <FiGrid className="text-gray-600 text-xl cursor-pointer" />
-        </div>
-      </div>
-
-      {/* Appointments List */}
-      <div className="space-y-4">
-        {filteredAppointments.map((appt) => (
-          <div
-            key={appt.id}
-            className="bg-white shadow rounded-lg p-4 flex justify-between items-center"
-          >
-            <div className="flex items-center gap-4">
-              <img
-                src={appt.image}
-                alt={appt.name}
-                className="w-12 h-12 rounded-full"
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8 pr-4 py-2 border rounded-md text-sm outline-none"
               />
-              <div>
-                <p className="font-semibold text-gray-700">#{appt.id}</p>
-                <p className="text-sm text-gray-600">{appt.name}</p>
-                <p className="text-xs text-gray-500">{appt.method}</p>
+              <FiSearch className="absolute left-2 top-2.5 text-gray-400" />
+            </div>
+            <button className="bg-teal-500 text-white px-3 py-2 rounded-md text-sm">
+              ≡
+            </button>
+            <button className="border border-gray-300 px-3 py-2 rounded-md text-sm">
+              📅
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {filteredAppointments.map((appt) => (
+            <div
+              key={appt.id}
+              className="flex items-center justify-between border rounded-lg p-4 hover:shadow-sm bg-white"
+            >
+              {/* Avatar + Info */}
+              <div className="flex items-center gap-3">
+                <img
+                  src={appt.avatar}
+                  alt={appt.name}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+                <div>
+                  <p className="text-sm text-teal-600 font-semibold">
+                    #{appt.id}
+                  </p>
+                  <p className="font-semibold text-gray-800">{appt.name}</p>
+                  <p className="text-sm text-gray-500">{appt.type}</p>
+                </div>
               </div>
-            </div>
-            <div className="text-sm text-gray-600">{appt.time}</div>
-            <div className="text-sm text-blue-600">
-              <p>{appt.email}</p>
-              <p>{appt.phone}</p>
-            </div>
-            <div className="text-sm">
-              <span
-                className={
-                  appt.status === "Paid" ? "text-green-600" : "text-yellow-600"
-                }
-              >
-                Payment {appt.status}
-              </span>
-            </div>
-            <div className="flex gap-2 text-gray-500">
-              <FaCheck className="cursor-pointer hover:text-green-600" />
-              <FaTimes className="cursor-pointer hover:text-red-500" />
-              <button className="bg-teal-100 px-3 py-1 rounded text-teal-700 text-sm hover:bg-teal-200">
+
+              {/* Time */}
+              <div className="text-sm text-center text-gray-600">
+                <p className="font-medium">Today</p>
+                <p className="text-teal-600">{appt.time}</p>
+              </div>
+
+              {/* Contact */}
+              <div className="text-sm text-center text-gray-600">
+                <p>{appt.email}</p>
+                <p className="flex items-center justify-center gap-1">
+                  📞 {appt.phone}
+                </p>
+              </div>
+
+              {/* Payment */}
+              <div className="text-sm text-center">
+                <p className="text-gray-600 font-medium">Payment</p>
+                <p
+                  className={
+                    appt.payment === "Paid"
+                      ? "text-green-600 font-bold"
+                      : "text-yellow-500 font-bold"
+                  }
+                >
+                  {appt.payment}
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <FaCheckCircle className="text-green-500 text-lg cursor-pointer" />
+                <FaTimesCircle className="text-red-400 text-lg cursor-pointer" />
+              </div>
+
+              {/* Details Button */}
+              <button className="bg-teal-100 hover:bg-teal-200 text-teal-700 px-4 py-1.5 rounded-full text-sm font-medium transition">
                 Details
               </button>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
 };
 
-export default Appointment;
+export default AppointmentPage;

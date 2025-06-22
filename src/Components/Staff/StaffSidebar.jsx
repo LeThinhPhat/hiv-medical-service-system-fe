@@ -1,0 +1,96 @@
+import React from "react";
+import {
+  FaChartLine,
+  FaFileAlt,
+  FaCalendarAlt,
+  FaComments,
+  FaThLarge,
+} from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
+import { IoIosArrowDown } from "react-icons/io";
+import { Link } from "react-router-dom";
+
+const navItems = [
+  {
+    label: "Dashboard",
+    icon: <MdDashboard className="text-xl" />,
+    path: "/staff/dashboard",
+  },
+  {
+    label: "Reports",
+    icon: <FaChartLine className="text-xl" />,
+    path: "/staff/reports",
+  },
+  {
+    label: "Appointment List",
+    icon: <FaFileAlt className="text-xl" />,
+    path: "/staff/appointmentlist",
+  },
+  {
+    label: "Schedule",
+    icon: <FaCalendarAlt className="text-xl" />,
+    path: "/staff/schedule",
+  },
+  {
+    label: "Messages",
+    icon: <FaComments className="text-xl" />,
+    path: "/staff/messages",
+  },
+  {
+    label: "More Apps",
+    icon: <FaThLarge className="text-xl" />,
+    path: "/staff/apps",
+    hasDropdown: true,
+  },
+  {
+    label: "Healthcare Admin",
+    icon: <MdDashboard className="text-xl" />,
+    path: "/healthcare-admin",
+  },
+];
+
+const StaffSidebar = () => {
+  return (
+    <aside className="w-64 min-h-screen bg-gradient-to-b from-gray-50 to-white shadow-xl flex flex-col transition-all duration-300">
+      {/* Logo Section */}
+      <div className="px-6 py-8 flex items-center justify-center border-b border-gray-100">
+        <div className="flex items-center space-x-3">
+          <FaChartLine className="text-2xl text-blue-600" />
+          <h1 className="text-2xl font-extrabold text-gray-800 tracking-tight">
+            HOMER
+          </h1>
+        </div>
+      </div>
+
+      {/* Navigation Section */}
+      <nav className="flex-1 px-4 py-6 space-y-1">
+        {navItems.map((item, index) => (
+          <SidebarLink
+            key={index}
+            icon={item.icon}
+            label={item.label}
+            to={item.path}
+            hasDropdown={item.hasDropdown}
+          />
+        ))}
+      </nav>
+    </aside>
+  );
+};
+
+const SidebarLink = ({ icon, label, to, hasDropdown }) => (
+  <Link
+    to={to}
+    className="flex items-center justify-between px-4 py-3 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 ease-in-out group"
+  >
+    <div className="flex items-center space-x-3">
+      <span className="text-gray-500 group-hover:text-blue-600">{icon}</span>
+      <span className="text-sm font-medium">{label}</span>
+    </div>
+    {hasDropdown && (
+      <IoIosArrowDown className="text-gray-400 group-hover:text-blue-600 transition-transform duration-200 group-hover:rotate-180" />
+    )}
+  </Link>
+);
+
+export default StaffSidebar;

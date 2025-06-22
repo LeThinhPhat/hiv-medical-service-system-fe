@@ -1,9 +1,10 @@
 import { Outlet } from "react-router-dom";
+import StaffSidebar from "./StaffSidebar";
 
 const StaffLayout = () => {
   return (
     <div style={{ display: "flex" }}>
-      {/* <AdminSidebar /> */}
+      <StaffSidebar />
       <main style={{ flex: 1, padding: "20px" }}>
         <Outlet />
       </main>

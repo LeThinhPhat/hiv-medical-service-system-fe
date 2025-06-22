@@ -1,37 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import authService from "../Services/authService"; // Ensure this path matches your project
+import authService from "../Services/authService"; // Đảm bảo đúng đường dẫn tới service
 
 const SignIn = () => {
-  // State for email, password, and token
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
- 
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     if (token) {
-      console.log("Response", token.data.data.user.role.name);
-       if(token.data.data.user.role.name === "CUSTOMER_ROLE"){
-         navigate("/");
-       }else if (token.data.data.user.role.name === "STAFF_ROLE"){
-         navigate("/staff");
-       }  else if (token.data.data.user.role.name === "DOCTOR_ROLE"){
-         navigate("/doctor");
-       }else if (token.data.data.user.role.name === "ADMIN_ROLE"){
-         navigate("/admin");
-       } else if (token.data.data.user.role.name === "MANAGER_ROLE"){
-         navigate("/manager");
-       }
-  }
+      const role = token.data.data.user.role.name;
+      const userId = token.data.data.user._id;
+
+      // ✅ Lưu doctorId để sử dụng trong Sidebar hoặc nơi khác
+      localStorage.setItem("doctorId", userId);
+
+      // Điều hướng theo vai trò
+      if (role === "CUSTOMER_ROLE") {
+        navigate("/");
+      } else if (role === "STAFF_ROLE") {
+        navigate("/staff");
+      } else if (role === "DOCTOR_ROLE") {
+        navigate("/doctor");
+      } else if (role === "ADMIN_ROLE") {
+        navigate("/admin");
+      } else if (role === "MANAGER_ROLE") {
+        navigate("/manager");
+      }
+    }
   }, [token, navigate]);
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -39,15 +41,18 @@ const SignIn = () => {
 
     try {
       const response = await authService.signin({ email, password });
-      console.log("Login response:", response);
       const accessToken = response.data.data.access_token;
-      
+
+      // ✅ Lưu token và doctorId
       localStorage.setItem("token", accessToken);
-      setToken(response); 
-     
+      localStorage.setItem("doctorId", response.data.data.user._id); // 👈 Quan trọng
+
+      setToken(response); // Trigger useEffect
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }

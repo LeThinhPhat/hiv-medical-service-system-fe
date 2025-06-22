@@ -23,12 +23,24 @@ import BookingApm from "../Components/Customer/BookingApm";
 
 // Admin/Staff/Manager/Doctor main pages
 import Admin from "../Components/Admin//Admin";
+
+/////
 import Staff from "../Components/Staff/Staff";
+import AppointmentList from "../Components/Staff/AppointmentList";
+
+////
 import Manager from "../Components/Manager/Manager";
 import Doctor from "../Components/Doctor/Doctor";
 import Appointment from "../Components/Doctor/Appointment";
+<<<<<<< Updated upstream
 import  BookingPage from "../Components/Customer/BookingStep/BookingPage";
 import BookingConfirmPage from "../Components/Customer/BookingStep/BookingConfirmPage";
+=======
+import PatientsList from "../Components/Doctor/PatientsList";
+import DoctorProfile from "../Components/Doctor/DoctorProfile";
+import DoctorSlot from "../Components/Staff/DoctorSlot";
+
+>>>>>>> Stashed changes
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -63,7 +75,8 @@ const Router = createBrowserRouter([
     element: <StaffLayout />,
     children: [
       { path: "", element: <Staff /> },
-      // Add staff child routes here if needed
+      { path: "/staff/appointmentlist", element: <AppointmentList /> },
+      { path: "/staff/schedule", element: <DoctorSlot /> },
     ],
   },
   {
@@ -80,6 +93,18 @@ const Router = createBrowserRouter([
     children: [
       { path: "", element: <Doctor /> },
       { path: "appointments", element: <Appointment /> },
+      {
+        path: "/doctor/my-patients",
+        element: <PatientsList />,
+      },
+      {
+        path: "doctor/doctors-profile",
+        element: <DoctorProfile />,
+      },
+      // {
+      //   path: "profile-doctor/:id",
+      //   element: <ProfilePage />,
+      // },
     ],
   },
   {
