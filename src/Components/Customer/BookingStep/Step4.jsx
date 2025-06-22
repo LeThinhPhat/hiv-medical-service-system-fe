@@ -4,56 +4,67 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Box,
   Grid,
   Typography,
   TextField,
   MenuItem,
   Button,
-  Avatar,
   Alert,
   IconButton,
 } from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CloseIcon from "@mui/icons-material/Close";
+import PersonIcon from "@mui/icons-material/Person";
 
-const Step4 = ({ open, onClose, onNext, onBack, data }) => {
+const Step4 = ({ open, onClose, onNext, onBack, data, hasProfile }) => {
   const [form, setForm] = useState({
-    firstName: data.firstName || "",
-    lastName: data.lastName || "",
-    phone: data.phone || "",
-    email: data.email || "",
-    patient: data.patient || "Andrew Fletcher",
-    symptoms: data.symptoms || "",
-    file: data.file || null,
-    reason: data.reason || "",
+    personalID: data.personalID || "",
+    name: data.name || "",
+    gender: data.gender || "",
+    dob: data.dob || "",
+    contactEmails: data.contactEmails?.[0] || "",
+    contactPhones: data.contactPhones?.[0] || "",
   });
   const [error, setError] = useState(null);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value,
+      [name]: value,
     }));
   };
 
   const handleNext = () => {
-    if (
-      !form.firstName ||
-      !form.lastName ||
-      !form.phone ||
-      !form.email ||
-      !form.reason
-    ) {
-      setError(
-        "Please fill in all required fields (First Name, Last Name, Phone, Email, Reason)."
-      );
+    if (!form.personalID) {
+      setError("Vui lòng nhập căn cước công dân.");
       return;
     }
+    if (!hasProfile) {
+      if (
+        !form.name ||
+        !form.gender ||
+        !form.dob ||
+        !form.contactEmails ||
+        !form.contactPhones
+      ) {
+        setError("Vui lòng điền đầy đủ thông tin cá nhân.");
+        return;
+      }
+    }
     setError(null);
-    const stepData = { ...form };
-    console.log("Step4 sending:", stepData);
+    let stepData;
+    if (hasProfile) {
+      stepData = { personalID: form.personalID };
+    } else {
+      stepData = {
+        personalID: form.personalID,
+        name: form.name,
+        gender: form.gender,
+        dob: form.dob,
+        contactEmails: [form.contactEmails],
+        contactPhones: [form.contactPhones],
+      };
+    }
     onNext(stepData);
     onClose();
   };
@@ -62,225 +73,257 @@ const Step4 = ({ open, onClose, onNext, onBack, data }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="lg"
+      maxWidth="sm"
       fullWidth
-      sx={{ "& .MuiDialog-paper": { borderRadius: 2 } }}
+      sx={{
+        "& .MuiDialog-paper": {
+          borderRadius: 3,
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+          backgroundColor: "#f9fafb",
+        },
+      }}
     >
-      <DialogTitle sx={{ m: 0, p: 2, display: "flex", alignItems: "center" }}>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Add Basic Information
+      <DialogTitle
+        sx={{
+          p: 3,
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: "#e3f2fd",
+          borderBottom: "1px solid #e0e0e0",
+        }}
+      >
+        <PersonIcon sx={{ color: "#1976d2", mr: 1, fontSize: 28 }} />
+        <Typography
+          variant="h6"
+          sx={{ flexGrow: 1, fontWeight: 600, color: "#1976d2" }}
+        >
+          {hasProfile ? "Verify Identity" : "Patient Information"}
         </Typography>
-        <IconButton onClick={onClose} sx={{ color: "grey.500" }}>
+        <IconButton onClick={onClose} sx={{ color: "#546e7a" }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers sx={{ p: 3 }}>
-        {/* Doctor Info */}
-        <Box
-          p={2}
-          sx={{
-            border: "1px solid #eee",
-            borderRadius: 2,
-            background: "#fff",
-            mb: 3,
-          }}
-        >
-          <Grid container spacing={2} alignItems="center">
-            <Grid item>
-              <Avatar
-                src="https://randomuser.me/api/portraits/men/32.jpg"
-                sx={{ width: 56, height: 56 }}
-                alt="Dr. Michael Brown"
-              />
-            </Grid>
-            <Grid item xs>
-              <Typography variant="subtitle1">Dr. Michael Brown</Typography>
-              <Typography variant="body2" color="primary">
-                {data.specialty || "Psychologist"}
-              </Typography>
-              <Box display="flex" alignItems="center" mt={0.5}>
-                <LocationOnIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                <Typography variant="caption">
-                  5th Street - 1011 W 5th St, Suite 120, Austin, TX 78703
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item>
-              <Box
-                sx={{
-                  backgroundColor: "#FF6B6B",
-                  color: "white",
-                  px: 1,
-                  py: 0.5,
-                  borderRadius: 1,
-                  fontSize: "0.75rem",
-                }}
-              >
-                ⭐ 5.0
-              </Box>
-            </Grid>
+      <DialogContent dividers sx={{ p: 4, backgroundColor: "#fff" }}>
+        {hasProfile ? (
+          <Alert
+            severity="info"
+            sx={{
+              mb: 3,
+              borderRadius: 2,
+              backgroundColor: "#e3f2fd",
+              color: "#1976d2",
+            }}
+          >
+            Bạn đã cung cấp đủ thông tin cá nhân. Vui lòng nhập căn cước công dân để tiếp tục đặt lịch.
+          </Alert>
+        ) : (
+          <Alert
+            severity="warning"
+            sx={{
+              mb: 3,
+              borderRadius: 2,
+              backgroundColor: "#fefce8",
+              color: "#a16207",
+            }}
+          >
+            Bạn chưa từng cung cấp thông tin cá nhân. Vui lòng điền đầy đủ thông tin bên dưới.
+          </Alert>
+        )}
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Căn cước công dân"
+              name="personalID"
+              value={form.personalID}
+              onChange={handleChange}
+              required
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#e0e0e0",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#1976d2",
+                },
+                "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#1976d2",
+                },
+              }}
+            />
           </Grid>
-
-          {/* Booking Info */}
-          <Grid container spacing={2} mt={2}>
-            <Grid item xs={12} sm={3}>
-              <Typography variant="body2" fontWeight={500}>
-                Specialty
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {data.specialty || "Cardiology"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Typography variant="body2" fontWeight={500}>
-                Service
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {data.service?.name || "Echocardiograms"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Typography variant="body2" fontWeight={500}>
-                Date & Time
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {data.time && data.date
-                  ? `${data.time}, ${data.date.toLocaleDateString()}`
-                  : "Not selected"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Typography variant="body2" fontWeight={500}>
-                Appointment type
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {data.appointmentType || "Clinic"}{" "}
-                {data.clinic ? `(${data.clinic.name})` : ""}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Box>
-
-        {/* Basic Info Form */}
-        <Box
-          p={2}
-          sx={{
-            border: "1px solid #eee",
-            borderRadius: 2,
-            background: "#fff",
-          }}
-        >
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                label="First Name"
-                name="firstName"
-                value={form.firstName}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                label="Last Name"
-                name="lastName"
-                value={form.lastName}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                label="Phone Number"
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                label="Email Address"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                select
-                fullWidth
-                label="Select Patient"
-                name="patient"
-                value={form.patient}
-                onChange={handleChange}
-              >
-                <MenuItem value="Andrew Fletcher">Andrew Fletcher</MenuItem>
-                <MenuItem value="New Patient">New Patient</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                label="Symptoms"
-                name="symptoms"
-                value={form.symptoms}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Typography variant="body2" gutterBottom>
-                Attachment
-              </Typography>
-              <input type="file" name="file" onChange={handleChange} />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                label="Reason for Visit"
-                name="reason"
-                value={form.reason}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-          </Grid>
-        </Box>
-
-        {/* Error Message */}
+          {!hasProfile && (
+            <>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Họ và tên"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  variant="outlined"
+                  sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                    "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  select
+                  fullWidth
+                  label="Giới tính"
+                  name="gender"
+                  value={form.gender}
+                  onChange={handleChange}
+                  required
+                  variant="outlined"
+                  sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                    "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                  }}
+                >
+                  <MenuItem value="Male">Nam</MenuItem>
+                  <MenuItem value="Female">Nữ</MenuItem>
+                  <MenuItem value="Other">Khác</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  type="date"
+                  label="Ngày sinh"
+                  name="dob"
+                  value={form.dob}
+                  onChange={handleChange}
+                  InputLabelProps={{ shrink: true }}
+                  required
+                  variant="outlined"
+                  sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                    "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Email liên hệ"
+                  name="contactEmails"
+                  value={form.contactEmails}
+                  onChange={handleChange}
+                  required
+                  variant="outlined"
+                  sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                    "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Số điện thoại liên hệ"
+                  name="contactPhones"
+                  value={form.contactPhones}
+                  onChange={handleChange}
+                  required
+                  variant="outlined"
+                  sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                    "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                  }}
+                />
+              </Grid>
+            </>
+          )}
+        </Grid>
         {error && (
-          <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+          <Alert
+            severity="error"
+            sx={{
+              mt: 3,
+              mb: 2,
+              borderRadius: 2,
+              backgroundColor: "#fef2f2",
+              color: "#b91c1c",
+            }}
+          >
             {error}
           </Alert>
         )}
       </DialogContent>
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onBack} color="inherit">
+      <DialogActions
+        sx={{
+          p: 3,
+          borderTop: "1px solid #e0e0e0",
+          backgroundColor: "#f9fafb",
+        }}
+      >
+        <Button
+          onClick={onBack}
+          color="inherit"
+          sx={{
+            textTransform: "none",
+            color: "#546e7a",
+            "&:hover": { backgroundColor: "#f1f5f9" },
+          }}
+        >
           Back
         </Button>
         <Button
           variant="contained"
-          color="info"
+          color="primary"
           onClick={handleNext}
-          disabled={
-            !form.firstName ||
-            !form.lastName ||
-            !form.phone ||
-            !form.email ||
-            !form.reason
-          }
+          sx={{
+            textTransform: "none",
+            borderRadius: 2,
+            px: 4,
+            backgroundColor: "#1976d2",
+            "&:hover": { backgroundColor: "#1565c0" },
+            "&.Mui-disabled": {
+              backgroundColor: "#e0e0e0",
+              color: "#9e9e9e",
+            },
+          }}
         >
-          Select Payment
+          Confirm Appointment
         </Button>
       </DialogActions>
     </Dialog>

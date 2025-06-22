@@ -4,11 +4,7 @@ const docListService = {
   getAllDoctors: async () => {
     try {
       const token = localStorage.getItem("token"); // Lấy token từ localStorage
-
-      if (!token) {
-        throw new Error("Token không hợp lệ || không có token");
-      }
-
+      
       const response = await fetch(`${BASE_URL}/doctors`, {
         method: "GET",
         headers: {
@@ -34,9 +30,7 @@ const docListService = {
     try {
       const token = localStorage.getItem("token");
 
-      if (!token) {
-        throw new Error("Token không hợp lệ || không có token");
-      }
+     
 
       const response = await fetch(`${BASE_URL}/doctors/${id}`, {
         method: "GET",

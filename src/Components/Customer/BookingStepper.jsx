@@ -8,12 +8,12 @@ import Step6 from "./BookingStep/Step6";
 import { Stepper, Step, StepLabel, Box, Alert, Button } from "@mui/material";
 
 const steps = [
-  "Specialty",
-  "Appointment Type",
-  "Date & Time",
-  "Basic Information",
-  "Payment",
-  "Confirmation",
+  "Chọn Dịch Vụ",
+  "Chọn Thời Gian",
+  "Chọn Bác Sĩ",
+  "Thông tin cơ bản",
+  "Thanh toán",
+  "Xác nhận",
 ];
 
 const BookingStepper = () => {
@@ -64,7 +64,7 @@ const BookingStepper = () => {
               onClick={handleDialogOpen}
               sx={{ fontSize: "1rem", py: 1.5, px: 4 }}
             >
-              Start Booking
+              Đặt Lịch Khám
             </Button>
             <Step1
               open={dialogOpen}

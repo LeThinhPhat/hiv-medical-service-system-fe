@@ -6,78 +6,50 @@ import {
   DialogActions,
   Box,
   Typography,
-  Avatar,
   Grid,
   Button,
   Card,
   CardContent,
-  CardActionArea,
   Alert,
   IconButton,
 } from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import VideoCallIcon from "@mui/icons-material/VideoCall";
-import CallIcon from "@mui/icons-material/Call";
-import ChatIcon from "@mui/icons-material/Chat";
-import HomeIcon from "@mui/icons-material/Home";
 import CloseIcon from "@mui/icons-material/Close";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import { LocalizationProvider, DateCalendar } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
-const appointmentTypes = [
-  { label: "Clinic", icon: <LocalHospitalIcon /> },
-  { label: "Video Call", icon: <VideoCallIcon /> },
-  { label: "Audio Call", icon: <CallIcon /> },
-  { label: "Chat", icon: <ChatIcon /> },
-  { label: "Home Visit", icon: <HomeIcon /> },
-];
-
-const clinics = [
-  {
-    name: "AllCare Family Medicine",
-    address: "3343 Private Lane, Valdosta",
-    distance: "500 Meters",
-    image: "https://cdn-icons-png.flaticon.com/512/1077/1077012.png",
-  },
-  {
-    name: "Vitalplus Clinic",
-    address: "4223 Pleasant Hill Road, Miami, FL 33169",
-    distance: "12 KM",
-    image: "https://cdn-icons-png.flaticon.com/512/3873/3873177.png",
-  },
-  {
-    name: "Wellness Path Chiropractic",
-    address: "418 Patton Lane, Garner, NC 27529, FL 33169",
-    distance: "16 KM",
-    image: "https://cdn-icons-png.flaticon.com/512/4320/4320337.png",
-  },
-];
+// Tạo time slots cách nhau 1 tiếng từ 07:00 đến 22:00
+const generateSlots = () => {
+  const slots = {
+    Morning: [],
+    Afternoon: [],
+    Evening: []
+  };
+  for (let h = 7; h <= 22; h++) {
+    const time = h.toString().padStart(2, "0") + ":00";
+    if (h < 12) slots.Morning.push(time);
+    else if (h < 17) slots.Afternoon.push(time);
+    else slots.Evening.push(time);
+  }
+  return slots;
+};
+const times = generateSlots();
 
 const Step2 = ({ open, onClose, onNext, onBack, data }) => {
-  const [selectedType, setSelectedType] = useState(
-    data.appointmentType || "Clinic"
-  );
-  const [selectedClinic, setSelectedClinic] = useState(
-    data.selectedClinic || null
-  );
+  const [selectedDate, setSelectedDate] = useState(data.date || new Date());
+  const [selectedTime, setSelectedTime] = useState(data.time || null);
   const [error, setError] = useState(null);
 
   const handleNext = () => {
-    if (selectedType === "Clinic" && selectedClinic === null) {
-      setError("Please select a clinic.");
-      return;
-    }
-    if (!selectedType) {
-      setError("Please select an appointment type.");
+    if (!selectedDate || !selectedTime) {
+      setError("Please select both a date and a time.");
       return;
     }
     setError(null);
     const stepData = {
-      appointmentType: selectedType,
+      date: selectedDate,
+      time: selectedTime,
     };
-    if (selectedType === "Clinic") {
-      stepData.clinic = clinics[selectedClinic];
-    }
-    console.log("Step2 sending:", stepData);
     onNext(stepData);
     onClose();
   };
@@ -86,158 +58,195 @@ const Step2 = ({ open, onClose, onNext, onBack, data }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
-      sx={{ "& .MuiDialog-paper": { borderRadius: 2 } }}
+      sx={{
+        "& .MuiDialog-paper": {
+          borderRadius: 3,
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+          backgroundColor: "#f9fafb",
+        },
+      }}
     >
-      <DialogTitle sx={{ m: 0, p: 2, display: "flex", alignItems: "center" }}>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Select Appointment Type
+      <DialogTitle
+        sx={{
+          p: 3,
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: "#e3f2fd",
+          borderBottom: "1px solid #e0e0e0",
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{ flexGrow: 1, fontWeight: 600, color: "#1976d2" }}
+        >
+          Khung Thời Gian Khám
         </Typography>
-        <IconButton onClick={onClose} sx={{ color: "grey.500" }}>
+        <IconButton onClick={onClose} sx={{ color: "#546e7a" }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers sx={{ p: 3 }}>
-        {/* Doctor Profile */}
-        <Box
-          p={2}
-          sx={{
-            border: "1px solid #eee",
-            borderRadius: 2,
-            background: "#fff",
-            mb: 3,
-          }}
-        >
-          <Grid container spacing={2} alignItems="center">
-            <Grid item>
-              <Avatar
-                src="https://randomuser.me/api/portraits/men/32.jpg"
-                sx={{ width: 56, height: 56 }}
-                alt="Dr. Michael Brown"
-              />
-            </Grid>
-            <Grid item xs>
-              <Typography variant="subtitle1">Dr. Michael Brown</Typography>
-              <Typography variant="body2" color="primary">
-                Psychologist
+      <DialogContent dividers sx={{ p: 4, backgroundColor: "#fff" }}>
+        <Grid container spacing={3}>
+          {/* Calendar */}
+          <Grid item xs={12} md={4}>
+            <Card
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                border: "1px solid #e0e0e0",
+                transition: "all 0.2s",
+                "&:hover": {
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                },
+              }}
+            >
+              <Typography
+                variant="subtitle1"
+                mb={2}
+                sx={{ fontWeight: 500, color: "#374151" }}
+              >
+                Chọn ngày
               </Typography>
-              <Box display="flex" alignItems="center" mt={0.5}>
-                <LocationOnIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                <Typography variant="caption">
-                  5th Street - 1011 W 5th St, Suite 120, Austin, TX 78703
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DateCalendar
+                  value={selectedDate}
+                  onChange={(newValue) => setSelectedDate(newValue)}
+                  minDate={new Date()}
+                  sx={{
+                    "& .MuiPickersDay-root.Mui-selected": {
+                      backgroundColor: "#1976d2",
+                      color: "#fff",
+                    },
+                    "& .MuiPickersDay-root:hover": {
+                      backgroundColor: "#e3f2fd",
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            </Card>
+          </Grid>
+
+          {/* Time Slots */}
+          <Grid item xs={12} md={8}>
+            <Card
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                border: "1px solid #e0e0e0",
+                transition: "all 0.2s",
+                "&:hover": {
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                },
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <EventAvailableIcon
+                  sx={{ color: "#1976d2", mr: 1, fontSize: 28 }}
+                />
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 500, color: "#374151" }}
+                >
+                  Vui lòng chọn thời gian khám
                 </Typography>
               </Box>
-            </Grid>
-            <Grid item>
-              <Box
-                sx={{
-                  backgroundColor: "#FF6B6B",
-                  color: "white",
-                  px: 1,
-                  py: 0.5,
-                  borderRadius: 1,
-                  fontSize: "0.75rem",
-                }}
-              >
-                ⭐ 5.0
-              </Box>
-            </Grid>
+              {Object.entries(times).map(([label, slots]) => (
+                <Box key={label} mb={2}>
+                  <Typography
+                    fontWeight={600}
+                    gutterBottom
+                    sx={{ color: "#374151" }}
+                  >
+                    {label}
+                  </Typography>
+                  <Grid container spacing={1}>
+                    {slots.map((time) => (
+                      <Grid item key={time}>
+                        <Button
+                          variant={
+                            selectedTime === time ? "contained" : "outlined"
+                          }
+                          onClick={() => setSelectedTime(time)}
+                          sx={{
+                            minWidth: 80,
+                            borderRadius: 1,
+                            borderColor: "#e0e0e0",
+                            backgroundColor:
+                              selectedTime === time ? "#1976d2" : "#fff",
+                            color:
+                              selectedTime === time ? "#fff" : "#374151",
+                            "&:hover": {
+                              backgroundColor:
+                                selectedTime === time ? "#1565c0" : "#f1f5f9",
+                              borderColor: "#1976d2",
+                            },
+                            transition: "all 0.2s",
+                          }}
+                        >
+                          {time}
+                        </Button>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+              ))}
+            </Card>
           </Grid>
-        </Box>
-
-        {/* Appointment Type */}
-        <Typography variant="subtitle1" gutterBottom>
-          Select Appointment Type
-        </Typography>
-        <Grid container spacing={2} mb={3}>
-          {appointmentTypes.map((type) => (
-            <Grid item key={type.label}>
-              <Button
-                variant={selectedType === type.label ? "outlined" : "contained"}
-                onClick={() => setSelectedType(type.label)}
-                startIcon={type.icon}
-                sx={{
-                  minWidth: 120,
-                  borderRadius: 2,
-                  textTransform: "none",
-                  backgroundColor:
-                    selectedType === type.label ? "#fff" : "#f4f4f4",
-                }}
-              >
-                {type.label}
-              </Button>
-            </Grid>
-          ))}
         </Grid>
 
-        {/* Clinics */}
-        {selectedType === "Clinic" && (
-          <>
-            <Typography variant="subtitle1" gutterBottom>
-              Select Clinics
-            </Typography>
-            <Grid container direction="column" spacing={2}>
-              {clinics.map((clinic, index) => (
-                <Grid item key={index}>
-                  <Card
-                    onClick={() => setSelectedClinic(index)}
-                    sx={{
-                      border:
-                        selectedClinic === index
-                          ? "2px solid #1976d2"
-                          : "1px solid #e0e0e0",
-                      boxShadow:
-                        selectedClinic === index ? "0 0 0 2px #bbdefb" : "none",
-                      borderRadius: 2,
-                    }}
-                  >
-                    <CardActionArea>
-                      <CardContent
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
-                        <Avatar
-                          src={clinic.image}
-                          sx={{ width: 56, height: 56, mr: 2 }}
-                        />
-                        <Box>
-                          <Typography fontWeight={600}>
-                            {clinic.name}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {clinic.address} • {clinic.distance}
-                          </Typography>
-                        </Box>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </>
-        )}
-
-        {/* Error Message */}
         {error && (
-          <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+          <Alert
+            severity="error"
+            sx={{
+              mt: 3,
+              mb: 2,
+              borderRadius: 2,
+              backgroundColor: "#fef2f2",
+              color: "#b91c1c",
+            }}
+          >
             {error}
           </Alert>
         )}
       </DialogContent>
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onBack} color="inherit">
-          Back
+      <DialogActions
+        sx={{
+          p: 3,
+          borderTop: "1px solid #e0e0e0",
+          backgroundColor: "#f9fafb",
+        }}
+      >
+        <Button
+          onClick={onBack}
+          color="inherit"
+          sx={{
+            textTransform: "none",
+            color: "#546e7a",
+            "&:hover": { backgroundColor: "#f1f5f9" },
+          }}
+        >
+          Trở lại
         </Button>
         <Button
           variant="contained"
-          color="info"
+          color="primary"
           onClick={handleNext}
-          disabled={
-            selectedType === null ||
-            (selectedType === "Clinic" && selectedClinic === null)
-          }
+          disabled={!selectedDate || !selectedTime}
+          sx={{
+            textTransform: "none",
+            borderRadius: 2,
+            px: 4,
+            backgroundColor: "#1976d2",
+            "&:hover": { backgroundColor: "#1565c0" },
+            "&.Mui-disabled": {
+              backgroundColor: "#e0e0e0",
+              color: "#9e9e9e",
+            },
+          }}
         >
-          Select Date & Time
+          Tiếp tục để chọn bác sĩ 
         </Button>
       </DialogActions>
     </Dialog>
