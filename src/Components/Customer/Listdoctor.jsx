@@ -145,11 +145,11 @@ const ListDoctor = () => {
                           Xem Chi Tiết
                         </Link>
                         <Link
-                          to={`/book`}
-                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
-                        >
-                          Đặt Lịch Khám
-                        </Link>
+                        to={`/book/${doctor.id}`} // Truyền id bác sĩ vào link
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+                      >
+                        Đặt Lịch Khám
+                      </Link>
                       </div>
                     </div>
                   ))

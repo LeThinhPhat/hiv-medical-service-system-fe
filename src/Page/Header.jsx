@@ -1,15 +1,28 @@
-import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { AuthContext } from "../Services/AuthContext"; // Điều chỉnh đường dẫn nếu cần
-import { IconButton, Menu as MuiMenu, MenuItem } from "@mui/material";
+import {
+  IconButton,
+  Menu as MuiMenu,
+  MenuItem,
+} from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { token, logout } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
+
+  // ✅ Lấy token từ localStorage
+  const token = localStorage.getItem("token");
+
+  // ✅ Hàm logout: xóa token và chuyển hướng
+  const logout = () => {
+    localStorage.removeItem("token");
+    setAnchorEl(null);
+    navigate("/signin"); // Hoặc dùng window.location.reload() nếu không dùng navigate
+  };
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const handleProfileMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -93,39 +106,19 @@ const Header = () => {
             <Link to="/" onClick={toggleMenu} className="hover:text-yellow-700">
               Trang chủ
             </Link>
-            <Link
-              to="/about"
-              onClick={toggleMenu}
-              className="hover:text-yellow-700"
-            >
+            <Link to="/about" onClick={toggleMenu} className="hover:text-yellow-700">
               Giới thiệu
             </Link>
-            <Link
-              to="/booking"
-              onClick={toggleMenu}
-              className="hover:text-yellow-700"
-            >
+            <Link to="/booking" onClick={toggleMenu} className="hover:text-yellow-700">
               Đặt lịch khám
             </Link>
-            <Link
-              to="/news"
-              onClick={toggleMenu}
-              className="hover:text-yellow-700"
-            >
+            <Link to="/news" onClick={toggleMenu} className="hover:text-yellow-700">
               Tin tức
             </Link>
-            <Link
-              to="/blogs"
-              onClick={toggleMenu}
-              className="hover:text-yellow-700"
-            >
+            <Link to="/blogs" onClick={toggleMenu} className="hover:text-yellow-700">
               Blogs
             </Link>
-            <Link
-              to="/test"
-              onClick={toggleMenu}
-              className="hover:text-yellow-700"
-            >
+            <Link to="/test" onClick={toggleMenu} className="hover:text-yellow-700">
               Test
             </Link>
             {token ? (

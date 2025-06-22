@@ -27,7 +27,8 @@ import Staff from "../Components/Staff/Staff";
 import Manager from "../Components/Manager/Manager";
 import Doctor from "../Components/Doctor/Doctor";
 import Appointment from "../Components/Doctor/Appointment";
-
+import  BookingPage from "../Components/Customer/BookingStep/BookingPage";
+import BookingConfirmPage from "../Components/Customer/BookingStep/BookingConfirmPage";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -41,6 +42,8 @@ const Router = createBrowserRouter([
       { path: "profile", element: <Profile /> },
       { path: "signin", element: <SignIn /> },
       { path: "register", element: <SignUp /> },
+      { path: "/book/:doctorId", element: <BookingPage /> },
+      { path: "/booking/confirm", element: <BookingConfirmPage /> },
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "docs", element: <ListDoctor /> },
       { path: "docs/:id", element: <DetailDoctor /> },

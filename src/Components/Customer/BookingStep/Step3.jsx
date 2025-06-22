@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,219 +10,297 @@ import {
   Avatar,
   Button,
   Card,
-  CardContent,
+  Chip,
   Alert,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CloseIcon from "@mui/icons-material/Close";
-import { LocalizationProvider, DateCalendar } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-
-const times = {
-  Morning: ["09:45", "10:45", "11:00", "11:30", "-"],
-  Afternoon: ["13:00", "-", "14:30", "15:00", "-"],
-  Evening: ["17:00", "-", "-", "18:30", "19:00"],
-};
+import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
+import PersonIcon from "@mui/icons-material/Person";
+import doctorSlotService from "../../../Services/doctorSlotService";
 
 const Step3 = ({ open, onClose, onNext, onBack, data }) => {
-  const [selectedDate, setSelectedDate] = useState(data.date || new Date());
-  const [selectedTime, setSelectedTime] = useState(data.time || null);
+  const [loading, setLoading] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [error, setError] = useState(null);
 
+  // Hàm lấy endTime từ startTime
+  function getEndTime(startTime) {
+    const hour = parseInt(startTime.split(":")[0], 10);
+    const minute = startTime.split(":")[1];
+    const endHour = hour + 1;
+    return endHour.toString().padStart(2, "0") + ":" + minute;
+  }
+
+  useEffect(() => {
+    const endTime = getEndTime(data.time);
+    if (!open) return;
+    const fetchDoctors = async () => {
+      setLoading(true);
+      setError(null);
+      setDoctors([]);
+      try {
+        const res = await doctorSlotService.getDoctorSlots({
+          date: data.date.toISOString().split("T")[0],
+          startTime: data.time,
+          endTime: endTime,
+        });
+        setDoctors(res?.filter(Boolean));
+      } catch (err) {
+        setError("Không thể tải danh sách bác sĩ.");
+        throw err;
+      }
+      setLoading(false);
+    };
+    fetchDoctors();
+  }, [open, data.date, data.time]);
+
   const handleNext = () => {
-    if (!selectedDate || !selectedTime) {
-      setError("Please select both a date and a time.");
+    if (!selectedDoctor) {
+      setError("Vui lòng chọn bác sĩ.");
       return;
     }
     setError(null);
-    const stepData = {
-      date: selectedDate,
-      time: selectedTime,
-    };
-    console.log("Step3 sending:", stepData);
-    onNext(stepData);
+    onNext({ ...data, doctor: selectedDoctor });
     onClose();
+  };
+
+  // Lấy avatar giả nếu chưa có ảnh thật
+  const getAvatar = (doctor) => {
+    if (doctor.userID?.avatar || doctor.avatar) {
+      return (
+        <Avatar
+          sx={{ width: 64, height: 64, boxShadow: 2, mr: 2 }}
+          src={doctor.userID?.avatar || doctor.avatar}
+        >
+          {doctor.userID?.name?.[0]?.toUpperCase() || "D"}
+        </Avatar>
+      );
+    }
+    const index =
+      doctor._id?.charCodeAt(doctor._id.length - 1) % 2 ||
+      Math.floor(Math.random() * 2);
+    const fakeImg = `https://randomuser.me/api/portraits/${
+      index === 0 ? "men" : "women"
+    }/${Math.abs(doctor._id?.charCodeAt(0) % 99)}.jpg`;
+    return (
+      <Avatar
+        sx={{ width: 64, height: 64, boxShadow: 2, mr: 2 }}
+        src={fakeImg}
+      >
+        {doctor.userID?.name?.[0]?.toUpperCase() || "D"}
+      </Avatar>
+    );
   };
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="lg"
+      maxWidth="md"
       fullWidth
-      sx={{ "& .MuiDialog-paper": { borderRadius: 2 } }}
+      sx={{
+        "& .MuiDialog-paper": {
+          borderRadius: 3,
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+          backgroundColor: "#f9fafb",
+        },
+      }}
     >
-      <DialogTitle sx={{ m: 0, p: 2, display: "flex", alignItems: "center" }}>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Select Date & Time
+      <DialogTitle
+        sx={{
+          p: 3,
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: "#e3f2fd",
+          borderBottom: "1px solid #e0e0e0",
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{ flexGrow: 1, fontWeight: 600, color: "#1976d2" }}
+        >
+          Select Your Doctor
         </Typography>
-        <IconButton onClick={onClose} sx={{ color: "grey.500" }}>
+        <IconButton onClick={onClose} sx={{ color: "#546e7a" }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers sx={{ p: 3 }}>
-        {/* Doctor Info */}
-        <Box
-          p={2}
-          sx={{
-            border: "1px solid #eee",
-            borderRadius: 2,
-            background: "#fff",
-            mb: 3,
-          }}
-        >
-          <Grid container spacing={2} alignItems="center">
-            <Grid item>
-              <Avatar
-                src="https://randomuser.me/api/portraits/men/32.jpg"
-                sx={{ width: 56, height: 56 }}
-                alt="Dr. Michael Brown"
-              />
-            </Grid>
-            <Grid item xs>
-              <Typography variant="subtitle1">Dr. Michael Brown</Typography>
-              <Typography variant="body2" color="primary">
-                {data.specialty || "Psychologist"}
-              </Typography>
-              <Box display="flex" alignItems="center" mt={0.5}>
-                <LocationOnIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                <Typography variant="caption">
-                  1011 W 5th St, Suite 120, Austin, TX 78703
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item>
-              <Box
-                sx={{
-                  backgroundColor: "#FF6B6B",
-                  color: "white",
-                  px: 1,
-                  py: 0.5,
-                  borderRadius: 1,
-                  fontSize: "0.75rem",
-                }}
-              >
-                ⭐ 5.0
-              </Box>
-            </Grid>
-          </Grid>
-
-          {/* Booking Info */}
-          <Grid container spacing={2} mt={2}>
-            <Grid item xs={12} sm={3}>
-              <Typography variant="body2" fontWeight={500}>
-                Specialty
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {data.specialty || "Cardiology"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Typography variant="body2" fontWeight={500}>
-                Service
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {data.service?.name || "Echocardiograms"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Typography variant="body2" fontWeight={500}>
-                Date & Time
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {selectedTime
-                  ? `${selectedTime}, ${selectedDate.toLocaleDateString()}`
-                  : "Not selected"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Typography variant="body2" fontWeight={500}>
-                Appointment type
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {data.appointmentType || "Clinic"}{" "}
-                {data.clinic ? `(${data.clinic.name})` : ""}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Box>
-
-        {/* Date and Time Selection */}
-        <Grid container spacing={3}>
-          {/* Calendar */}
-          <Grid item xs={12} md={4}>
-            <Card elevation={3} sx={{ p: 2 }}>
-              <Typography variant="subtitle1" mb={1}>
-                Select Date
-              </Typography>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DateCalendar
-                  value={selectedDate}
-                  onChange={(newValue) => setSelectedDate(newValue)}
-                  minDate={new Date()}
-                />
-              </LocalizationProvider>
-            </Card>
-          </Grid>
-
-          {/* Time Slots */}
-          <Grid item xs={12} md={8}>
-            <Card elevation={3} sx={{ p: 2 }}>
-              <Typography variant="subtitle1" mb={2}>
-                Select Time
-              </Typography>
-              {Object.entries(times).map(([label, slots]) => (
-                <Box key={label} mb={2}>
-                  <Typography fontWeight={600} gutterBottom>
-                    {label}
-                  </Typography>
-                  <Grid container spacing={1}>
-                    {slots.map((time, idx) => (
-                      <Grid item key={idx}>
-                        <Button
-                          variant={
-                            selectedTime === time ? "contained" : "outlined"
-                          }
-                          disabled={time === "-"}
-                          onClick={() => setSelectedTime(time)}
-                          sx={{
-                            minWidth: 80,
-                            backgroundColor:
-                              selectedTime === time ? "#00BFD8" : "#f0f0f0",
-                            color:
-                              selectedTime === time ? "#fff" : "text.primary",
-                          }}
-                        >
-                          {time}
-                        </Button>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              ))}
-            </Card>
-          </Grid>
-        </Grid>
-
-        {/* Error Message */}
+      <DialogContent dividers sx={{ p: 4, backgroundColor: "#fff" }}>
+        {loading && (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: 200,
+            }}
+          >
+            <CircularProgress color="primary" />
+            <Typography variant="body2" sx={{ ml: 2, color: "#546e7a" }}>
+              Loading available doctors...
+            </Typography>
+          </Box>
+        )}
         {error && (
-          <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+          <Alert
+            severity="error"
+            sx={{
+              mt: 3,
+              mb: 2,
+              borderRadius: 2,
+              backgroundColor: "#fef2f2",
+              color: "#b91c1c",
+            }}
+          >
             {error}
           </Alert>
         )}
+        {!loading && doctors.length === 0 && !error && (
+          <Alert
+            severity="warning"
+            sx={{
+              mt: 3,
+              mb: 2,
+              borderRadius: 2,
+              backgroundColor: "#fefce8",
+              color: "#a16207",
+            }}
+          >
+            Không có bác sĩ nào khả dụng ở khung giờ này.
+          </Alert>
+        )}
+        <Grid container spacing={2}>
+          {doctors.map((doctor) => (
+            <Grid item xs={12} sm={6} md={4} key={doctor._id}>
+              <Card
+                onClick={() => setSelectedDoctor(doctor)}
+                sx={{
+                  borderRadius: 2,
+                  p: 2,
+                  cursor: "pointer",
+                  border:
+                    selectedDoctor?._id === doctor._id
+                      ? "2px solid #1976d2"
+                      : "1px solid #e0e0e0",
+                  backgroundColor:
+                    selectedDoctor?._id === doctor._id ? "#e3f2fd" : "#fff",
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                    transform: "translateY(-2px)",
+                  },
+                  position: "relative",
+                }}
+              >
+                {selectedDoctor?._id === doctor._id && (
+                  <Chip
+                    icon={<HealthAndSafetyIcon />}
+                    label="Đang chọn"
+                    color="primary"
+                    size="small"
+                    sx={{
+                      position: "absolute",
+                      top: 12,
+                      right: 12,
+                      zIndex: 1,
+                      backgroundColor: "#1976d2",
+                      color: "#fff",
+                    }}
+                  />
+                )}
+                <Box display="flex" alignItems="center" mb={2}>
+                  {getAvatar(doctor)}
+                  <Box>
+                    <Typography
+                      fontWeight={500}
+                      fontSize={18}
+                      sx={{ color: "#374151" }}
+                    >
+                      {doctor.userID?.name || "Bác sĩ"}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ color: "#546e7a" }}
+                    >
+                      {doctor.specializations || "Chưa cập nhật chuyên môn"}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ color: "#546e7a" }}
+                    >
+                      Số phòng: <b>{doctor.room || "N/A"}</b>
+                    </Typography>
+                  </Box>
+                </Box>
+                <Box display="flex" alignItems="center">
+                  <PersonIcon sx={{ color: "#1976d2", mr: 1, fontSize: 20 }} />
+                  <Box>
+                    {doctor.userID?.email && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: "block", color: "#546e7a" }}
+                      >
+                        📧 {doctor.userID.email}
+                      </Typography>
+                    )}
+                    {doctor.userID?.phone && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: "block", color: "#546e7a" }}
+                      >
+                        ☎️ {doctor.userID.phone}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       </DialogContent>
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onBack} color="inherit">
+      <DialogActions
+        sx={{
+          p: 3,
+          borderTop: "1px solid #e0e0e0",
+          backgroundColor: "#f9fafb",
+        }}
+      >
+        <Button
+          onClick={onBack}
+          color="inherit"
+          sx={{
+            textTransform: "none",
+            color: "#546e7a",
+            "&:hover": { backgroundColor: "#f1f5f9" },
+          }}
+        >
           Back
         </Button>
         <Button
           variant="contained"
-          color="info"
+          color="primary"
           onClick={handleNext}
-          disabled={!selectedDate || !selectedTime}
+          disabled={!selectedDoctor}
+          sx={{
+            textTransform: "none",
+            borderRadius: 2,
+            px: 4,
+            backgroundColor: "#1976d2",
+            "&:hover": { backgroundColor: "#1565c0" },
+            "&.Mui-disabled": {
+              backgroundColor: "#e0e0e0",
+              color: "#9e9e9e",
+            },
+          }}
         >
-          Add Basic Information
+          Continue to Confirmation
         </Button>
       </DialogActions>
     </Dialog>
