@@ -21,14 +21,10 @@ import Profile from "../Page/Profile";
 import About from "../Page/About";
 import BookingApm from "../Components/Customer/BookingApm";
 
-// Admin/Staff/Manager/Doctor main pages
 import Admin from "../Components/Admin//Admin";
-
-/////
 import Staff from "../Components/Staff/Staff";
 import AppointmentList from "../Components/Staff/AppointmentList";
 
-////
 import Manager from "../Components/Manager/Manager";
 import Doctor from "../Components/Doctor/Doctor";
 import AppointmentFake from "../Components/Doctor/AppointmentFake";
@@ -46,6 +42,8 @@ import DoctorSchedule from "../Components/Doctor/DoctorSchedule";
 import DoctorAppointments from "../Components/Doctor/DoctorAppoinment";
 import CreateMedicalRecord from "../Components/Doctor/CreateMedicalRecord";
 import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
+import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPayment";
+import SuccessPaymentPage from "../Components/Customer/BookingStep/SuccessPaymentPage";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -56,11 +54,13 @@ const Router = createBrowserRouter([
       { path: "blogs", element: <BlogList /> },
       { path: "blogs/:id", element: <BlogDetail /> },
       { path: "booking", element: <Booking /> },
+      { path: "booking-payment", element: <BookingPaymentPage /> },
       { path: "profile", element: <Profile /> },
       { path: "signin", element: <SignIn /> },
       { path: "register", element: <SignUp /> },
       { path: "/book/:doctorId", element: <BookingPage /> },
       { path: "/booking/confirm", element: <BookingConfirmPage /> },
+      { path: "/payments/vnpay-return", element: <SuccessPaymentPage /> },
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "docs", element: <ListDoctor /> },
       { path: "docs/:id", element: <DetailDoctor /> },

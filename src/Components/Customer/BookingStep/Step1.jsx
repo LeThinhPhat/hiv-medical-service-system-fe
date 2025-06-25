@@ -18,7 +18,6 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
 import ServicesService from "../../../Services/ServicesService";
-import PatientService from "../../../Services/patientService";
 
 const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
   const [services, setServices] = useState([]);
@@ -33,14 +32,14 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
       try {
         setLoadingServices(true);
         const result = await ServicesService.getAllService();
-        const patient = await PatientService.getPatientByToken();
+        const patient = JSON.parse(localStorage.getItem("patient"));
         console.log("Patient data:", patient.medicalRecordID);
         let filteredServices = result;
         if (!patient || !patient.medicalRecordID || patient.medicalRecordID.length === 0) {
           filteredServices = result.filter(
-            (service) =>
-              service.name &&
-              service.name.toLowerCase().includes("basic checkup")
+        (service) =>
+          service.name &&
+          service.name.toLowerCase().includes("tổng quát")
           );
         }
         setServices(filteredServices);
@@ -72,19 +71,21 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="lg" // Increased from 'md' to 'lg'
       fullWidth
       sx={{
         "& .MuiDialog-paper": {
-          borderRadius: 3,
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+          borderRadius: 4,
+          boxShadow: "0 6px 24px rgba(0, 0, 0, 0.15)",
           backgroundColor: "#f9fafb",
+          width: "90%", // Custom width for larger dialog
+          maxHeight: "90vh", // Ensure it fits within viewport
         },
       }}
     >
       <DialogTitle
         sx={{
-          p: 3,
+          p: 4, // Increased padding
           display: "flex",
           alignItems: "center",
           backgroundColor: "#e3f2fd",
@@ -92,18 +93,18 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
         }}
       >
         <Typography
-          variant="h6"
+          variant="h5" // Increased from h6 to h5
           sx={{ flexGrow: 1, fontWeight: 600, color: "#1976d2" }}
         >
           Vui lòng chọn dịch vụ khám
         </Typography>
         <IconButton onClick={onClose} sx={{ color: "#546e7a" }}>
-          <CloseIcon />
+          <CloseIcon sx={{ fontSize: 32 }} /> {/* Increased icon size */}
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers sx={{ p: 4, backgroundColor: "#fff" }}>
+      <DialogContent dividers sx={{ p: 5, backgroundColor: "#fff" }}> {/* Increased padding */}
         <Typography
-          variant="subtitle1"
+          variant="h6" // Increased from subtitle1 to h6
           gutterBottom
           sx={{ fontWeight: 500, color: "#374151" }}
         >
@@ -115,20 +116,20 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              height: 200,
+              height: 300, // Increased height for loading area
             }}
           >
-            <CircularProgress color="primary" />
-            <Typography variant="body2" sx={{ ml: 2, color: "#546e7a" }}>
+            <CircularProgress color="primary" size={60} /> {/* Increased spinner size */}
+            <Typography variant="body1" sx={{ ml: 3, color: "#546e7a" }}> {/* Increased font size */}
               Loading available services...
             </Typography>
           </Box>
         ) : services.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body1" color="text.secondary"> {/* Increased font size */}
             No services available at this time.
           </Typography>
         ) : (
-          <Grid container spacing={2}>
+          <Grid container spacing={3}> {/* Increased spacing */}
             {services.map((service, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Card
@@ -136,42 +137,43 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
                   sx={{
                     border:
                       selectedService === index
-                        ? "2px solid #1976d2"
+                        ? "3px solid #1976d2" // Thicker border
                         : "1px solid #e0e0e0",
-                    borderRadius: 2,
+                    borderRadius: 3, // Increased border radius
                     transition: "all 0.2s",
                     "&:hover": {
-                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                      transform: "translateY(-2px)",
+                      boxShadow: "0 6px 16px rgba(0, 0, 0, 0.15)",
+                      transform: "translateY(-3px)",
                     },
                     backgroundColor:
                       selectedService === index ? "#e3f2fd" : "#fff",
+                    minHeight: 140, // Increased card height
                   }}
                   onClick={() => setSelectedService(index)}
                 >
                   <CardActionArea>
-                    <CardContent sx={{ display: "flex", alignItems: "center" }}>
+                    <CardContent sx={{ display: "flex", alignItems: "center", p: 3 }}> {/* Increased padding */}
                       <HealthAndSafetyIcon
                         sx={{
                           color: "#1976d2",
-                          mr: 2,
-                          fontSize: 28,
+                          mr: 3, // Increased margin
+                          fontSize: 36, // Increased icon size
                         }}
                       />
                       <Box>
                         <Typography
-                          variant="body1"
+                          variant="h6" // Increased from body1 to h6
                           sx={{ fontWeight: 500, color: "#374151" }}
                         >
                           {service.name}
                         </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ mt: 0.5 }}
-                        >
-                          ${service.price.toFixed(2)}
-                        </Typography>
+                       <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ mt: 1 }}
+                      >
+                        {service.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                      </Typography>
                       </Box>
                     </CardContent>
                   </CardActionArea>
@@ -185,11 +187,12 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
           <Alert
             severity="error"
             sx={{
-              mt: 3,
-              mb: 2,
-              borderRadius: 2,
+              mt: 4, // Increased margin
+              mb: 3,
+              borderRadius: 3,
               backgroundColor: "#fef2f2",
               color: "#b91c1c",
+              fontSize: "1.1rem", // Increased font size
             }}
           >
             {error}
@@ -198,7 +201,7 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
       </DialogContent>
       <DialogActions
         sx={{
-          p: 3,
+          p: 4, // Increased padding
           borderTop: "1px solid #e0e0e0",
           backgroundColor: "#f9fafb",
         }}
@@ -209,6 +212,8 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
           sx={{
             textTransform: "none",
             color: "#546e7a",
+            fontSize: "1.1rem", // Increased font size
+            px: 4, // Increased padding
             "&:hover": { backgroundColor: "#f1f5f9" },
           }}
         >
@@ -221,8 +226,9 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
           disabled={selectedService === null}
           sx={{
             textTransform: "none",
-            borderRadius: 2,
-            px: 4,
+            borderRadius: 3,
+            px: 6, // Increased padding
+            fontSize: "1.1rem", // Increased font size
             backgroundColor: "#1976d2",
             "&:hover": { backgroundColor: "#1565c0" },
             "&.Mui-disabled": {

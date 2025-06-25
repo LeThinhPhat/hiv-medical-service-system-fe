@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { FaUserMd, FaEnvelope, FaStethoscope, FaRegBuilding, FaBriefcase } from "react-icons/fa";
 import doctorSlotService from "../../../Services/doctorSlotService";
 import docListService from "../../../Services/CusService/docterListService";
+import ServicesService from "../../../Services/ServicesService";
 
 // Hàm trả về yyyy-MM-dd hôm nay
 const today = new Date();
@@ -11,7 +12,9 @@ const defaultDate = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(t
 
 function formatTime(isoString) {
   const date = new Date(isoString);
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  // Trừ đi 7 giờ (chênh lệch UTC và UTC+7) để hiển thị đúng giờ địa phương
+  const adjustedDate = new Date(date.getTime() - 7 * 60 * 60 * 1000);
+  return adjustedDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" , hour12: false });
 }
 
 function formatDate(isoDateString) {
@@ -33,19 +36,23 @@ const BookingPage = () => {
   const [doctorInfo, setDoctorInfo] = useState(null);
   const [loadingDoctor, setLoadingDoctor] = useState(true);
   const [error, setError] = useState(null);
+  const [services, setServices] = useState([]);
+  const [selectedService, setSelectedService] = useState("");
 
   const userRole = localStorage.getItem("role") || "patient";
 
+  // Lấy thông tin bác sĩ
   useEffect(() => {
     const fetchDoctorInfo = async () => {
       setLoadingDoctor(true);
       setError(null);
       try {
         const info = await docListService.getDoctorById(doctorId);
+        const services = await ServicesService.getAllService();
         setDoctorInfo(info);
+        setServices(services);
       } catch (err) {
-        console.error("Lỗi khi lấy thông tin bác sĩ:", err);
-        setError("Không thể tải thông tin bác sĩ. Vui lòng thử lại.");
+        setError("Không thể tải thông tin bác sĩ. Vui lòng thử lại.", err);
         setDoctorInfo(null);
       } finally {
         setLoadingDoctor(false);
@@ -54,10 +61,20 @@ const BookingPage = () => {
     if (doctorId) fetchDoctorInfo();
   }, [doctorId]);
 
+  // Lấy lịch khám theo ngày và dịch vụ
   useEffect(() => {
     const fetchSchedule = async () => {
+      if (!selectedService) {
+        setSchedule([]);
+        setSelectedSlot(null);
+        return;
+      }
       try {
-        const slots = await doctorSlotService.getDoctorSlotsByDate(doctorId, selectedDate);
+        const slots = await doctorSlotService.getDoctorSlotsByDateAndService(
+          doctorId,
+          selectedDate,
+          selectedService
+        );
         setSchedule([{ date: selectedDate, slots: slots || [] }]);
         setSelectedSlot(null);
       } catch (err) {
@@ -66,8 +83,8 @@ const BookingPage = () => {
         setSelectedSlot(null);
       }
     };
-    if (doctorId && selectedDate) fetchSchedule();
-  }, [doctorId, selectedDate]);
+    if (doctorId && selectedDate && selectedService) fetchSchedule();
+  }, [doctorId, selectedDate, selectedService]);
 
   const getInitials = (name) => {
     if (!name) return "DR";
@@ -79,13 +96,14 @@ const BookingPage = () => {
   };
 
   const handleConfirmBooking = () => {
-    if (!selectedSlot) return;
+    if (!selectedSlot || !selectedService) return;
     navigate("/booking/confirm", {
       state: {
         doctor: doctorInfo,
         slot: selectedSlot,
         date: selectedDate,
         userRole: userRole,
+        service: services.find((s) => s._id === selectedService),
       },
     });
   };
@@ -169,23 +187,54 @@ const BookingPage = () => {
         </div>
       )}
 
+      {/* Service Picker */}
+      <div className="mb-6 flex items-center gap-3">
+        <label htmlFor="service" className="font-semibold text-gray-700">
+          Chọn dịch vụ:
+        </label>
+        <select
+          id="service"
+          value={selectedService}
+          className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all"
+          onChange={(e) => setSelectedService(e.target.value)}
+        >
+          <option value="">-- Chọn dịch vụ --</option>
+          {services.map((service) => (
+            <option value={service._id} key={service._id}>
+              {service.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Schedule */}
       <div className="bg-white rounded-lg shadow-md p-8 border border-gray-200">
         {/* Date picker */}
         <div className="mb-6 flex items-center gap-3">
-          <label htmlFor="date" className="font-semibold text-gray-700">Chọn ngày khám:</label>
+          <label htmlFor="date" className="font-semibold text-gray-700">
+            Chọn ngày khám:
+          </label>
           <input
             type="date"
             id="date"
             value={selectedDate}
             min={defaultDate}
             className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all"
-            onChange={e => setSelectedDate(e.target.value)}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            disabled={!selectedService}
           />
         </div>
 
-        {schedule.length === 0 || schedule[0].slots.length === 0 ? (
-          <p className="text-center text-gray-500">Không có lịch làm việc cho bác sĩ này vào ngày {formatDate(selectedDate)}</p>
+        {/* Chỉ hiển thị lịch khi đã chọn dịch vụ */}
+        {!selectedService ? (
+          <p className="text-center text-gray-500">
+            Vui lòng chọn dịch vụ để xem lịch khám.
+          </p>
+        ) : schedule.length === 0 || schedule[0].slots.length === 0 ? (
+          <p className="text-center text-gray-500">
+            Không có lịch làm việc cho bác sĩ này vào ngày{" "}
+            {formatDate(selectedDate)}
+          </p>
         ) : (
           <div>
             {schedule.map((day, idx) => (
@@ -216,7 +265,8 @@ const BookingPage = () => {
                 <span>
                   <span className="mr-1 text-gray-700">Bạn đã chọn:</span>
                   <b className="text-blue-600">
-                    {formatTime(selectedSlot.startTime)} - {formatTime(selectedSlot.endTime)}
+                    {formatTime(selectedSlot.startTime)} -{" "}
+                    {formatTime(selectedSlot.endTime)}
                   </b>
                 </span>
                 <button
