@@ -14,13 +14,12 @@ import { AiFillIdcard } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
 const DoctorSidebar = () => {
   const location = useLocation();
-  const doctorId = localStorage.getItem("doctorId");
 
   const menuItems = [
     {
-      label: "Healthcare Admin",
+      label: "MedicalList",
       icon: <MdDashboard />,
-      path: "/healthcare-admin",
+      path: "/doctor/medicallist",
     },
     {
       label: "Medical Dashboard",
@@ -28,9 +27,9 @@ const DoctorSidebar = () => {
       path: "/medical-dashboard",
     },
     {
-      label: "Clinic Dashboard",
+      label: "Creata Medical",
       icon: <FaThLarge />,
-      path: "/clinic-dashboard",
+      path: "/doctor/medical",
     },
     {
       label: "Appointments",
@@ -53,12 +52,12 @@ const DoctorSidebar = () => {
     {
       label: "Doctors Profile",
       icon: <FaUser />,
-      path: "doctor/doctors-profile",
+      path: "/doctor/profile",
     },
     {
       label: "Doctor",
       icon: <FaPlus />,
-      path: `/doctor/profile-doctor/${localStorage.getItem("doctorId")}`,
+      path: "/doctor/profile-doctor",
     },
     { label: "Edit Doctor", icon: <FaEdit />, path: "/edit-doctor" },
     {

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import Overview from "./Overview";
-//import ProfileDoctor from "./ProfileDoctor";
 const appointments = [
   {
     id: "APT009",
@@ -66,7 +65,6 @@ const AppointmentPage = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* <Overview /> */}
-      <ProfileDoctor />
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-800">Appointments</h2>
