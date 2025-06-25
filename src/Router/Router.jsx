@@ -31,7 +31,7 @@ import AppointmentList from "../Components/Staff/AppointmentList";
 ////
 import Manager from "../Components/Manager/Manager";
 import Doctor from "../Components/Doctor/Doctor";
-import Appointment from "../Components/Doctor/Appointment";
+import AppointmentFake from "../Components/Doctor/AppointmentFake";
 import ProfileDoctor from "../Components/Doctor/ProfileDoctor";
 import BookingPage from "../Components/Customer/BookingStep/BookingPage";
 import BookingConfirmPage from "../Components/Customer/BookingStep/BookingConfirmPage";
@@ -40,9 +40,12 @@ import PatientsList from "../Components/Doctor/PatientsList";
 // import DoctorProfile from "../Components/Doctor/DoctorProfile";
 import DoctorSlot from "../Components/Staff/DoctorSlot";
 import DoctorProfile from "../Components/Doctor/DoctorProfile";
-import CreateRecord from "../Components/Doctor/CreateRecord";
 import MedicalRecords from "../Components/Doctor/MedicalRecords";
-
+import DoctorSlotList from "../Components/Doctor/DoctorSlotList";
+import DoctorSchedule from "../Components/Doctor/DoctorSchedule";
+import DoctorAppointments from "../Components/Doctor/DoctorAppoinment";
+import CreateMedicalRecord from "../Components/Doctor/CreateMedicalRecord";
+import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -94,7 +97,7 @@ const Router = createBrowserRouter([
     element: <DoctorLayout />,
     children: [
       { path: "", element: <Doctor /> },
-      { path: "appointments", element: <Appointment /> },
+      { path: "appointments", element: <AppointmentFake /> },
       { path: "my-patients", element: <PatientsList /> },
       {
         path: "profile-doctor",
@@ -105,12 +108,28 @@ const Router = createBrowserRouter([
         element: <DoctorProfile />,
       },
       {
-        path: "medical",
-        element: <CreateRecord />,
-      },
-      {
         path: "medicallist",
         element: <MedicalRecords />,
+      },
+      {
+        path: "doctorslot",
+        element: <DoctorSlotList />,
+      },
+      {
+        path: "doctorschedule",
+        element: <DoctorSchedule />,
+      },
+      {
+        path: "doctorsappoinment",
+        element: <DoctorAppointments />,
+      },
+      {
+        path: "doctorsappoinment/medical-records/create/:patientID",
+        element: <CreateMedicalRecord />,
+      },
+      {
+        path: "doctorsappoinment/medical-records/view/:patientID",
+        element: <ViewMedicalRecord />,
       },
     ],
   },

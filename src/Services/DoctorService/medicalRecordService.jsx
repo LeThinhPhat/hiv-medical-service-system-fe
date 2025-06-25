@@ -49,6 +49,23 @@ const medicalRecordService = {
       throw error;
     }
   },
-};
+  // Gọi API để lấy hồ sơ bệnh án theo ID
+  getMedicalRecordById: async (id) => {
+    try {
+      const token = localStorage.getItem("token");
 
+      const response = await axios.get(`${API_URL}/${id}`, {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data.data; // hoặc response.data tùy vào backend trả về
+    } catch (error) {
+      console.error("Lỗi lấy hồ sơ bệnh án theo ID:", error);
+      throw error;
+    }
+  },
+};
 export default medicalRecordService;

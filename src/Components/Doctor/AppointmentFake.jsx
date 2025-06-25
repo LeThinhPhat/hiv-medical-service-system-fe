@@ -55,7 +55,7 @@ const appointments = [
   },
 ];
 
-const AppointmentPage = () => {
+const AppointmentFake = () => {
   const [search, setSearch] = useState("");
 
   const filteredAppointments = appointments.filter((appt) =>
@@ -157,4 +157,4 @@ const AppointmentPage = () => {
   );
 };
 
-export default AppointmentPage;
+export default AppointmentFake;
