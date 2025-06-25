@@ -26,44 +26,72 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [error, setError] = useState(null);
 
-  // Hàm lấy endTime từ startTime
-  function getEndTime(startTime) {
-    const hour = parseInt(startTime.split(":")[0], 10);
-    const minute = startTime.split(":")[1];
-    const endHour = hour + 1;
-    return endHour.toString().padStart(2, "0") + ":" + minute;
+  // State mới cho API slot riêng từng bác sĩ
+  const [doctorSlots, setDoctorSlots] = useState(null);
+  const [loadingDoctorSlot, setLoadingDoctorSlot] = useState(false);
+  const [slotError, setSlotError] = useState(null);
+
+  function combineDateAndTime(dateObj, timeStr) {
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    const d = new Date(dateObj);
+    d.setHours(hours, minutes, 0, 0);
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString();
   }
 
+  const Starttime = combineDateAndTime(data.date, data.time);
+
   useEffect(() => {
-    const endTime = getEndTime(data.time);
     if (!open) return;
+    setSelectedDoctor(null); // reset khi mở lại dialog
+    setDoctorSlots(null);
+    setSlotError(null);
     const fetchDoctors = async () => {
       setLoading(true);
       setError(null);
       setDoctors([]);
       try {
+        // Giả định hàm này lấy về danh sách bác sĩ rảnh (hoặc tất cả bác sĩ, tùy logic cũ)
         const res = await doctorSlotService.getDoctorSlots({
-          date: data.date.toISOString().split("T")[0],
-          startTime: data.time,
-          endTime: endTime,
+          startTime: Starttime,
         });
         setDoctors(res?.filter(Boolean));
       } catch (err) {
         setError("Không thể tải danh sách bác sĩ.");
-        throw err;
       }
       setLoading(false);
     };
     fetchDoctors();
+    // eslint-disable-next-line
   }, [open, data.date, data.time]);
 
+  // Khi chọn bác sĩ, kiểm tra slot ở thời điểm này
+  const handleSelectDoctor = async (doctor) => {
+    setSelectedDoctor(doctor);
+    setLoadingDoctorSlot(true);
+    setSlotError(null);
+    setDoctorSlots(null);
+    try {
+      const slots = await doctorSlotService.getDoctorSlotByDoctor(
+        doctor._id,
+        Starttime
+      );
+      setDoctorSlots(slots);
+      if (!slots || slots.length === 0) {
+        setSlotError("Bác sĩ này không có slot trống ở thời điểm này.");
+      }
+    } catch (err) {
+      setSlotError("Bác sĩ này không có slot trống ở thời điểm này.");
+    }
+    setLoadingDoctorSlot(false);
+  };
+
   const handleNext = () => {
-    if (!selectedDoctor) {
-      setError("Vui lòng chọn bác sĩ.");
+    if (!selectedDoctor || (doctorSlots && doctorSlots.length === 0)) {
+      setError("Vui lòng chọn bác sĩ có slot trống.");
       return;
     }
     setError(null);
-    onNext({ ...data, doctor: selectedDoctor });
+    onNext({ ...data, slot: doctorSlots, doctor: selectedDoctor });
     onClose();
   };
 
@@ -72,7 +100,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
     if (doctor.userID?.avatar || doctor.avatar) {
       return (
         <Avatar
-          sx={{ width: 64, height: 64, boxShadow: 2, mr: 2 }}
+          sx={{ width: 80, height: 80, boxShadow: 2, mr: 3 }}
           src={doctor.userID?.avatar || doctor.avatar}
         >
           {doctor.userID?.name?.[0]?.toUpperCase() || "D"}
@@ -87,7 +115,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
     }/${Math.abs(doctor._id?.charCodeAt(0) % 99)}.jpg`;
     return (
       <Avatar
-        sx={{ width: 64, height: 64, boxShadow: 2, mr: 2 }}
+        sx={{ width: 80, height: 80, boxShadow: 2, mr: 3 }}
         src={fakeImg}
       >
         {doctor.userID?.name?.[0]?.toUpperCase() || "D"}
@@ -99,19 +127,21 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
       sx={{
         "& .MuiDialog-paper": {
-          borderRadius: 3,
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+          borderRadius: 4,
+          boxShadow: "0 6px 24px rgba(0, 0, 0, 0.15)",
           backgroundColor: "#f9fafb",
+          width: "90%",
+          maxHeight: "90vh",
         },
       }}
     >
       <DialogTitle
         sx={{
-          p: 3,
+          p: 4,
           display: "flex",
           alignItems: "center",
           backgroundColor: "#e3f2fd",
@@ -119,27 +149,27 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
         }}
       >
         <Typography
-          variant="h6"
+          variant="h5"
           sx={{ flexGrow: 1, fontWeight: 600, color: "#1976d2" }}
         >
-          Select Your Doctor
+          Vui lòng chọn bác sĩ khám
         </Typography>
         <IconButton onClick={onClose} sx={{ color: "#546e7a" }}>
-          <CloseIcon />
+          <CloseIcon sx={{ fontSize: 32 }} />
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers sx={{ p: 4, backgroundColor: "#fff" }}>
+      <DialogContent dividers sx={{ p: 5, backgroundColor: "#fff" }}>
         {loading && (
           <Box
             sx={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              height: 200,
+              height: 300,
             }}
           >
-            <CircularProgress color="primary" />
-            <Typography variant="body2" sx={{ ml: 2, color: "#546e7a" }}>
+            <CircularProgress color="primary" size={60} />
+            <Typography variant="body1" sx={{ ml: 3, color: "#546e7a" }}>
               Loading available doctors...
             </Typography>
           </Box>
@@ -148,11 +178,12 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
           <Alert
             severity="error"
             sx={{
-              mt: 3,
-              mb: 2,
-              borderRadius: 2,
+              mt: 4,
+              mb: 3,
+              borderRadius: 3,
               backgroundColor: "#fef2f2",
               color: "#b91c1c",
+              fontSize: "1.1rem",
             }}
           >
             {error}
@@ -162,74 +193,76 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
           <Alert
             severity="warning"
             sx={{
-              mt: 3,
-              mb: 2,
-              borderRadius: 2,
+              mt: 4,
+              mb: 3,
+              borderRadius: 3,
               backgroundColor: "#fefce8",
               color: "#a16207",
+              fontSize: "1.1rem",
             }}
           >
             Không có bác sĩ nào khả dụng ở khung giờ này.
           </Alert>
         )}
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
           {doctors.map((doctor) => (
             <Grid item xs={12} sm={6} md={4} key={doctor._id}>
               <Card
-                onClick={() => setSelectedDoctor(doctor)}
+                onClick={() => handleSelectDoctor(doctor)}
                 sx={{
-                  borderRadius: 2,
-                  p: 2,
+                  borderRadius: 3,
+                  p: 3,
                   cursor: "pointer",
                   border:
                     selectedDoctor?._id === doctor._id
-                      ? "2px solid #1976d2"
+                      ? "3px solid #1976d2"
                       : "1px solid #e0e0e0",
                   backgroundColor:
                     selectedDoctor?._id === doctor._id ? "#e3f2fd" : "#fff",
                   transition: "all 0.2s",
                   "&:hover": {
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                    transform: "translateY(-2px)",
+                    boxShadow: "0 6px 16px rgba(0, 0, 0, 0.15)",
+                    transform: "translateY(-3px)",
                   },
                   position: "relative",
+                  minHeight: 200,
                 }}
               >
                 {selectedDoctor?._id === doctor._id && (
                   <Chip
-                    icon={<HealthAndSafetyIcon />}
+                    icon={<HealthAndSafetyIcon sx={{ fontSize: 24 }} />}
                     label="Đang chọn"
                     color="primary"
-                    size="small"
+                    size="medium"
                     sx={{
                       position: "absolute",
-                      top: 12,
-                      right: 12,
+                      top: 16,
+                      right: 16,
                       zIndex: 1,
                       backgroundColor: "#1976d2",
                       color: "#fff",
+                      fontSize: "1rem",
                     }}
                   />
                 )}
-                <Box display="flex" alignItems="center" mb={2}>
+                <Box display="flex" alignItems="center" mb={3}>
                   {getAvatar(doctor)}
                   <Box>
                     <Typography
-                      fontWeight={500}
-                      fontSize={18}
-                      sx={{ color: "#374151" }}
+                      variant="h6"
+                      sx={{ fontWeight: 500, color: "#374151" }}
                     >
                       {doctor.userID?.name || "Bác sĩ"}
                     </Typography>
                     <Typography
-                      variant="body2"
+                      variant="body1"
                       color="text.secondary"
                       sx={{ color: "#546e7a" }}
                     >
                       {doctor.specializations || "Chưa cập nhật chuyên môn"}
                     </Typography>
                     <Typography
-                      variant="caption"
+                      variant="body2"
                       color="text.secondary"
                       sx={{ color: "#546e7a" }}
                     >
@@ -238,11 +271,11 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
                   </Box>
                 </Box>
                 <Box display="flex" alignItems="center">
-                  <PersonIcon sx={{ color: "#1976d2", mr: 1, fontSize: 20 }} />
+                  <PersonIcon sx={{ color: "#1976d2", mr: 1, fontSize: 24 }} />
                   <Box>
                     {doctor.userID?.email && (
                       <Typography
-                        variant="caption"
+                        variant="body2"
                         color="text.secondary"
                         sx={{ display: "block", color: "#546e7a" }}
                       >
@@ -251,7 +284,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
                     )}
                     {doctor.userID?.phone && (
                       <Typography
-                        variant="caption"
+                        variant="body2"
                         color="text.secondary"
                         sx={{ display: "block", color: "#546e7a" }}
                       >
@@ -260,6 +293,24 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
                     )}
                   </Box>
                 </Box>
+                {/* Thêm phần thông báo slot */}
+                {selectedDoctor?._id === doctor._id && (
+                  <Box mt={2}>
+                    {loadingDoctorSlot && (
+                      <Typography color="primary">
+                        Đang kiểm tra slot trống...
+                      </Typography>
+                    )}
+                    {slotError && (
+                      <Typography color="error">{slotError}</Typography>
+                    )}
+                    {doctorSlots && doctorSlots.length > 0 && (
+                      <Typography color="success.main">
+                        Bác sĩ này còn {doctorSlots.length} slot khả dụng.
+                      </Typography>
+                    )}
+                  </Box>
+                )}
               </Card>
             </Grid>
           ))}
@@ -267,7 +318,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
       </DialogContent>
       <DialogActions
         sx={{
-          p: 3,
+          p: 4,
           borderTop: "1px solid #e0e0e0",
           backgroundColor: "#f9fafb",
         }}
@@ -278,6 +329,8 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
           sx={{
             textTransform: "none",
             color: "#546e7a",
+            fontSize: "1.1rem",
+            px: 4,
             "&:hover": { backgroundColor: "#f1f5f9" },
           }}
         >
@@ -287,11 +340,16 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
           variant="contained"
           color="primary"
           onClick={handleNext}
-          disabled={!selectedDoctor}
+          disabled={
+            !selectedDoctor ||
+            loadingDoctorSlot ||
+            (doctorSlots && doctorSlots.length === 0)
+          }
           sx={{
             textTransform: "none",
-            borderRadius: 2,
-            px: 4,
+            borderRadius: 3,
+            px: 6,
+            fontSize: "1.1rem",
             backgroundColor: "#1976d2",
             "&:hover": { backgroundColor: "#1565c0" },
             "&.Mui-disabled": {
@@ -300,7 +358,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
             },
           }}
         >
-          Continue to Confirmation
+          Tiếp tục đến xác nhận
         </Button>
       </DialogActions>
     </Dialog>

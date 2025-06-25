@@ -6,8 +6,11 @@ import "react-toastify/dist/ReactToastify.css";
 
 function formatTime(isoString) {
   const date = new Date(isoString);
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  // Trừ đi 7 giờ (chênh lệch UTC và UTC+7) để hiển thị đúng giờ địa phương
+  const adjustedDate = new Date(date.getTime() - 7 * 60 * 60 * 1000);
+  return adjustedDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
 }
+
 function formatDate(isoDateString) {
   if (!isoDateString) return "";
   const date = new Date(isoDateString);
@@ -43,7 +46,12 @@ const BookingConfirmPage = () => {
         phone: patient.contactPhones ? patient.contactPhones[0] : ""
       });
     }
-  }, [token]);
+    // Debug: In ra giá trị slot để kiểm tra
+    console.log("slot.startTime:", slot.startTime);
+    console.log("slot.endTime:", slot.endTime);
+    console.log("Formatted startTime:", formatTime(slot.startTime));
+    console.log("Formatted endTime:", formatTime(slot.endTime));
+  }, [token, slot]);
 
   const handleChange = (e) => setInfo({ ...info, [e.target.name]: e.target.value });
 

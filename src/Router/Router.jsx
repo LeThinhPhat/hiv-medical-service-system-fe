@@ -21,14 +21,10 @@ import Profile from "../Page/Profile";
 import About from "../Page/About";
 import BookingApm from "../Components/Customer/BookingApm";
 
-// Admin/Staff/Manager/Doctor main pages
 import Admin from "../Components/Admin//Admin";
-
-/////
 import Staff from "../Components/Staff/Staff";
 import AppointmentList from "../Components/Staff/AppointmentList";
 
-////
 import Manager from "../Components/Manager/Manager";
 import Doctor from "../Components/Doctor/Doctor";
 import Appointment from "../Components/Doctor/Appointment";
@@ -43,6 +39,7 @@ import DoctorProfile from "../Components/Doctor/DoctorProfile";
 import CreateRecord from "../Components/Doctor/CreateRecord";
 import MedicalRecords from "../Components/Doctor/MedicalRecords";
 import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPayment";
+import SuccessPaymentPage from "../Components/Customer/BookingStep/SuccessPaymentPage";
 
 const Router = createBrowserRouter([
   {
@@ -60,6 +57,7 @@ const Router = createBrowserRouter([
       { path: "register", element: <SignUp /> },
       { path: "/book/:doctorId", element: <BookingPage /> },
       { path: "/booking/confirm", element: <BookingConfirmPage /> },
+      { path: "/payments/vnpay-return", element: <SuccessPaymentPage/> },
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "docs", element: <ListDoctor /> },
       { path: "docs/:id", element: <DetailDoctor /> },
