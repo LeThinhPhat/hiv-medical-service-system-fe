@@ -26,11 +26,11 @@ const DoctorSidebar = () => {
       icon: <FaClipboardList />,
       path: "/medical-dashboard",
     },
-    {
-      label: "Creata Medical",
-      icon: <FaThLarge />,
-      path: "/doctor/medical",
-    },
+    // {
+    //   label: "Creata Medical",
+    //   icon: <FaThLarge />,
+    //   path: "/doctor/medical",
+    // },
     {
       label: "Appointments",
       icon: <FaCalendarAlt />,
@@ -59,11 +59,16 @@ const DoctorSidebar = () => {
       icon: <FaPlus />,
       path: "/doctor/profile-doctor",
     },
-    { label: "Edit Doctor", icon: <FaEdit />, path: "/edit-doctor" },
+    { label: "Doctor Slot", icon: <FaEdit />, path: "/doctor/doctorslot" },
     {
-      label: "Patients Dashboard",
+      label: "DoctorShedule",
       icon: <MdDashboard />,
-      path: "/patients-dashboard",
+      path: "/doctor/doctorschedule",
+    },
+    {
+      label: "Doctor-Appointment",
+      icon: <MdDashboard />,
+      path: "/doctor/doctorsappoinment",
     },
   ];
 

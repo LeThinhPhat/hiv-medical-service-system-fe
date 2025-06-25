@@ -2,7 +2,6 @@ import { matchPath, Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import Banner from "./Banner";
-import Appointment from "../Components/Doctor/Appointment";
 function Layout() {
   const location = useLocation();
   const pathname = location.pathname;
