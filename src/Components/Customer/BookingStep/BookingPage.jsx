@@ -12,7 +12,9 @@ const defaultDate = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(t
 
 function formatTime(isoString) {
   const date = new Date(isoString);
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  // Trừ đi 7 giờ (chênh lệch UTC và UTC+7) để hiển thị đúng giờ địa phương
+  const adjustedDate = new Date(date.getTime() - 7 * 60 * 60 * 1000);
+  return adjustedDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" , hour12: false });
 }
 
 function formatDate(isoDateString) {
@@ -41,25 +43,23 @@ const BookingPage = () => {
 
   // Lấy thông tin bác sĩ
   useEffect(() => {
-  const fetchDoctorInfo = async () => {
-    setLoadingDoctor(true);
-    setError(null);
-    try {
-       const info = await docListService.getDoctorById(doctorId);
-       setDoctorInfo(info);
-       const services = await ServicesService.getAllService();
-      
-      setDoctorInfo(info);
-      setServices(services);
-    } catch (err) {
-      setError("Không thể tải thông tin bác sĩ. Vui lòng thử lại.",err);
-      setDoctorInfo(null);
-    } finally {
-      setLoadingDoctor(false);
-    }
-  };
-  if (doctorId) fetchDoctorInfo();
-}, [doctorId]);
+    const fetchDoctorInfo = async () => {
+      setLoadingDoctor(true);
+      setError(null);
+      try {
+        const info = await docListService.getDoctorById(doctorId);
+        const services = await ServicesService.getAllService();
+        setDoctorInfo(info);
+        setServices(services);
+      } catch (err) {
+        setError("Không thể tải thông tin bác sĩ. Vui lòng thử lại.", err);
+        setDoctorInfo(null);
+      } finally {
+        setLoadingDoctor(false);
+      }
+    };
+    if (doctorId) fetchDoctorInfo();
+  }, [doctorId]);
 
   // Lấy lịch khám theo ngày và dịch vụ
   useEffect(() => {
@@ -78,7 +78,7 @@ const BookingPage = () => {
         setSchedule([{ date: selectedDate, slots: slots || [] }]);
         setSelectedSlot(null);
       } catch (err) {
-        console.error("Lỗi khi lấy lịch làm việc:",);
+        console.error("Lỗi khi lấy lịch làm việc:", err);
         setSchedule([]);
         setSelectedSlot(null);
       }
@@ -249,7 +249,7 @@ const BookingPage = () => {
                       className={`px-5 py-2 rounded-md border transition-all text-base font-semibold
                         ${
                           selectedSlot && selectedSlot._id === slot._id
-                            ? "bg-blue-600 text-white borderVinhome-blue-600 shadow-md"
+                            ? "bg-blue-600 text-white border-blue-600 shadow-md"
                             : "bg-white text-gray-700 hover:bg-blue-50 border-gray-300 hover:border-blue-600"
                         }`}
                       onClick={() => setSelectedSlot(slot)}

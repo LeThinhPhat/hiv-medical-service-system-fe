@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Step1 from "./BookingStep/Step1";
 import Step2 from "./BookingStep/Step2";
 import Step3 from "./BookingStep/Step3";
-import Step4 from "./BookingStep/Step4";
-import Step5 from "./BookingStep/Step5";
-import Step6 from "./BookingStep/Step6";
 import { Stepper, Step, StepLabel, Box, Alert, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   "Chọn Dịch Vụ",
   "Chọn Thời Gian",
   "Chọn Bác Sĩ",
-  "Thông tin cơ bản",
-  "Thanh toán",
-  "Xác nhận",
 ];
 
 const BookingStepper = () => {
@@ -21,14 +16,10 @@ const BookingStepper = () => {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const handleDialogOpen = () => {
-    setDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-  };
+  const handleDialogOpen = () => setDialogOpen(true);
+  const handleDialogClose = () => setDialogOpen(false);
 
   const handleNext = (stepData) => {
     if (!stepData || Object.keys(stepData).length === 0) {
@@ -37,20 +28,22 @@ const BookingStepper = () => {
     }
     setError(null);
     setFormData((prev) => ({ ...prev, ...stepData }));
-    setActiveStep((prevStep) => prevStep + 1);
-  };
 
-  const handleBack = () => {
-    if (activeStep > 0) {
-      setActiveStep((prevStep) => prevStep - 1);
+    // Nếu ở Step3 -> redirect sang BookingConfirmPage
+    if (activeStep === 2) {
+      const { doctor, slot, date, service } = { ...formData, ...stepData };
+      console.log("check:", formData);
+      console.log("Final booking data:", { doctor, slot, date, service });
+      navigate("booking/confirm", {
+        state: { doctor, slot, date, service }
+      });
+    } else {
+      setActiveStep((prevStep) => prevStep + 1);
     }
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-    setFormData({});
-    setError(null);
-    setDialogOpen(false);
+  const handleBack = () => {
+    if (activeStep > 0) setActiveStep((prevStep) => prevStep - 1);
   };
 
   const renderStepContent = (step) => {
@@ -94,51 +87,14 @@ const BookingStepper = () => {
             data={formData}
           />
         );
-      case 3:
-        return (
-          <Step4
-            open={true}
-            onClose={() => {}}
-            onNext={handleNext}
-            onBack={handleBack}
-            data={formData}
-          />
-        );
-      case 4:
-        return (
-          <Step5
-            open={true}
-            onClose={() => {}}
-            onNext={handleNext}
-            onBack={handleBack}
-            data={formData}
-          />
-        );
-      case 5:
-        return (
-          <Step6
-            open={true}
-            onClose={() => {}}
-            onReset={handleReset}
-            data={formData}
-          />
-        );
       default:
-        return <div>Finish!</div>;
+        return <div>Hoàn thành!</div>;
     }
   };
 
-  useEffect(() => {
-    console.log("Current formData:", formData);
-  }, [formData]);
-
   return (
     <Box sx={{ width: "100%", p: { xs: 1, sm: 2, md: 3 } }}>
-      <Stepper
-        activeStep={activeStep}
-        alternativeLabel
-        aria-label="Booking process"
-      >
+      <Stepper activeStep={activeStep} alternativeLabel aria-label="Booking process">
         {steps.map((label, index) => (
           <Step key={label}>
             <StepLabel aria-label={`Step ${index + 1}: ${label}`}>

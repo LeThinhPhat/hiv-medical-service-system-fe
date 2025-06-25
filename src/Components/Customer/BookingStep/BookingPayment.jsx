@@ -1,11 +1,15 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import paymentService from "../../../Services/CusService/PaymentService";
 
 function formatTime(isoString) {
   const date = new Date(isoString);
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  // Trừ đi 7 giờ (chênh lệch UTC và UTC+7) để hiển thị đúng giờ địa phương
+  const adjustedDate = new Date(date.getTime() - 7 * 60 * 60 * 1000);
+  return adjustedDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
 }
+
 function formatDate(isoDateString) {
   if (!isoDateString) return "";
   const date = new Date(isoDateString);
@@ -17,7 +21,6 @@ function formatDate(isoDateString) {
 
 const BookingPaymentPage = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const {
     info,
     doctor,
@@ -31,16 +34,18 @@ const BookingPaymentPage = () => {
   if (!info || !doctor || !slot) return <div>Không có dữ liệu lịch hẹn!</div>;
   const serviceName = service?.name || "Chưa chọn dịch vụ";
 
-  const handlePayment = () => {
-    toast.success(
-      <>
-        <b>Thanh toán thành công!</b><br />
-        Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.
-      </>
-    );
-    setTimeout(() => {
-      navigate("/success");
-    }, 1800);
+  const handlePayment = async () => {
+    try {
+      // Gọi API tạo payment và nhận về paymentUrl
+      const { paymentUrl } = await paymentService.createPayment({
+        appointmentID: appointment._id,
+      });
+      // Redirect sang trang thanh toán
+      window.location.href = paymentUrl;
+    } catch (err) {
+      toast.error("Tạo thanh toán thất bại!");
+      throw err;
+    }
   };
 
   return (
@@ -60,7 +65,7 @@ const BookingPaymentPage = () => {
         <div className="text-lg mb-2"><b>Giờ:</b> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</div>
         <div className="text-lg"><b>Dịch vụ:</b> {serviceName}</div>
         <div className="text-lg">
-          <b>Giá Tiền:</b> {appointment.serviceID.price?.toLocaleString('vi-VN')} ₫
+          <b>Giá Tiền:</b> {appointment.serviceID?.price?.toLocaleString('vi-VN')} ₫
         </div>
       </div>
       <button
