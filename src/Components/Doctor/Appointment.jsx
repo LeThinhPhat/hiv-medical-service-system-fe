@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import Overview from "./Overview";
-import ProfileDoctor from "./ProfileDoctor";
+//import ProfileDoctor from "./ProfileDoctor";
 const appointments = [
   {
     id: "APT009",

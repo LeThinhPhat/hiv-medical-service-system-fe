@@ -32,15 +32,13 @@ import AppointmentList from "../Components/Staff/AppointmentList";
 import Manager from "../Components/Manager/Manager";
 import Doctor from "../Components/Doctor/Doctor";
 import Appointment from "../Components/Doctor/Appointment";
-<<<<<<< Updated upstream
 import  BookingPage from "../Components/Customer/BookingStep/BookingPage";
 import BookingConfirmPage from "../Components/Customer/BookingStep/BookingConfirmPage";
-=======
 import PatientsList from "../Components/Doctor/PatientsList";
 import DoctorProfile from "../Components/Doctor/DoctorProfile";
 import DoctorSlot from "../Components/Staff/DoctorSlot";
+import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPayment";
 
->>>>>>> Stashed changes
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -51,6 +49,7 @@ const Router = createBrowserRouter([
       { path: "blogs", element: <BlogList /> },
       { path: "blogs/:id", element: <BlogDetail /> },
       { path: "booking", element: <Booking /> },
+      { path: "booking-payment", element: <BookingPaymentPage /> },
       { path: "profile", element: <Profile /> },
       { path: "signin", element: <SignIn /> },
       { path: "register", element: <SignUp /> },
