@@ -1,5 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import appointmentService from "../../../Services/CusService/AppointmentService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function formatTime(isoString) {
   const date = new Date(isoString);
@@ -17,117 +20,140 @@ function formatDate(isoDateString) {
 const BookingConfirmPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { doctor, slot, date, userRole } = location.state || {};
-  const [cccd, setCCCD] = useState("");
-  const [info, setInfo] = useState({});
-  const [selectedService, setSelectedService] = useState("");
 
-  // Fake data service ở đây!
-  const services = [
-    { _id: "1", name: "Khám tổng quát" },
-    { _id: "2", name: "Khám nội khoa" },
-    { _id: "3", name: "Xét nghiệm máu" },
-    { _id: "4", name: "Tư vấn dinh dưỡng" },
-    { _id: "5", name: "Tiêm chủng" },
-  ];
+  const {
+    doctor,
+    slot,
+    date,
+    service = null
+  } = location.state || {};
 
-  const handleSubmitBooking = (e) => {
+  const token = localStorage.getItem("token");
+  if (!doctor || !slot) return <div>Không có dữ liệu đặt lịch!</div>;
+  const serviceName = service?.name || "Chưa chọn dịch vụ";
+  const [info, setInfo] = useState({ name: "", cccd: "", phone: "" });
+  const patient = JSON.parse(localStorage.getItem("patient")) || {};
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (token) {
+      setInfo({
+        name: patient.name || "",
+        cccd: patient.personalID || "",
+        phone: patient.contactPhones ? patient.contactPhones[0] : ""
+      });
+    }
+  }, [token]);
+
+  const handleChange = (e) => setInfo({ ...info, [e.target.name]: e.target.value });
+
+  const handleSubmitBooking = async (e) => {
     e.preventDefault();
-    if (!selectedService) {
-      alert("Vui lòng chọn dịch vụ!");
+    if (!info.name || !info.cccd || !info.phone) {
+      toast.warning("Vui lòng nhập đầy đủ thông tin bệnh nhân!");
       return;
     }
-    if (userRole === "patient") {
-      if (!cccd) {
-        alert("Vui lòng nhập CCCD");
-        return;
-      }
-      alert(`Đặt lịch thành công cho bệnh nhân với CCCD: ${cccd}, dịch vụ: ${selectedService}`);
-      // navigate("/success");
-    } else {
-      if (!info.name || !info.phone) {
-        alert("Vui lòng nhập đầy đủ thông tin!");
-        return;
-      }
-      alert(`Đặt lịch thành công cho khách khác, dịch vụ: ${selectedService}!`);
-      // navigate("/success");
+    setLoading(true);
+    const appointmentData = {
+      patientID: patient._id,
+      doctorSlotID: [slot._id],
+      serviceID: service?._id || null,
+      treatmentID: null
+    };
+    try {
+      const appointment = await appointmentService.createAppointment(appointmentData);
+      toast.success(
+        <>
+          <b>Đặt lịch thành công!</b><br />
+          Bệnh nhân: {info.name} <br />
+          CCCD: {info.cccd} <br />
+          SĐT: {info.phone} <br />
+          Bác sĩ: {doctor.userID?.name} <br />
+          Ngày: {formatDate(date)}, {formatTime(slot.startTime)} - {formatTime(slot.endTime)}<br />
+          Dịch vụ: {serviceName}
+        </>
+      );
+      setTimeout(() => {
+        navigate("/booking-payment", {
+          state: {
+            appointment,
+            info,
+            doctor,
+            slot,
+            date,
+            service
+          }
+        });
+      }, 1800);
+    } catch (error) {
+      toast.error("Đặt lịch thất bại: " + (error.message || "Lỗi không xác định"));
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!doctor || !slot) return <div>Không có dữ liệu đặt lịch!</div>;
-
   return (
-    <div className="max-w-md mx-auto mt-8 bg-white p-8 rounded-xl shadow">
-      <h2 className="text-2xl font-bold mb-4 text-green-700">Xác nhận đặt lịch</h2>
-      <div className="mb-4">
-        <b>Bác sĩ:</b> {doctor.userID?.name}<br />
-        <b>Ngày:</b> {formatDate(date)}<br />
-        <b>Giờ:</b> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+    <div className="max-w-md mx-auto mt-10 bg-white p-10 rounded-2xl shadow-2xl" style={{ background: "#f9fafb" }}>
+      <h2 className="text-3xl font-extrabold mb-6 text-center drop-shadow-xl"
+          style={{ color: "#1976d2" }}>
+        Xác nhận đặt lịch
+      </h2>
+      <div className="mb-6 border-2 rounded-xl p-5 shadow-md"
+        style={{ borderColor: "#1976d2", background: "#e3f2fd" }}>
+        <div className="text-lg mb-2"><b>Bác sĩ:</b> {doctor.userID?.name}</div>
+        <div className="text-lg mb-2"><b>Ngày:</b> {formatDate(date)}</div>
+        <div className="text-lg mb-2"><b>Giờ:</b> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</div>
+        <div className="text-lg"><b>Dịch vụ:</b> {serviceName}</div>
       </div>
       <form onSubmit={handleSubmitBooking}>
-        {/* Ô chọn dịch vụ */}
         <div className="mb-4">
-          <label className="block font-semibold mb-1">Chọn dịch vụ:</label>
-          <select
-            value={selectedService}
-            onChange={e => setSelectedService(e.target.value)}
-            className="w-full border rounded px-3 py-2"
+          <label className="block font-semibold mb-1">Họ tên:</label>
+          <input
+            type="text"
+            name="name"
+            value={info.name}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2 mb-2"
+            placeholder="Nhập họ tên"
             required
-          >
-            <option value="">-- Chọn dịch vụ --</option>
-            {services.map(sv => (
-              <option key={sv._id} value={sv.name}>
-                {sv.name}
-              </option>
-            ))}
-          </select>
+            disabled={loading}
+          />
+          <label className="block font-semibold mb-1">CCCD:</label>
+          <input
+            type="text"
+            name="cccd"
+            value={info.cccd}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2 mb-2"
+            placeholder="Nhập số CCCD"
+            required
+            disabled={loading}
+          />
+          <label className="block font-semibold mb-1">Số điện thoại:</label>
+          <input
+            type="text"
+            name="phone"
+            value={info.phone}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+            placeholder="Nhập số điện thoại"
+            required
+            disabled={loading}
+          />
         </div>
-        {/* Nếu là patient: nhập CCCD, không thì nhập info */}
-        {userRole === "patient" ? (
-          <div className="mb-4">
-            <label className="block font-semibold mb-1">Nhập số CCCD:</label>
-            <input
-              type="text"
-              value={cccd}
-              onChange={e => setCCCD(e.target.value)}
-              className="w-full border rounded px-3 py-2"
-              placeholder="CCCD"
-              required
-            />
-          </div>
-        ) : (
-          <div>
-            <div className="mb-2">
-              <label className="block font-semibold mb-1">Tên khách:</label>
-              <input
-                type="text"
-                value={info.name || ""}
-                onChange={e => setInfo((i) => ({ ...i, name: e.target.value }))}
-                className="w-full border rounded px-3 py-2"
-                placeholder="Tên"
-                required
-              />
-            </div>
-            <div className="mb-2">
-              <label className="block font-semibold mb-1">Số điện thoại:</label>
-              <input
-                type="text"
-                value={info.phone || ""}
-                onChange={e => setInfo((i) => ({ ...i, phone: e.target.value }))}
-                className="w-full border rounded px-3 py-2"
-                placeholder="SĐT"
-                required
-              />
-            </div>
-          </div>
-        )}
         <button
           type="submit"
-          className="w-full mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-semibold shadow"
+          className="w-full mt-4 text-white text-xl px-6 py-4 rounded-2xl font-bold shadow-lg transition-all duration-200"
+          style={{
+            background: "#1976d2",
+            border: "none"
+          }}
+          disabled={loading}
         >
-          Xác nhận đặt lịch
+          {loading ? "Đang xử lý..." : "Xác nhận đặt lịch"}
         </button>
       </form>
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 };

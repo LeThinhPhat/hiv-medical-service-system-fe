@@ -42,6 +42,7 @@ import DoctorSlot from "../Components/Staff/DoctorSlot";
 import DoctorProfile from "../Components/Doctor/DoctorProfile";
 import CreateRecord from "../Components/Doctor/CreateRecord";
 import MedicalRecords from "../Components/Doctor/MedicalRecords";
+import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPayment";
 
 const Router = createBrowserRouter([
   {
@@ -53,6 +54,7 @@ const Router = createBrowserRouter([
       { path: "blogs", element: <BlogList /> },
       { path: "blogs/:id", element: <BlogDetail /> },
       { path: "booking", element: <Booking /> },
+      { path: "booking-payment", element: <BookingPaymentPage /> },
       { path: "profile", element: <Profile /> },
       { path: "signin", element: <SignIn /> },
       { path: "register", element: <SignUp /> },

@@ -32,8 +32,9 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
     const fetchServices = async () => {
       try {
         setLoadingServices(true);
+       
         const result = await ServicesService.getAllService();
-        const patient = await PatientService.getPatientByToken();
+        const patient = JSON.parse(localStorage.getItem("patient"));
         console.log("Patient data:", patient.medicalRecordID);
         let filteredServices = result;
         if (!patient || !patient.medicalRecordID || patient.medicalRecordID.length === 0) {

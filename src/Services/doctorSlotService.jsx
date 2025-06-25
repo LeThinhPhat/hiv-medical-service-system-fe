@@ -32,11 +32,12 @@ const doctorSlotService = {
       throw error;
     }
   },
-  getDoctorSlotsByDate: async (doctorId, date) => {
+  getDoctorSlotsByDateAndService: async (doctorId, date, serviceId) => {
   try {
+    
     const token = localStorage.getItem("token");
     const response = await fetch(
-      `${BASE_URL}/doctorSlots/${doctorId}/slots-by-date?date=${date}`,
+      `${BASE_URL}/doctorSlots/${doctorId}/available-slots?serviceId=${serviceId}&date=${date}`,
       {
         method: "GET",
         headers: {
@@ -58,5 +59,6 @@ const doctorSlotService = {
     throw error;
   }
 }
+
 };
 export default doctorSlotService;
