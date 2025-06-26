@@ -23,27 +23,6 @@
 // };
 
 // export default doctorprofileService;
-// src/Services/DoctorService/profileService.jsx
-
-// import axios from "axios";
-
-// const API_URL = "http://localhost:3000/api/doctors"; // endpoint backend của bạn
-
-// const doctorprofileService = {
-//   getDoctorById: async (id) => {
-//     try {
-//       const response = await axios.get(`${API_URL}/${id}`);
-//       return response.data.data; // ✅ chỉ trả về dữ liệu doctor
-//     } catch (error) {
-//       console.error("Lỗi khi lấy thông tin bác sĩ:", error);
-//       throw error;
-//     }
-//   },
-// };
-
-// export default doctorprofileService;
-// Services/DoctorService/doctorprofileService.jsx
-
 import axios from "axios";
 
 const API_URL = "http://localhost:3000/doctors/token";
