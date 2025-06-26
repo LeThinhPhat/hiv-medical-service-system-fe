@@ -44,6 +44,7 @@ import CreateMedicalRecord from "../Components/Doctor/CreateMedicalRecord";
 import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
 import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPayment";
 import SuccessPaymentPage from "../Components/Customer/BookingStep/SuccessPaymentPage";
+import CreateDoctorSchedule from "../Components/Manager/CreateDoctorSchedule";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -89,6 +90,7 @@ const Router = createBrowserRouter([
     element: <ManagerLayout />,
     children: [
       { path: "", element: <Manager /> },
+      { path: "doctors", element: <CreateDoctorSchedule /> },
       // Add manager child routes here if needed
     ],
   },
