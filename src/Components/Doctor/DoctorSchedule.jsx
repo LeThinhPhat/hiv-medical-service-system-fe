@@ -8,7 +8,6 @@ const DoctorSchedule = () => {
   const [currentMonday, setCurrentMonday] = useState(getMonday(new Date()));
   const token = localStorage.getItem("token");
 
-  // 👉 Hàm lấy thứ 2 đầu tuần từ 1 ngày bất kỳ
   function getMonday(date) {
     const d = new Date(date);
     const day = d.getDay();
@@ -97,94 +96,103 @@ const DoctorSchedule = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">
+    <div className="p-6 max-w-5xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-lg shadow-sm">
+        <h1 className="text-xl font-bold text-gray-800 mb-2 sm:mb-0">
           📅 Lịch làm việc tuần: {formatRange()}
         </h1>
-        <div className="space-x-2">
+        <div className="flex space-x-2">
           <button
             onClick={goToPreviousWeek}
-            className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
+            className="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors text-sm"
           >
             ⬅️ Tuần trước
           </button>
           <button
             onClick={goToNextWeek}
-            className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
+            className="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors text-sm"
           >
             ➡️ Tuần sau
           </button>
         </div>
       </div>
 
-      <table className="min-w-full border border-gray-300 rounded-md">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">Ngày</th>
-            <th className="p-2 border">Ca trực</th>
-            <th className="p-2 border">Trạng thái</th>
-            <th className="p-2 border">Người tạo</th>
-            <th className="p-2 border">Chọn ca</th>
-            <th className="p-2 border">Xác nhận</th>
-            <th className="p-2 border">Đã đăng ký</th>
-          </tr>
-        </thead>
-        <tbody>
-          {schedule.length > 0 ? (
-            schedule.map((item) => (
-              <tr key={item._id} className="text-center">
-                <td className="p-2 border">
-                  {moment(item.date).format("DD/MM/YYYY")}
-                </td>
-                <td className="p-2 border capitalize">{item.shiftName}</td>
-                <td className="p-2 border">{item.status}</td>
-                <td className="p-2 border">{item.createdBy?.email}</td>
-                <td className="p-2 border">
-                  <select
-                    className="border px-2 py-1 rounded"
-                    value={selectedShifts[item._id] || "morning"}
-                    onChange={(e) =>
-                      handleShiftChange(item._id, e.target.value)
-                    }
-                  >
-                    <option value="morning">Sáng</option>
-                    <option value="afternoon">Chiều</option>
-                    <option value="full">Cả ngày</option>
-                  </select>
-                </td>
-                <td className="p-2 border">
-                  {!item.isConfirmed ? (
-                    <button
-                      onClick={() => handleConfirmSchedule(item._id)}
-                      className="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600"
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+          <thead>
+            <tr className="bg-gray-50 text-gray-600 uppercase text-xs font-semibold">
+              <th className="p-3 border-b text-left">Ngày</th>
+              <th className="p-3 border-b text-left">Ca trực</th>
+              <th className="p-3 border-b text-left">Trạng thái</th>
+              <th className="p-3 border-b text-left">Người tạo</th>
+              <th className="p-3 border-b text-left">Chọn ca</th>
+              <th className="p-3 border-b text-left">Xác nhận</th>
+              <th className="p-3 border-b text-left">Đã đăng ký</th>
+            </tr>
+          </thead>
+          <tbody>
+            {schedule.length > 0 ? (
+              schedule.map((item) => (
+                <tr
+                  key={item._id}
+                  className="hover:bg-gray-50 transition-colors text-sm"
+                >
+                  <td className="p-3 border-b text-gray-700">
+                    {moment(item.date).format("DD/MM/YYYY")}
+                  </td>
+                  <td className="p-3 border-b capitalize text-gray-700">
+                    {item.shiftName}
+                  </td>
+                  <td className="p-3 border-b text-gray-700">{item.status}</td>
+                  <td className="p-3 border-b text-gray-700">
+                    {item.createdBy?.email}
+                  </td>
+                  <td className="p-3 border-b">
+                    <select
+                      className="w-full p-1 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      value={selectedShifts[item._id] || "morning"}
+                      onChange={(e) =>
+                        handleShiftChange(item._id, e.target.value)
+                      }
                     >
-                      Xác nhận
-                    </button>
-                  ) : (
-                    <span className="text-green-600 font-semibold">
-                      ✅ Đã xác nhận
-                    </span>
-                  )}
-                </td>
-                <td className="p-2 border">
-                  {item.shiftName === "morning"
-                    ? "Ca sáng"
-                    : item.shiftName === "afternoon"
-                    ? "Ca chiều"
-                    : "Cả ngày"}
+                      <option value="morning">Sáng</option>
+                      <option value="afternoon">Chiều</option>
+                      <option value="full">Cả ngày</option>
+                    </select>
+                  </td>
+                  <td className="p-3 border-b">
+                    {!item.isConfirmed ? (
+                      <button
+                        onClick={() => handleConfirmSchedule(item._id)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors text-sm"
+                      >
+                        Xác nhận
+                      </button>
+                    ) : (
+                      <span className="text-green-600 font-medium">
+                        ✅ Đã xác nhận
+                      </span>
+                    )}
+                  </td>
+                  <td className="p-3 border-b text-gray-700">
+                    {item.shiftName === "morning"
+                      ? "Ca sáng"
+                      : item.shiftName === "afternoon"
+                      ? "Ca chiều"
+                      : "Cả ngày"}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" className="p-4 text-center text-gray-500">
+                  Không có lịch làm việc nào.
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" className="p-4 text-center">
-                Không có lịch làm việc nào.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
