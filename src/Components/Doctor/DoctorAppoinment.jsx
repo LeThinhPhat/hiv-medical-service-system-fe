@@ -49,8 +49,12 @@ const DoctorAppointments = () => {
                 <td className="p-2">
                   {new Date(appt.createdAt).toLocaleString()}
                 </td>
-                <td className="p-2">{appt.patientID}</td>
-                <td className="p-2">{appt.serviceID}</td>
+                <td className="p-2">
+                  {appt.patientID?.name || "Không có tên"}
+                </td>
+                <td className="p-2">
+                  {appt.serviceID?.name || "Không có dịch vụ"}
+                </td>
                 <td className="p-2">
                   {new Date(appt.startTime).toLocaleString()}
                 </td>
@@ -59,7 +63,7 @@ const DoctorAppointments = () => {
                   <button
                     className="bg-green-600 text-white px-3 py-1 rounded mr-2 hover:bg-green-700"
                     onClick={() =>
-                      navigate(`medical-records/view/${appt.patientID}`)
+                      navigate(`medical-records/view/${appt.patientID?._id}`)
                     }
                   >
                     Xem hồ sơ
@@ -67,7 +71,7 @@ const DoctorAppointments = () => {
                   <button
                     className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
                     onClick={() =>
-                      navigate(`medical-records/create/${appt.patientID}`)
+                      navigate(`medical-records/create/${appt.patientID?._id}`)
                     }
                   >
                     Tạo bệnh án

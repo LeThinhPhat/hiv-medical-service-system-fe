@@ -26,6 +26,7 @@ import Staff from "../Components/Staff/Staff";
 import AppointmentList from "../Components/Staff/AppointmentList";
 
 import Manager from "../Components/Manager/Manager";
+import ManagerDoctorList from "../Components/Manager/ManagerDoctorList";
 import Doctor from "../Components/Doctor/Doctor";
 import AppointmentFake from "../Components/Doctor/AppointmentFake";
 import ProfileDoctor from "../Components/Doctor/ProfileDoctor";
@@ -45,6 +46,7 @@ import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
 import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPayment";
 import SuccessPaymentPage from "../Components/Customer/BookingStep/SuccessPaymentPage";
 import CreateDoctorSchedule from "../Components/Manager/CreateDoctorSchedule";
+import ManagerAppointment from "../Components/Manager/ManagerAppointment";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -91,6 +93,8 @@ const Router = createBrowserRouter([
     children: [
       { path: "", element: <Manager /> },
       { path: "doctors", element: <CreateDoctorSchedule /> },
+      { path: "doctorlist", element: <ManagerDoctorList /> },
+      { path: "appointments", element: <ManagerAppointment /> },
       // Add manager child routes here if needed
     ],
   },

@@ -1,17 +1,6 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import {
-  Box,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Avatar,
-  Typography,
-  Divider,
-} from "@mui/material";
-import {
-  Menu as MenuIcon,
   LocalHospital,
   Group,
   Event,
@@ -26,11 +15,10 @@ import {
   Widgets,
   People,
 } from "@mui/icons-material";
-import { NavLink } from "react-router-dom";
 
 const sidebarItems = [
   { text: "Doctors", icon: <LocalHospital />, path: "/manager/doctors" },
-  { text: "Patients", icon: <Group />, path: "/manager/patients" },
+  { text: "Patients", icon: <Group />, path: "/manager/doctorlist" },
   { text: "Staff", icon: <People />, path: "/manager/staff" },
   { text: "Appointments", icon: <Event />, path: "/manager/appointments" },
   { text: "Departments", icon: <Apartment />, path: "/manager/departments" },
@@ -47,74 +35,53 @@ const sidebarItems = [
 
 const ManagerSidebar = () => {
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: 250,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: {
-          width: 250,
-          boxSizing: "border-box",
-          backgroundColor: "#fff",
-          borderRight: "1px solid #e0e0e0",
-        },
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          bgcolor: "#1976d2",
-          color: "#fff",
-          height: 64,
-          px: 2,
-        }}
-      >
-        <MenuIcon sx={{ mr: 1 }} />
-        <Typography variant="h6" noWrap>
-          Medflex
-        </Typography>
-      </Box>
+    <div className="w-64 h-screen bg-white border-r shadow-sm flex flex-col">
+      <div className="flex items-center p-4 bg-teal-600 text-white">
+        <svg
+          className="w-6 h-6 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M4 6h16M4 12h16m-7 6h7"
+          />
+        </svg>
+        <h1 className="text-xl font-bold">Medflex</h1>
+      </div>
 
-      <Box sx={{ p: 2, display: "flex", alignItems: "center" }}>
-        <Avatar
-          alt="Nick Gonzalez"
+      <div className="p-4 flex items-center border-b">
+        <img
           src="https://randomuser.me/api/portraits/men/75.jpg"
-          sx={{ width: 48, height: 48, mr: 2 }}
+          alt="Nick Gonzalez"
+          className="w-12 h-12 rounded-full mr-3"
         />
-        <Box>
-          <Typography fontWeight="bold">Nick Gonzalez</Typography>
-          <Typography variant="body2" color="textSecondary">
-            Dept Admin
-          </Typography>
-        </Box>
-      </Box>
+        <div>
+          <p className="font-semibold text-gray-800">Manager</p>
+        </div>
+      </div>
 
-      <Divider />
-
-      <List>
+      <nav className="flex-1 overflow-y-auto">
         {sidebarItems.map((item) => (
           <NavLink
             key={item.text}
             to={item.path}
-            style={({ isActive }) => ({
-              textDecoration: "none",
-              color: isActive ? "#1976d2" : "#333",
-              backgroundColor: isActive ? "#e3f2fd" : "transparent",
-            })}
+            className={({ isActive }) =>
+              `flex items-center p-3 text-gray-700 hover:bg-teal-50 rounded-lg transition-colors ${
+                isActive ? "bg-teal-100 text-teal-600 font-medium" : ""
+              }`
+            }
           >
-            <ListItemButton>
-              <ListItemIcon
-                sx={{ color: (isActive) => (isActive ? "#1976d2" : "#555") }}
-              >
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
+            <span className="mr-3 text-lg">{item.icon}</span>
+            <span className="text-sm">{item.text}</span>
           </NavLink>
         ))}
-      </List>
-    </Drawer>
+      </nav>
+    </div>
   );
 };
 

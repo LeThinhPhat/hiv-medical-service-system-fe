@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -7,16 +7,35 @@ import {
   Paper,
   Chip,
   IconButton,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import doctorScheduleService from "../../Services/ManagerService/createScheduleService";
+import doctorService from "../../Services/ManagerService/doctorService"; // ✅ import
 
 const CreateDoctorSchedule = () => {
-  const [doctorID, setDoctorID] = useState(""); // nhập ID bác sĩ
-  const [dateInput, setDateInput] = useState(""); // ngày nhập vào
-  const [dates, setDates] = useState([]); // mảng ngày
+  const [doctorID, setDoctorID] = useState("");
+  const [doctors, setDoctors] = useState([]); // ✅ danh sách bác sĩ
+  const [dateInput, setDateInput] = useState("");
+  const [dates, setDates] = useState([]);
   const [message, setMessage] = useState("");
+
+  // ✅ Gọi API để lấy danh sách bác sĩ
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const data = await doctorService.getAllDoctors();
+        setDoctors(data);
+      } catch (err) {
+        console.error("Lỗi khi lấy bác sĩ:", err);
+      }
+    };
+    fetchDoctors();
+  }, []);
 
   const handleAddDate = () => {
     if (dateInput && !dates.includes(dateInput)) {
@@ -49,13 +68,21 @@ const CreateDoctorSchedule = () => {
         Tạo Lịch Khám Mới
       </Typography>
 
-      <TextField
-        fullWidth
-        label="Doctor ID"
-        value={doctorID}
-        onChange={(e) => setDoctorID(e.target.value)}
-        margin="normal"
-      />
+      {/* ✅ Select chọn bác sĩ */}
+      <FormControl fullWidth margin="normal">
+        <InputLabel>Chọn Bác sĩ</InputLabel>
+        <Select
+          value={doctorID}
+          label="Chọn Bác sĩ"
+          onChange={(e) => setDoctorID(e.target.value)}
+        >
+          {doctors.map((doc) => (
+            <MenuItem key={doc._id} value={doc._id}>
+              {doc.userID?.name || "Không rõ"} — {doc._id}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
       <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
         <TextField
