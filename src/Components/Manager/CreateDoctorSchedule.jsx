@@ -1,114 +1,176 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Box,
-  Button,
-  TextField,
-  Typography,
   Paper,
-  Chip,
-  IconButton,
-  MenuItem,
+  Typography,
   Select,
-  InputLabel,
+  MenuItem,
   FormControl,
+  InputLabel,
+  Button,
+  Box,
+  OutlinedInput,
+  Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
+import doctorService from "../../Services/ManagerService/doctorService";
 import doctorScheduleService from "../../Services/ManagerService/createScheduleService";
-import doctorService from "../../Services/ManagerService/doctorService"; // ✅ import
 
-const CreateDoctorSchedule = () => {
-  const [doctorID, setDoctorID] = useState("");
-  const [doctors, setDoctors] = useState([]); // ✅ danh sách bác sĩ
-  const [dateInput, setDateInput] = useState("");
-  const [dates, setDates] = useState([]);
+const CreateDoctorScheduleWeek = () => {
+  const [doctors, setDoctors] = useState([]);
+  const [startDate, setStartDate] = useState(() => {
+    const today = new Date();
+    today.setDate(today.getDate() - today.getDay());
+    return today;
+  });
+  const [scheduleData, setScheduleData] = useState({});
   const [message, setMessage] = useState("");
+  const [errorDetails, setErrorDetails] = useState("");
 
-  // ✅ Gọi API để lấy danh sách bác sĩ
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
         const data = await doctorService.getAllDoctors();
-        setDoctors(data);
+        setDoctors(data || []);
       } catch (err) {
-        console.error("Lỗi khi lấy bác sĩ:", err);
+        console.error("Lỗi khi lấy danh sách bác sĩ:", err);
       }
     };
     fetchDoctors();
   }, []);
 
-  const handleAddDate = () => {
-    if (dateInput && !dates.includes(dateInput)) {
-      setDates([...dates, dateInput]);
-      setDateInput("");
-    }
-  };
+  const daysOfWeek = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + i);
+    const key = date.toISOString().slice(0, 10);
+    const label = date.toLocaleDateString("vi-VN", {
+      weekday: "long",
+      day: "2-digit",
+      month: "2-digit",
+    });
+    return { key, label };
+  });
 
-  const handleRemoveDate = (dateToRemove) => {
-    setDates(dates.filter((d) => d !== dateToRemove));
+  const handleDoctorChange = (date, selectedDoctors) => {
+    setScheduleData((prev) => ({
+      ...prev,
+      [date]: selectedDoctors,
+    }));
   };
 
   const handleSubmit = async () => {
     try {
-      const result = await doctorScheduleService.createSchedule({
-        doctorID,
-        dates,
+      const selectedDoctorIDs = new Set();
+      const selectedDates = [];
+
+      Object.entries(scheduleData).forEach(([date, doctorIDs]) => {
+        doctorIDs.forEach((id) => selectedDoctorIDs.add(id));
+        selectedDates.push(date);
       });
-      setMessage(result.message || "Tạo lịch khám thành công");
+
+      const payload = {
+        doctorID: Array.from(selectedDoctorIDs),
+        dates: selectedDates,
+      };
+
+      await doctorScheduleService.createSchedule(payload);
+      setMessage("✅ Gửi lịch khám thành công!");
+      setErrorDetails("");
     } catch (err) {
-      setMessage(
-        "Tạo lịch khám thất bại: " + (err.message || "Lỗi không xác định")
-      );
+      console.error("❌ API Error:", err.response?.data || err.message);
+      setMessage("❌ Gửi lịch khám thất bại");
+      setErrorDetails(JSON.stringify(err.response?.data || err.message));
     }
   };
 
+  const handlePreviousWeek = () => {
+    const newStart = new Date(startDate);
+    newStart.setDate(startDate.getDate() - 7);
+    setStartDate(newStart);
+    setScheduleData({});
+  };
+
+  const handleNextWeek = () => {
+    const newStart = new Date(startDate);
+    newStart.setDate(startDate.getDate() + 7);
+    setStartDate(newStart);
+    setScheduleData({});
+  };
+
   return (
-    <Paper elevation={4} sx={{ p: 4, maxWidth: 600, mx: "auto", mt: 4 }}>
+    <Paper elevation={4} sx={{ p: 4, maxWidth: 1200, mx: "auto", mt: 4 }}>
       <Typography variant="h5" fontWeight="bold" gutterBottom>
-        Tạo Lịch Khám Mới
+        Tạo Lịch Khám Theo Tuần (Lịch Dạng Bảng)
       </Typography>
 
-      {/* ✅ Select chọn bác sĩ */}
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Chọn Bác sĩ</InputLabel>
-        <Select
-          value={doctorID}
-          label="Chọn Bác sĩ"
-          onChange={(e) => setDoctorID(e.target.value)}
-        >
-          {doctors.map((doc) => (
-            <MenuItem key={doc._id} value={doc._id}>
-              {doc.userID?.name || "Không rõ"} — {doc._id}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
-        <TextField
-          label="Chọn ngày khám"
-          type="date"
-          InputLabelProps={{ shrink: true }}
-          value={dateInput}
-          onChange={(e) => setDateInput(e.target.value)}
-          fullWidth
-        />
-        <IconButton color="primary" onClick={handleAddDate}>
-          <AddIcon />
-        </IconButton>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
+        <Button variant="outlined" onClick={handlePreviousWeek}>
+          Tuần trước
+        </Button>
+        <Button variant="outlined" onClick={handleNextWeek}>
+          Tuần sau
+        </Button>
       </Box>
 
-      <Box sx={{ mt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
-        {dates.map((date) => (
-          <Chip
-            key={date}
-            label={date}
-            onDelete={() => handleRemoveDate(date)}
-            deleteIcon={<DeleteIcon />}
-            color="info"
-          />
-        ))}
-      </Box>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Ca / Ngày</TableCell>
+              {daysOfWeek.map(({ key, label }) => (
+                <TableCell key={key} align="center">
+                  {label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell>Bác sĩ trực</TableCell>
+              {daysOfWeek.map(({ key }) => (
+                <TableCell key={key}>
+                  <FormControl fullWidth>
+                    <InputLabel>Chọn bác sĩ</InputLabel>
+                    <Select
+                      multiple
+                      size="small"
+                      value={scheduleData[key] || []}
+                      onChange={(e) => handleDoctorChange(key, e.target.value)}
+                      input={<OutlinedInput label="Chọn bác sĩ" />}
+                      renderValue={(selected) => (
+                        <Box
+                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                        >
+                          {selected.map((id) => {
+                            const doc = doctors.find((d) => d._id === id);
+                            return (
+                              <Chip
+                                key={id}
+                                label={doc?.userID?.name || id}
+                                color="info"
+                              />
+                            );
+                          })}
+                        </Box>
+                      )}
+                    >
+                      {doctors.map((doc) => (
+                        <MenuItem key={doc._id} value={doc._id}>
+                          {doc.userID?.name || "Không rõ"}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       <Button
         variant="contained"
@@ -116,18 +178,27 @@ const CreateDoctorSchedule = () => {
         fullWidth
         sx={{ mt: 3 }}
         onClick={handleSubmit}
-        disabled={!doctorID || dates.length === 0}
+        disabled={Object.keys(scheduleData).length === 0}
       >
         Gửi Lịch Khám
       </Button>
 
       {message && (
-        <Typography color="primary" sx={{ mt: 2 }}>
+        <Typography
+          sx={{ mt: 2 }}
+          color={message.startsWith("✅") ? "green" : "red"}
+        >
           {message}
+        </Typography>
+      )}
+
+      {errorDetails && (
+        <Typography sx={{ mt: 1, fontSize: "0.875rem", color: "gray" }}>
+          Chi tiết lỗi: {errorDetails}
         </Typography>
       )}
     </Paper>
   );
 };
 
-export default CreateDoctorSchedule;
+export default CreateDoctorScheduleWeek;
