@@ -29,7 +29,6 @@ import Manager from "../Components/Manager/Manager";
 import ManagerDoctorList from "../Components/Manager/ManagerDoctorList";
 import Doctor from "../Components/Doctor/Doctor";
 import AppointmentFake from "../Components/Doctor/AppointmentFake";
-import ProfileDoctor from "../Components/Doctor/ProfileDoctor";
 import BookingPage from "../Components/Customer/BookingStep/BookingPage";
 import BookingConfirmPage from "../Components/Customer/BookingStep/BookingConfirmPage";
 
@@ -47,6 +46,7 @@ import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPaymen
 import SuccessPaymentPage from "../Components/Customer/BookingStep/SuccessPaymentPage";
 import CreateDoctorSchedule from "../Components/Manager/CreateDoctorSchedule";
 import ManagerAppointment from "../Components/Manager/ManagerAppointment";
+import Calendar from "../Components/Doctor/Calendar";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -106,10 +106,6 @@ const Router = createBrowserRouter([
       { path: "appointments", element: <AppointmentFake /> },
       { path: "my-patients", element: <PatientsList /> },
       {
-        path: "profile-doctor",
-        element: <ProfileDoctor />,
-      },
-      {
         path: "profile",
         element: <DoctorProfile />,
       },
@@ -124,6 +120,10 @@ const Router = createBrowserRouter([
       {
         path: "doctorschedule",
         element: <DoctorSchedule />,
+      },
+      {
+        path: "calendar",
+        element: <Calendar />,
       },
       {
         path: "doctorsappoinment",

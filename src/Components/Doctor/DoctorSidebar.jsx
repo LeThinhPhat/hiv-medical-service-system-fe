@@ -91,12 +91,12 @@ const DoctorSidebar = () => {
           path: "/doctors-grid",
         },
         {
-          label: "Doctors Cards",
+          label: "Lịch làm việc",
           icon: <FaUserMd />,
-          path: "/doctors-cards",
+          path: "/doctor/calendar",
         },
         {
-          label: "Doctor Profile",
+          label: "Hồ sơ cá nhân",
           icon: <FaUser />,
           path: "/doctor/profile",
         },
