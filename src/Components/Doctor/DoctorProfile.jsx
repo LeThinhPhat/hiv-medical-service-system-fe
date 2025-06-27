@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaUserMd, FaStar, FaLungs, FaStarHalfAlt } from "react-icons/fa";
 import doctorprofileService from "../../Services/DoctorService/doctorprofileService";
+import doctorScheduleService from "../../Services/DoctorService/doctorScheduleService";
 
 const DoctorProfile = () => {
   const [doctor, setDoctor] = useState(null);
+  const [schedules, setSchedules] = useState([]);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDoctor = async () => {
@@ -17,7 +21,28 @@ const DoctorProfile = () => {
       }
     };
 
+    const fetchSchedules = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const today = new Date();
+        const startDate = new Date(today);
+        const endDate = new Date(today);
+        startDate.setDate(startDate.getDate() - today.getDay());
+        endDate.setDate(startDate.getDate() + 6);
+
+        const response = await doctorScheduleService.getScheduleByWeek(
+          token,
+          startDate.toISOString().slice(0, 10),
+          endDate.toISOString().slice(0, 10)
+        );
+        setSchedules(response.data);
+      } catch (err) {
+        console.error("Lỗi khi lấy lịch làm việc:", err);
+      }
+    };
+
     fetchDoctor();
+    fetchSchedules();
   }, []);
 
   if (error) {
@@ -33,7 +58,7 @@ const DoctorProfile = () => {
       {/* Top Info Section */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Doctor Info */}
-        <div className="col-span-1 lg:col-span-1 bg-blue-500 text-white rounded-lg flex p-4 items-center">
+        <div className="col-span-1 bg-blue-500 text-white rounded-lg flex p-4 items-center">
           <img
             src="https://randomuser.me/api/portraits/women/44.jpg"
             alt={`Dr. ${doctor?.userID?.name}`}
@@ -105,28 +130,80 @@ const DoctorProfile = () => {
 
         {/* Availability */}
         <div className="bg-white p-6 rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">Lịch làm việc</h3>
-          <div className="space-y-2 mb-4">
-            {[
-              "Thứ 2 - 9:00 - 14:00",
-              "Thứ 3 - 9:00 - 14:00",
-              "Thứ 4 - 9:00 - 14:00",
-              "Thứ 5 - 9:00 - 14:00",
-              "Thứ 6 - 9:00 - 14:00",
-              "Thứ 7 - 9:00 - 14:00",
-              "Chủ nhật - Nghỉ",
-            ].map((slot, i) => (
-              <span
-                key={i}
-                className="inline-block bg-gray-100 px-3 py-1 text-sm text-gray-800 rounded"
-              >
-                {slot}
-              </span>
-            ))}
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-black">Lịch làm việc</h3>
+            <button
+              onClick={() => navigate("/doctor/calendar")}
+              className="flex items-center gap-2 text-sm text-black font-medium text-white bg-blue-500 px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition-colors duration-200"
+            >
+              <span className="text-base">📅</span>
+              <span>Xem chi tiết</span>
+            </button>
           </div>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Đặt lịch hẹn
-          </button>
+
+          <div className="space-y-2">
+            {Array.from({ length: 7 }).map((_, i) => {
+              const current = new Date();
+              current.setHours(0, 0, 0, 0);
+              current.setDate(current.getDate() - current.getDay() + i);
+              const formatted = current.toISOString().slice(0, 10);
+
+              const weekday = current.toLocaleDateString("vi-VN", {
+                weekday: "long",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              });
+
+              const scheduleForDay = schedules.filter(
+                (s) => s.date.slice(0, 10) === formatted
+              );
+
+              return (
+                <div
+                  key={i}
+                  className={`px-3 py-2 rounded ${
+                    scheduleForDay.length > 0
+                      ? "bg-gray-100 text-gray-800"
+                      : "bg-red-100 text-red-600"
+                  }`}
+                >
+                  <div className="font-semibold">📅 {weekday}</div>
+                  {scheduleForDay.length > 0 ? (
+                    <ul className="list-disc list-inside text-sm mt-1">
+                      {scheduleForDay.map((shift, idx) => {
+                        const shiftLabel =
+                          shift.shiftName === "morning"
+                            ? "Ca sáng (8:00 - 11:30)"
+                            : shift.shiftName === "afternoon"
+                            ? "Ca chiều (13:00 - 17:00)"
+                            : "Cả ngày";
+
+                        return (
+                          <li key={idx}>
+                            {shiftLabel} |{" "}
+                            <span
+                              className={`font-medium ${
+                                shift.isConfirmed
+                                  ? "text-green-600"
+                                  : "text-yellow-600"
+                              }`}
+                            >
+                              {shift.isConfirmed
+                                ? "Đã xác nhận"
+                                : "Chưa xác nhận"}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <div className="text-sm mt-1">OFF</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
