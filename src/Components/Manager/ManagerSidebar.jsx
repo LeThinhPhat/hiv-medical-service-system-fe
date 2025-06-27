@@ -18,7 +18,7 @@ import {
 
 const sidebarItems = [
   { text: "Doctors", icon: <LocalHospital />, path: "/manager/doctors" },
-  { text: "Patients", icon: <Group />, path: "/manager/doctorlist" },
+  { text: "Doctor List", icon: <Group />, path: "/manager/doctorlist" },
   { text: "Staff", icon: <People />, path: "/manager/staff" },
   { text: "Appointments", icon: <Event />, path: "/manager/appointments" },
   { text: "Departments", icon: <Apartment />, path: "/manager/departments" },

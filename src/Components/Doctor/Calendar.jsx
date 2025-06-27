@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-// Ensure `react-datepicker` is installed: `npm install react-datepicker`
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// Verify that this path is correct relative to this file
 import doctorScheduleService from "../../Services/DoctorService/doctorScheduleService";
 
 const DoctorWeeklySchedule = () => {
@@ -42,14 +40,14 @@ const DoctorWeeklySchedule = () => {
     const dateKey = schedule.date.slice(0, 10);
     const shift = schedule.shiftName;
     if (!acc[dateKey]) acc[dateKey] = {};
+
     if (shift === "full") {
-      // If shift is "full", assign to both morning and afternoon
       acc[dateKey]["morning"] = { ...schedule, shiftName: "morning" };
       acc[dateKey]["afternoon"] = { ...schedule, shiftName: "afternoon" };
     } else {
-      // Otherwise, assign to the specified shift
       acc[dateKey][shift] = schedule;
     }
+
     return acc;
   }, {});
 
@@ -61,6 +59,7 @@ const DoctorWeeklySchedule = () => {
       weekday: "long",
       day: "2-digit",
       month: "2-digit",
+      timeZone: "UTC",
     });
     return { label, key };
   });
@@ -150,16 +149,27 @@ const DoctorWeeklySchedule = () => {
                       </td>
                     );
                   }
+
                   const slot = groupedSchedule[day.key]?.[shift];
+                  const isPending = slot && slot.isConfirmed === false;
+
                   return (
                     <td
                       key={day.key + shift}
-                      className={`border border-gray-200 px-6 py-4 text-center ${
-                        slot ? "bg-green-50" : "bg-red-50"
-                      } transition-colors duration-200`}
+                      className={`border border-gray-200 px-6 py-4 text-center transition-colors duration-200 ${
+                        slot
+                          ? isPending
+                            ? "bg-yellow-100"
+                            : "bg-green-50"
+                          : "bg-red-50"
+                      }`}
                     >
                       {slot ? (
-                        <span className="text-green-600 font-medium">
+                        <span
+                          className={`font-medium ${
+                            isPending ? "text-yellow-600" : "text-green-600"
+                          }`}
+                        >
                           {slot.status}
                         </span>
                       ) : (

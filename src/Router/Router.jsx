@@ -41,12 +41,14 @@ import DoctorSlotList from "../Components/Doctor/DoctorSlotList";
 import DoctorSchedule from "../Components/Doctor/DoctorSchedule";
 import DoctorAppointments from "../Components/Doctor/DoctorAppoinment";
 import CreateMedicalRecord from "../Components/Doctor/CreateMedicalRecord";
-import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
+// import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
+import DetailMedical from "../Components/Doctor/DetailMedical";
 import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPayment";
 import SuccessPaymentPage from "../Components/Customer/BookingStep/SuccessPaymentPage";
 import CreateDoctorSchedule from "../Components/Manager/CreateDoctorSchedule";
 import ManagerAppointment from "../Components/Manager/ManagerAppointment";
 import Calendar from "../Components/Doctor/Calendar";
+import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -134,7 +136,7 @@ const Router = createBrowserRouter([
         element: <CreateMedicalRecord />,
       },
       {
-        path: "doctorsappoinment/medical-records/view/:patientID",
+        path: "doctorsappoinment/medical-records/personal-id/:patientID",
         element: <ViewMedicalRecord />,
       },
     ],
