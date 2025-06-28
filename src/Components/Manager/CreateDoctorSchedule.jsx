@@ -102,22 +102,22 @@ const CreateDoctorScheduleWeek = () => {
   };
 
   return (
-    <Paper elevation={4} sx={{ p: 4, maxWidth: 1200, mx: "auto", mt: 4 }}>
+    <Paper elevation={4} sx={{ p: 4, maxWidth: "100%", mx: "auto", mt: 4 }}>
       <Typography variant="h5" fontWeight="bold" gutterBottom>
-        Tạo Lịch Khám Theo Tuần (Lịch Dạng Bảng)
+        Tạo Lịch Khám Theo Tuần (Dạng Bảng)
       </Typography>
 
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
         <Button variant="outlined" onClick={handlePreviousWeek}>
-          Tuần trước
+          ← Tuần trước
         </Button>
         <Button variant="outlined" onClick={handleNextWeek}>
-          Tuần sau
+          Tuần sau →
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
+        <Table size="small">
           <TableHead>
             <TableRow>
               <TableCell>Ca / Ngày</TableCell>
@@ -130,14 +130,13 @@ const CreateDoctorScheduleWeek = () => {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell>Bác sĩ trực</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Bác sĩ trực</TableCell>
               {daysOfWeek.map(({ key }) => (
                 <TableCell key={key}>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth size="small">
                     <InputLabel>Chọn bác sĩ</InputLabel>
                     <Select
                       multiple
-                      size="small"
                       value={scheduleData[key] || []}
                       onChange={(e) => handleDoctorChange(key, e.target.value)}
                       input={<OutlinedInput label="Chọn bác sĩ" />}
@@ -151,7 +150,7 @@ const CreateDoctorScheduleWeek = () => {
                               <Chip
                                 key={id}
                                 label={doc?.userID?.name || id}
-                                color="info"
+                                color="primary"
                               />
                             );
                           })}
@@ -176,7 +175,7 @@ const CreateDoctorScheduleWeek = () => {
         variant="contained"
         color="success"
         fullWidth
-        sx={{ mt: 3 }}
+        sx={{ mt: 3, fontWeight: "bold" }}
         onClick={handleSubmit}
         disabled={Object.keys(scheduleData).length === 0}
       >

@@ -46,6 +46,10 @@ import CreateDoctorSchedule from "../Components/Manager/CreateDoctorSchedule";
 import ManagerAppointment from "../Components/Manager/ManagerAppointment";
 import Calendar from "../Components/Doctor/Calendar";
 import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
+import ManagerPatient from "../Components/Manager/ManagerPatient";
+import ManagerService from "../Components/Manager/ManagerService";
+import ManagerUser from "../Components/Manager/ManagerUser";
+import UserDetail from "../Components/Manager/UserDetail";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -94,6 +98,10 @@ const Router = createBrowserRouter([
       { path: "doctors", element: <CreateDoctorSchedule /> },
       { path: "doctorlist", element: <ManagerDoctorList /> },
       { path: "appointments", element: <ManagerAppointment /> },
+      { path: "patient", element: <ManagerPatient /> },
+      { path: "service", element: <ManagerService /> },
+      { path: "user", element: <ManagerUser /> },
+      { path: "user/:id", element: <UserDetail /> },
       // Add manager child routes here if needed
     ],
   },
