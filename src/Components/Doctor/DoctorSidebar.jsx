@@ -1,16 +1,19 @@
 import React from "react";
 import {
+  FaClipboardList,
+  FaFileMedical,
+  FaCalendarPlus,
+  FaCalendarCheck,
+  FaStethoscope,
+  FaUsers,
+  FaIdCardAlt,
   FaUserMd,
   FaCalendarAlt,
-  FaClipboardList,
-  FaThLarge,
+  FaUserCircle,
+  FaBusinessTime,
   FaUser,
-  FaEdit,
-  FaPlus,
 } from "react-icons/fa";
-import { MdDashboard } from "react-icons/md";
-import { IoMdPeople } from "react-icons/io";
-import { AiFillIdcard } from "react-icons/ai";
+import { MdOutlineDashboard, MdOutlineAnalytics } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 
 const DoctorSidebar = () => {
@@ -22,12 +25,12 @@ const DoctorSidebar = () => {
       items: [
         {
           label: "Medical Dashboard",
-          icon: <FaClipboardList />,
+          icon: <MdOutlineAnalytics />,
           path: "/medical-dashboard",
         },
         {
           label: "Doctors Dashboard",
-          icon: <MdDashboard />,
+          icon: <MdOutlineDashboard />,
           path: "/doctors-dashboard",
         },
       ],
@@ -37,12 +40,12 @@ const DoctorSidebar = () => {
       items: [
         {
           label: "Medical List",
-          icon: <MdDashboard />,
+          icon: <FaClipboardList />,
           path: "/doctor/medicallist",
         },
         {
           label: "Create Medical",
-          icon: <FaThLarge />,
+          icon: <FaFileMedical />,
           path: "/doctor/medical",
         },
       ],
@@ -52,17 +55,17 @@ const DoctorSidebar = () => {
       items: [
         {
           label: "Appointments",
-          icon: <FaPlus />,
+          icon: <FaCalendarPlus />,
           path: "/doctor/appointments",
         },
         {
           label: "Doctor Schedule",
-          icon: <FaEdit />,
+          icon: <FaCalendarCheck />,
           path: "/doctor/doctorschedule",
         },
         {
           label: "Doctor Appointment",
-          icon: <FaCalendarAlt />,
+          icon: <FaStethoscope />,
           path: "/doctor/doctorsappoinment",
         },
       ],
@@ -72,12 +75,12 @@ const DoctorSidebar = () => {
       items: [
         {
           label: "My Patients",
-          icon: <IoMdPeople />,
+          icon: <FaUsers />,
           path: "/doctor/my-patients",
         },
         {
           label: "Patient Profile",
-          icon: <AiFillIdcard />,
+          icon: <FaIdCardAlt />,
           path: "/doctor/patient-profile",
         },
       ],
@@ -87,22 +90,22 @@ const DoctorSidebar = () => {
       items: [
         {
           label: "Doctors Grid",
-          icon: <FaThLarge />,
+          icon: <FaUserMd />,
           path: "/doctors-grid",
         },
         {
           label: "Lịch làm việc",
-          icon: <FaUserMd />,
+          icon: <FaCalendarAlt />,
           path: "/doctor/calendar",
         },
         {
           label: "Hồ sơ cá nhân",
-          icon: <FaUser />,
+          icon: <FaUserCircle />,
           path: "/doctor/profile",
         },
         {
-          label: "Doctor Slot",
-          icon: <FaEdit />,
+          label: "Ca làm việc",
+          icon: <FaBusinessTime />,
           path: "/doctor/doctorslot",
         },
       ],
@@ -111,6 +114,7 @@ const DoctorSidebar = () => {
 
   return (
     <div className="w-64 h-screen bg-gradient-to-b from-teal-50 to-white border-r shadow-lg flex flex-col transition-all duration-300">
+      {/* Logo */}
       <div className="flex items-center px-6 py-4 border-b border-teal-100">
         <img
           src="https://cdn-icons-png.flaticon.com/512/6073/6073873.png"
@@ -121,6 +125,8 @@ const DoctorSidebar = () => {
           Clinix
         </h1>
       </div>
+
+      {/* Menu */}
       <nav className="flex-1 p-4 overflow-y-auto">
         {menuItems.map((section, index) => (
           <div key={index} className="mb-6">
@@ -139,6 +145,8 @@ const DoctorSidebar = () => {
           </div>
         ))}
       </nav>
+
+      {/* Footer Settings */}
       <div className="p-4 border-t border-teal-100">
         <Link to="/doctor/settings">
           <div className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition-colors">
