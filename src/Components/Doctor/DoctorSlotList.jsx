@@ -43,28 +43,30 @@ const DoctorSlotList = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={viLocale}>
-      <div className="max-w-4xl mx-auto p-4">
+      <div>
+        {/* Chọn ngày */}
         <div className="flex flex-col sm:flex-row items-center justify-between mb-6 bg-white p-4 rounded-lg shadow-sm">
           <div className="flex items-center space-x-2">
             <button
               onClick={handlePrevDay}
-              className="p-2 rounded-full bg-teal-100 text-teal-600 hover:bg-teal-200 transition-colors"
+              className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
             >
               <FaArrowLeft />
             </button>
             <span className="text-gray-500">
               <FaCalendarAlt />
             </span>
-            <h2 className="text-lg font-semibold text-gray-700">
+            <h2 className="text-xl font-semibold text-gray-700">
               {formatDate(currentDate)}
             </h2>
             <button
               onClick={handleNextDay}
-              className="p-2 rounded-full bg-teal-100 text-teal-600 hover:bg-teal-200 transition-colors"
+              className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
             >
               <FaArrowRight />
             </button>
           </div>
+
           <div className="mt-2 sm:mt-0">
             <DatePicker
               label="Chọn ngày"
@@ -79,7 +81,7 @@ const DoctorSlotList = () => {
                     "& .MuiInputBase-root": {
                       borderRadius: "0.5rem",
                       backgroundColor: "white",
-                      fontSize: "0.875rem",
+                      fontSize: "1rem",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       borderColor: "#e5e7eb",
@@ -91,37 +93,58 @@ const DoctorSlotList = () => {
           </div>
         </div>
 
+        {/* Bảng slots */}
         {slots.length > 0 ? (
-          <div className="space-y-2">
-            {slots.map((slot) => (
-              <div
-                key={slot._id}
-                className="p-3 bg-white rounded-lg shadow hover:bg-gray-50 transition-colors flex items-center justify-between"
-              >
-                <div className="flex items-center space-x-2">
-                  <span className="text-teal-500">🕒</span>
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      Bắt đầu:{" "}
+          <div className="overflow-x-auto bg-white shadow rounded-lg">
+            <table className="min-w-full table-auto text-xl text-gray-700 border border-gray-300">
+              <thead className="bg-blue-400 text-gray-900 uppercase">
+                <tr>
+                  <th className="py-3 px-4 text-left border border-gray-300">
+                    Stt
+                  </th>
+                  <th className="py-3 px-4 text-left border border-gray-300">
+                    Giờ Bắt Đầu
+                  </th>
+                  <th className="py-3 px-4 text-left border border-gray-300">
+                    Giờ Kết Thúc
+                  </th>
+                  <th className="py-3 px-4 text-left border border-gray-300">
+                    Trạng Thái
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {slots.map((slot, index) => (
+                  <tr
+                    key={slot._id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="py-2 px-4 font-medium border border-gray-300">
+                      {index + 1}
+                    </td>
+                    <td className="py-2 px-4 border border-gray-300">
                       {new Date(slot.startTime).toLocaleTimeString("vi-VN")}
-                    </p>
-                    <p className="text-sm text-gray-700">
-                      Kết thúc:{" "}
+                    </td>
+                    <td className="py-2 px-4 border border-gray-300">
                       {new Date(slot.endTime).toLocaleTimeString("vi-VN")}
-                    </p>
-                  </div>
-                </div>
-                <span
-                  className={`text-sm font-medium ${
-                    slot.status === "Available"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {slot.status}
-                </span>
-              </div>
-            ))}
+                    </td>
+                    <td className="py-2 px-4 border border-gray-300">
+                      <span
+                        className={`px-3 py-1 rounded-full font-semibold ${
+                          slot.status === "Sẵn sàng khám"
+                            ? "bg-green-100 text-green-700"
+                            : slot.status === "Đang xét duyệt"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {slot.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
           <div className="text-center p-4 bg-white rounded-lg shadow-sm">
