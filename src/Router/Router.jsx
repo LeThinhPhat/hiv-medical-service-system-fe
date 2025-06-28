@@ -33,7 +33,6 @@ import BookingPage from "../Components/Customer/BookingStep/BookingPage";
 import BookingConfirmPage from "../Components/Customer/BookingStep/BookingConfirmPage";
 
 import PatientsList from "../Components/Doctor/PatientsList";
-// import DoctorProfile from "../Components/Doctor/DoctorProfile";
 import DoctorSlot from "../Components/Staff/DoctorSlot";
 import DoctorProfile from "../Components/Doctor/DoctorProfile";
 import MedicalRecords from "../Components/Doctor/MedicalRecords";
@@ -41,8 +40,6 @@ import DoctorSlotList from "../Components/Doctor/DoctorSlotList";
 import DoctorSchedule from "../Components/Doctor/DoctorSchedule";
 import DoctorAppointments from "../Components/Doctor/DoctorAppoinment";
 import CreateMedicalRecord from "../Components/Doctor/CreateMedicalRecord";
-// import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
-import DetailMedical from "../Components/Doctor/DetailMedical";
 import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPayment";
 import SuccessPaymentPage from "../Components/Customer/BookingStep/SuccessPaymentPage";
 import CreateDoctorSchedule from "../Components/Manager/CreateDoctorSchedule";
