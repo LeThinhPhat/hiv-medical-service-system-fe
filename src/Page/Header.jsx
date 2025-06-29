@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import {
-  IconButton,
-  Menu as MuiMenu,
-  MenuItem,
-} from "@mui/material";
+import { IconButton, Menu as MuiMenu, MenuItem } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 
@@ -32,51 +28,49 @@ const Header = () => {
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
         {/* Logo */}
-        <div className="text-2xl font-bold text-yellow-700">
+        <div className="text-2xl font-bold text-blue-700">
           <Link to="/">GoldenAge</Link>
         </div>
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex space-x-6 text-gray-700 text-sm font-medium">
-          <Link to="/" className="hover:text-yellow-700 transition">
+          <Link to="/" className="hover:text-blue-700 transition">
             Trang chủ
           </Link>
-          <Link to="/about" className="hover:text-yellow-700 transition">
+          <Link to="/about" className="hover:text-blue-700 transition">
             Giới thiệu
           </Link>
-          <Link to="/booking" className="hover:text-yellow-700 transition">
+          <Link to="/booking" className="hover:text-blue-700 transition">
             Đặt lịch khám
           </Link>
-          <Link to="/docs" className="hover:text-yellow-700 transition">
+          <Link to="/docs" className="hover:text-blue-700 transition">
             Đội ngũ bác sĩ
           </Link>
-          <Link to="/blogs" className="hover:text-yellow-700 transition">
+          <Link to="/blogs" className="hover:text-blue-700 transition">
             Blogs
           </Link>
-          <Link to="/test" className="hover:text-yellow-700 transition">
+          <Link to="/test" className="hover:text-blue-700 transition">
             Test
           </Link>
         </nav>
 
         {/* Mobile Menu Button */}
         <div className="md:hidden">
-          <button onClick={toggleMenu} className="text-yellow-700">
+          <button onClick={toggleMenu} className="text-blue-700">
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {/* Profile Icons */}
         <div className="hidden md:flex space-x-2">
-          {/* Xem Profile (chỉ hiện khi có token) */}
-          {token && (
-            <IconButton component={Link} to="/profile">
-              <PersonSearchIcon fontSize="large" sx={{ color: "#F59E0B" }} />
-            </IconButton>
-          )}
+          {/* Xem Profile */}
+          <IconButton component={Link} to="/profile">
+            <PersonSearchIcon fontSize="large" sx={{ color: "#3B82F6" }} />
+          </IconButton>
 
           {/* Menu tài khoản */}
           <IconButton onClick={handleProfileMenuOpen}>
-            <AccountCircleIcon fontSize="large" sx={{ color: "#F59E0B" }} />
+            <AccountCircleIcon fontSize="large" sx={{ color: "	#3B82F6" }} />
           </IconButton>
 
           {/* Dropdown Menu */}
@@ -108,19 +102,39 @@ const Header = () => {
             <Link to="/" onClick={toggleMenu} className="hover:text-yellow-700">
               Trang chủ
             </Link>
-            <Link to="/about" onClick={toggleMenu} className="hover:text-yellow-700">
+            <Link
+              to="/about"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
               Giới thiệu
             </Link>
-            <Link to="/booking" onClick={toggleMenu} className="hover:text-yellow-700">
+            <Link
+              to="/booking"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
               Đặt lịch khám
             </Link>
-            <Link to="/news" onClick={toggleMenu} className="hover:text-yellow-700">
+            <Link
+              to="/news"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
               Tin tức
             </Link>
-            <Link to="/blogs" onClick={toggleMenu} className="hover:text-yellow-700">
+            <Link
+              to="/blogs"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
               Blogs
             </Link>
-            <Link to="/test" onClick={toggleMenu} className="hover:text-yellow-700">
+            <Link
+              to="/test"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
               Test
             </Link>
             {token ? (

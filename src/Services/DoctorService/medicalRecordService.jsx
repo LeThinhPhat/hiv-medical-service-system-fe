@@ -3,7 +3,7 @@ import axios from "axios";
 const API_URL = "http://localhost:3000/medicalrecords";
 
 const medicalRecordService = {
-  // Gọi API để tạo hồ sơ bệnh án mới
+  // ✅ Tạo hồ sơ bệnh án
   createMedicalRecord: async (data) => {
     try {
       const token = localStorage.getItem("token");
@@ -20,7 +20,7 @@ const medicalRecordService = {
         headers: {
           Accept: "*/*",
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Gửi token nếu backend yêu cầu
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -31,7 +31,7 @@ const medicalRecordService = {
     }
   },
 
-  // Gọi API để lấy tất cả hồ sơ bệnh án
+  // ✅ Lấy tất cả hồ sơ bệnh án
   getAllMedicalRecords: async () => {
     try {
       const token = localStorage.getItem("token");
@@ -49,23 +49,26 @@ const medicalRecordService = {
       throw error;
     }
   },
-  // Gọi API để lấy hồ sơ bệnh án theo ID
-  getMedicalRecordById: async (id) => {
+
+  // ✅ Lấy hồ sơ bệnh án theo personalID
+  getMedicalRecordByPersonalID: async (personalId) => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.get(`${API_URL}/${id}`, {
+      const response = await axios.get(`${API_URL}/personalID`, {
+        params: { personalId },
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      return response.data.data; // hoặc response.data tùy vào backend trả về
+      return response.data.data;
     } catch (error) {
-      console.error("Lỗi lấy hồ sơ bệnh án theo ID:", error);
+      console.error("Lỗi lấy hồ sơ theo Personal ID:", error);
       throw error;
     }
   },
 };
+
 export default medicalRecordService;

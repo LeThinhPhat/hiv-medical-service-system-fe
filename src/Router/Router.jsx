@@ -26,14 +26,13 @@ import Staff from "../Components/Staff/Staff";
 import AppointmentList from "../Components/Staff/AppointmentList";
 
 import Manager from "../Components/Manager/Manager";
+import ManagerDoctorList from "../Components/Manager/ManagerDoctorList";
 import Doctor from "../Components/Doctor/Doctor";
 import AppointmentFake from "../Components/Doctor/AppointmentFake";
-import ProfileDoctor from "../Components/Doctor/ProfileDoctor";
 import BookingPage from "../Components/Customer/BookingStep/BookingPage";
 import BookingConfirmPage from "../Components/Customer/BookingStep/BookingConfirmPage";
 
 import PatientsList from "../Components/Doctor/PatientsList";
-// import DoctorProfile from "../Components/Doctor/DoctorProfile";
 import DoctorSlot from "../Components/Staff/DoctorSlot";
 import DoctorProfile from "../Components/Doctor/DoctorProfile";
 import MedicalRecords from "../Components/Doctor/MedicalRecords";
@@ -41,9 +40,16 @@ import DoctorSlotList from "../Components/Doctor/DoctorSlotList";
 import DoctorSchedule from "../Components/Doctor/DoctorSchedule";
 import DoctorAppointments from "../Components/Doctor/DoctorAppoinment";
 import CreateMedicalRecord from "../Components/Doctor/CreateMedicalRecord";
-import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
 import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPayment";
 import SuccessPaymentPage from "../Components/Customer/BookingStep/SuccessPaymentPage";
+import CreateDoctorSchedule from "../Components/Manager/CreateDoctorSchedule";
+import ManagerAppointment from "../Components/Manager/ManagerAppointment";
+import Calendar from "../Components/Doctor/Calendar";
+import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
+import ManagerPatient from "../Components/Manager/ManagerPatient";
+import ManagerService from "../Components/Manager/ManagerService";
+import ManagerUser from "../Components/Manager/ManagerUser";
+import UserDetail from "../Components/Manager/UserDetail";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -89,6 +95,13 @@ const Router = createBrowserRouter([
     element: <ManagerLayout />,
     children: [
       { path: "", element: <Manager /> },
+      { path: "doctors", element: <CreateDoctorSchedule /> },
+      { path: "doctorlist", element: <ManagerDoctorList /> },
+      { path: "appointments", element: <ManagerAppointment /> },
+      { path: "patient", element: <ManagerPatient /> },
+      { path: "service", element: <ManagerService /> },
+      { path: "user", element: <ManagerUser /> },
+      { path: "user/:id", element: <UserDetail /> },
       // Add manager child routes here if needed
     ],
   },
@@ -120,6 +133,10 @@ const Router = createBrowserRouter([
         element: <DoctorSchedule />,
       },
       {
+        path: "calendar",
+        element: <Calendar />,
+      },
+      {
         path: "doctorsappoinment",
         element: <DoctorAppointments />,
       },
@@ -128,7 +145,7 @@ const Router = createBrowserRouter([
         element: <CreateMedicalRecord />,
       },
       {
-        path: "doctorsappoinment/medical-records/view/:patientID",
+        path: "doctorsappoinment/medical-records/personal-id/:patientID",
         element: <ViewMedicalRecord />,
       },
     ],
