@@ -45,7 +45,31 @@ const appointmentService = {
       console.error("Error get appointment by ID:", error);
       throw error;
     }
-  }
+  },
+
+    getAppointmentByToken: async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${BASE_URL}/appointments/token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      const result = await response.json();
+      
+      console.log("API response:", result);
+
+      return result.data;
+    } catch (error) {
+      console.error(`Error fetching patient data:`, error);
+      throw error;
+    }
+  },
 };
+
+
 
 export default appointmentService;

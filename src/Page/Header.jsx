@@ -21,7 +21,7 @@ const Header = () => {
   const logout = () => {
     localStorage.removeItem("token");
     setAnchorEl(null);
-    navigate("/signin"); // Hoặc dùng window.location.reload() nếu không dùng navigate
+    navigate("/signin");
   };
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -67,10 +67,12 @@ const Header = () => {
 
         {/* Profile Icons */}
         <div className="hidden md:flex space-x-2">
-          {/* Xem Profile */}
-          <IconButton component={Link} to="/profile">
-            <PersonSearchIcon fontSize="large" sx={{ color: "#F59E0B" }} />
-          </IconButton>
+          {/* Xem Profile (chỉ hiện khi có token) */}
+          {token && (
+            <IconButton component={Link} to="/profile">
+              <PersonSearchIcon fontSize="large" sx={{ color: "#F59E0B" }} />
+            </IconButton>
+          )}
 
           {/* Menu tài khoản */}
           <IconButton onClick={handleProfileMenuOpen}>
