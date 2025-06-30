@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import doctorScheduleService from "../../services/DoctorService/doctorScheduleService";
+import doctorScheduleService from "../../Services/DoctorService/doctorScheduleService";
 import moment from "moment";
 
 const DoctorSchedule = () => {

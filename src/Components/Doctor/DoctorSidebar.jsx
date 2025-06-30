@@ -58,15 +58,16 @@ const DoctorSidebar = () => {
           icon: <FaCalendarPlus />,
           path: "/doctor/appointments",
         },
-        {
-          label: "Doctor Schedule",
-          icon: <FaCalendarCheck />,
-          path: "/doctor/doctorschedule",
-        },
+
         {
           label: "Doctor Appointment",
           icon: <FaStethoscope />,
           path: "/doctor/doctorsappoinment",
+        },
+        {
+          label: "Doctors Grid",
+          icon: <FaUserMd />,
+          path: "/doctors-grid",
         },
       ],
     },
@@ -89,11 +90,6 @@ const DoctorSidebar = () => {
       section: "Doctors",
       items: [
         {
-          label: "Doctors Grid",
-          icon: <FaUserMd />,
-          path: "/doctors-grid",
-        },
-        {
           label: "Lịch làm việc",
           icon: <FaCalendarAlt />,
           path: "/doctor/calendar",
@@ -107,6 +103,11 @@ const DoctorSidebar = () => {
           label: "Ca làm việc",
           icon: <FaBusinessTime />,
           path: "/doctor/doctorslot",
+        },
+        {
+          label: "Xác nhận lịch làm việc",
+          icon: <FaCalendarCheck />,
+          path: "/doctor/doctorschedule",
         },
       ],
     },

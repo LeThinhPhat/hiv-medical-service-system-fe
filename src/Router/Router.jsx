@@ -50,6 +50,8 @@ import ManagerPatient from "../Components/Manager/ManagerPatient";
 import ManagerService from "../Components/Manager/ManagerService";
 import ManagerUser from "../Components/Manager/ManagerUser";
 import UserDetail from "../Components/Manager/UserDetail";
+import ManagerDrugs from "../Components/Manager/ManagerDrugs";
+import DrugDetails from "../Components/Manager/DrugDetail";
 import SearchBooking from "../Components/Customer/SearchBooking";
 const Router = createBrowserRouter([
   {
@@ -61,7 +63,7 @@ const Router = createBrowserRouter([
       { path: "blogs", element: <BlogList /> },
       { path: "blogs/:id", element: <BlogDetail /> },
       { path: "booking", element: <Booking /> },
-      { path: "search-appointment", element: <SearchBooking/> },
+      { path: "search-appointment", element: <SearchBooking /> },
       { path: "booking-payment", element: <BookingPaymentPage /> },
       { path: "profile", element: <Profile /> },
       { path: "signin", element: <SignIn /> },
@@ -104,6 +106,8 @@ const Router = createBrowserRouter([
       { path: "service", element: <ManagerService /> },
       { path: "user", element: <ManagerUser /> },
       { path: "user/:id", element: <UserDetail /> },
+      { path: "drugs", element: <ManagerDrugs /> },
+      { path: "drugs/:id", element: <DrugDetails /> },
       // Add manager child routes here if needed
     ],
   },
