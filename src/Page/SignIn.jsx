@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../Services/authService"; // Đảm bảo đúng đường dẫn tới service
@@ -14,11 +15,7 @@ const SignIn = () => {
   useEffect(() => {
     if (token) {
       const role = token.data.data.user.role.name;
-      const userId = token.data.data.user._id;
-
-      // ✅ Lưu doctorId để sử dụng trong Sidebar hoặc nơi khác
-      localStorage.setItem("doctorId", userId);
-
+      
       // Điều hướng theo vai trò
       if (role === "CUSTOMER_ROLE") {
         navigate("/");
@@ -45,7 +42,7 @@ const SignIn = () => {
 
       // ✅ Lưu token và doctorId
       localStorage.setItem("token", accessToken);
-      localStorage.setItem("doctorId", response.data.data.user._id); // 👈 Quan trọng
+      localStorage.setItem("user", JSON.stringify(response.data.data.user)); 
 
       setToken(response); // Trigger useEffect
     } catch (err) {
@@ -60,7 +57,29 @@ const SignIn = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md relative">
+        {/* Nút Back ở góc trái trên cùng */}
+        <button
+          onClick={() => navigate("/")}
+          className="absolute top-4 left-4 text-sm text-blue-600 hover:underline flex items-center"
+        >
+          <svg
+            className="w-4 h-4 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 19l-7-7 7-7"
+            ></path>
+          </svg>
+          Back
+        </button>
+
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
           Sign In
         </h2>
@@ -100,7 +119,7 @@ const SignIn = () => {
             />
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-end">
             <Link
               to="/forgot-password"
               className="text-sm text-blue-600 hover:underline"

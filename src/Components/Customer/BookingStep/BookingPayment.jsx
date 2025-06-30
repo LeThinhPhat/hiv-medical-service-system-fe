@@ -23,16 +23,11 @@ const BookingPaymentPage = () => {
   const location = useLocation();
   const {
     info,
-    doctor,
-    slot,
-    date,
-    service,
     appointment
   } = location.state || {};
 
   console.log("BookingPaymentPage location state:", appointment);
-  if (!info || !doctor || !slot) return <div>Không có dữ liệu lịch hẹn!</div>;
-  const serviceName = service?.name || "Chưa chọn dịch vụ";
+ 
 
   const handlePayment = async () => {
     try {
@@ -57,13 +52,22 @@ const BookingPaymentPage = () => {
       <div className="mb-6 border-2 rounded-xl p-5 shadow-md"
         style={{ borderColor: "#1976d2", background: "#e3f2fd" }}>
         <div className="text-lg mb-2"><b>Mã lịch hẹn:</b> <span style={{ color: "#1976d2" }}>{appointment._id || "N/A"}</span></div>
-        <div className="text-lg mb-2"><b>Bệnh nhân:</b> {info.name}</div>
-        <div className="text-lg mb-2"><b>CCCD:</b> {info.cccd}</div>
-        <div className="text-lg mb-2"><b>SĐT:</b> {info.phone}</div>
-        <div className="text-lg mb-2"><b>Bác sĩ:</b> {doctor.userID?.name}</div>
-        <div className="text-lg mb-2"><b>Ngày:</b> {formatDate(date)}</div>
-        <div className="text-lg mb-2"><b>Giờ:</b> {formatTime(slot.startTime)} - {formatTime(slot.endTime)}</div>
-        <div className="text-lg"><b>Dịch vụ:</b> {serviceName}</div>
+      <div className="text-lg mb-2">
+        <b>Bệnh nhân:</b> {appointment.patientID?.userID?.name || appointment.patientID?.name}
+      </div>
+        <div className="text-lg mb-2"><b>CCCD:</b> {appointment.patientID.personalID}</div>
+        <div className="text-lg mb-2"><b>SĐT:</b> {info?.phone || "Không có"}</div>
+        <div className="text-lg mb-2"><b>Bác sĩ:</b> {appointment.doctorID.userID?.name}</div>
+        <div className="text-lg mb-2"><b>Ngày:</b> {formatDate(appointment.date)}</div>
+       <div className="text-lg mb-2">
+        <b>Giờ:</b> {formatTime(appointment.startTime)} -{" "}
+        {formatTime(
+          appointment.doctorSlotID.length >= 2
+            ? appointment.doctorSlotID[1].endTime
+            : appointment.doctorSlotID[0].endTime
+        )}
+      </div>
+        <div className="text-lg"><b>Dịch vụ:</b> {appointment.serviceID.name}</div>
         <div className="text-lg">
           <b>Giá Tiền:</b> {appointment.serviceID?.price?.toLocaleString('vi-VN')} ₫
         </div>

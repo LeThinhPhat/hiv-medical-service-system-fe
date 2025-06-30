@@ -8,7 +8,7 @@ const CustLayout = () => {
   const location = useLocation();
   const pathname = location.pathname;
 
-  const paths = ["/login", "/signin", "/signup", "/profile/:customerId/return"];
+  const paths = ["/login", "/signin", "/signup", "/profile"];
 
   const hideHeaderFooter = paths.some((path) => matchPath(path, pathname));
 

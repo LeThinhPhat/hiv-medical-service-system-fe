@@ -52,6 +52,7 @@ import ManagerUser from "../Components/Manager/ManagerUser";
 import UserDetail from "../Components/Manager/UserDetail";
 import ManagerDrugs from "../Components/Manager/ManagerDrugs";
 import DrugDetails from "../Components/Manager/DrugDetail";
+import SearchBooking from "../Components/Customer/SearchBooking";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -62,6 +63,7 @@ const Router = createBrowserRouter([
       { path: "blogs", element: <BlogList /> },
       { path: "blogs/:id", element: <BlogDetail /> },
       { path: "booking", element: <Booking /> },
+      { path: "search-appointment", element: <SearchBooking /> },
       { path: "booking-payment", element: <BookingPaymentPage /> },
       { path: "profile", element: <Profile /> },
       { path: "signin", element: <SignIn /> },
@@ -116,6 +118,10 @@ const Router = createBrowserRouter([
       { path: "", element: <Doctor /> },
       { path: "appointments", element: <AppointmentFake /> },
       { path: "my-patients", element: <PatientsList /> },
+      // {
+      //   path: "profile-doctor",
+      //   element: <ProfileDoctor/>,
+      // },
       {
         path: "profile",
         element: <DoctorProfile />,

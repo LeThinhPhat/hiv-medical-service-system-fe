@@ -11,7 +11,6 @@ import {
 const ProfileDoctor = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchProfile = async () => {
       try {
