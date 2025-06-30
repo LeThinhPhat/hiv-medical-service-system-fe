@@ -1,4 +1,21 @@
 import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActions,
+  CircularProgress,
+  MenuItem,
+  Fade,
+  Stack,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import docService from "../../Services/CusService/docterListService";
 
@@ -9,23 +26,15 @@ const ListDoctor = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const departments = [
-    "Tất cả bác sĩ",
-    ...new Set(doctors.map((doctor) => doctor.specialty)),
-  ];
-
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
         setLoading(true);
         const response = await docService.getAllDoctors();
-        console.log("API response:", response);
         const data = Array.isArray(response.data) ? response.data : response;
         const mappedDoctors = data.map((doctor) => ({
           id: doctor._id,
-          name:
-            doctor.userID?.name ||
-            `Dr. ${doctor.userID?._id?.slice(-6) || "Unknown"}`,
+          name: doctor.userID?.name || `Dr. ${doctor.userID?._id?.slice(-6) || "Unknown"}`,
           specialty: doctor.specializations || "Không có chuyên khoa",
           avatar: "https://nguoinoitieng.tv/images/nnt/107/0/bjur.jpg",
         }));
@@ -40,162 +49,221 @@ const ListDoctor = () => {
     fetchDoctors();
   }, []);
 
+  const departments = ["Tất cả bác sĩ", ...new Set(doctors.map((doctor) => doctor.specialty))];
+
   const filteredDoctors = doctors.filter(
     (doctor) =>
       doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedDepartment === "Tất cả bác sĩ" ||
-        doctor.specialty === selectedDepartment)
+      (selectedDepartment === "Tất cả bác sĩ" || doctor.specialty === selectedDepartment)
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="container mx-auto py-6">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Đội ngũ bác sĩ chuyên khoa
-        </h1>
-        <p className="text-gray-600 mt-2">
-          <Link to="/" className="text-gray-600 hover:underline">
-            Trang chủ
-          </Link>{" "}
-          /<span className="text-gray-800"> Danh sách bác sĩ</span>
-        </p>
-      </header>
+    <Box sx={{ bgcolor: "#f5f7fa", minHeight: "100vh", py: 6 }}>
+      <Container maxWidth="lg">
+        {/* Header Section */}
+        <Box sx={{ mb: 6, textAlign: "center" }}>
+          <Typography
+            variant="h3"
+            fontWeight={700}
+            color="primary.main"
+            sx={{ mb: 1, fontSize: { xs: "2rem", md: "3rem" } }}
+          >
+            Đội ngũ bác sĩ chuyên khoa
+          </Typography>
+        </Box>
 
-      {/* Main Content */}
-      <main className="container mx-auto flex space-x-6">
-        {/* Sidebar */}
-        <aside className="w-1/4 bg-white p-4 rounded-lg shadow">
-          <div className="mb-4">
-            <input
-              type="text"
+        {/* Search Section */}
+        <Paper
+          elevation={3}
+          sx={{
+            p: 3,
+            borderRadius: 2,
+            mb: 4,
+            bgcolor: "white",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+          }}
+        >
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <TextField
+              label="Tìm kiếm bác sĩ"
+              variant="outlined"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm kiếm bác sĩ..."
-              className="w-full p-2 border rounded-lg"
+              sx={{
+                flex: 1,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  bgcolor: "white",
+                },
+              }}
             />
-            <button className="w-full mt-2 bg-green-600 text-white p-2 rounded-lg">
+            <TextField
+              select
+              label="Chuyên khoa"
+              value={selectedDepartment}
+              onChange={(e) => setSelectedDepartment(e.target.value)}
+              sx={{
+                flex: 1,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  bgcolor: "white",
+                },
+              }}
+            >
+              {departments.map((dept, idx) => (
+                <MenuItem key={idx} value={dept}>
+                  {dept}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                height: 56,
+                px: 4,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: "none",
+                "&:hover": {
+                  bgcolor: "primary.dark",
+                  transform: "translateY(-2px)",
+                  transition: "all 0.2s ease",
+                },
+              }}
+            >
               Tìm kiếm
-            </button>
-          </div>
-          <div>
-            {departments.map((dept, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedDepartment(dept)}
-                className={`flex justify-between items-center w-full text-left py-2 border-b ${
-                  selectedDepartment === dept
-                    ? "text-green-600"
-                    : "text-gray-600"
-                }`}
-              >
-                <span>{dept}</span>
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-            ))}
-          </div>
-        </aside>
+            </Button>
+          </Stack>
+        </Paper>
 
-        {/* Doctor List */}
-        <section className="w-3/4">
+        {/* Doctors List */}
+        <Paper elevation={0} sx={{ p: { xs: 2, md: 4 }, borderRadius: 2, bgcolor: "transparent" }}>
           {loading ? (
-            <p className="text-gray-600">Đang tải...</p>
+            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+              <CircularProgress size={48} />
+            </Box>
           ) : error ? (
-            <p className="text-red-600">{error}</p>
+            <Typography color="error" align="center" variant="h6">
+              {error}
+            </Typography>
           ) : (
-            <>
-              <h2 className="text-xl font-semibold mb-4">
-                {selectedDepartment}
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredDoctors.length > 0 ? (
-                  filteredDoctors.map((doctor) => (
-                    <div
-                      key={doctor.id}
-                      className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-all duration-300 border border-gray-200"
-                    >
-                      <img
-                        src={doctor.avatar}
-                        alt={doctor.name}
-                        className="w-full h-40 object-cover rounded-lg mb-4"
-                      />
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {doctor.name}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {doctor.specialty}
-                      </p>
-                      <div className="mt-4 flex space-x-2">
-                        <Link
-                          to={`/docs/${doctor.id}`}
-                          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all"
+            <Fade in timeout={800}>
+              <Box>
+                <Typography
+                  variant="h5"
+                  fontWeight={600}
+                  color="text.primary"
+                  sx={{ mb: 3 }}
+                >
+                  {selectedDepartment}
+                </Typography>
+                <Grid container spacing={3}>
+                  {filteredDoctors.length > 0 ? (
+                    filteredDoctors.map((doctor) => (
+                      <Grid item xs={12} sm={6} md={4} key={doctor.id}>
+                        <Card
+                          sx={{
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                            borderRadius: 3,
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                            "&:hover": {
+                              transform: "translateY(-5px)",
+                              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                            },
+                          }}
                         >
-                          Xem Chi Tiết
-                        </Link>
-                        <Link
-                        to={`/book/${doctor.id}`} // Truyền id bác sĩ vào link
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
-                      >
-                        Đặt Lịch Khám
-                      </Link>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-600">Không tìm thấy bác sĩ nào.</p>
-                )}
-              </div>
-            </>
+                          <CardMedia
+                            component="img"
+                            image={doctor.avatar}
+                            alt={doctor.name}
+                            sx={{
+                              width: 120,
+                              height: 120,
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                              mt: 3,
+                              mx: "auto",
+                              border: "2px solid #e0e0e0",
+                            }}
+                          />
+                          <CardContent sx={{ flexGrow: 1, textAlign: "center" }}>
+                            <Typography
+                              variant="h6"
+                              fontWeight={600}
+                              color="text.primary"
+                              sx={{ mb: 1 }}
+                            >
+                              {doctor.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {doctor.specialty}
+                            </Typography>
+                          </CardContent>
+                          <CardActions sx={{ justifyContent: "center", pb: 3 }}>
+                            <Button
+                              component={Link}
+                              to={`/docs/${doctor.id}`}
+                              variant="outlined"
+                              color="primary"
+                              size="small"
+                              sx={{
+                                borderRadius: 2,
+                                textTransform: "none",
+                                mr: 1,
+                                "&:hover": {
+                                  bgcolor: "primary.main",
+                                  color: "white",
+                                },
+                              }}
+                            >
+                              Xem chi tiết
+                            </Button>
+                            <Button
+                              component={Link}
+                              to={`/book/${doctor.id}`}
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              sx={{
+                                borderRadius: 2,
+                                textTransform: "none",
+                                "&:hover": {
+                                  bgcolor: "primary.dark",
+                                },
+                              }}
+                            >
+                              Đặt lịch khám
+                            </Button>
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    ))
+                  ) : (
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      align="center"
+                      sx={{ width: "100%", py: 4 }}
+                    >
+                      Không tìm thấy bác sĩ nào.
+                    </Typography>
+                  )}
+                </Grid>
+              </Box>
+            </Fade>
           )}
-        </section>
-      </main>
-
-      {/* Floating Buttons */}
-      <div className="fixed bottom-4 right-4 flex flex-col space-y-2">
-        <button className="bg-green-600 text-white p-3 rounded-full">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M3 5h18M3 12h18M3 19h18"
-            />
-          </svg>
-        </button>
-        <button className="bg-yellow-400 text-white p-3 rounded-full">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M8 10h.01M12 10h.01M16 10h.01M9 16h6M21 12c0 4.418-3.582 8-8 8s-8-3.582-8-8 3.582-8 8-8 8 3.582 8 8z"
-            />
-          </svg>
-        </button>
-      </div>
-    </div>
+        </Paper>
+      </Container>
+    </Box>
   );
 };
 
