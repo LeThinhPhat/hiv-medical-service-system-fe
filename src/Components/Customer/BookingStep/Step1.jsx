@@ -33,7 +33,7 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
         setLoadingServices(true);
         const result = await ServicesService.getAllService();
         const patient = JSON.parse(localStorage.getItem("patient"));
-        console.log("Patient data:", patient.medicalRecordID);
+      
         let filteredServices = result;
         if (!patient || !patient.medicalRecordID || patient.medicalRecordID.length === 0) {
           filteredServices = result.filter(

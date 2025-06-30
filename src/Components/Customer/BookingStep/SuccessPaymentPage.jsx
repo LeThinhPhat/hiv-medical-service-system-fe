@@ -1,19 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import appointmentService from "../../../Services/CusService/AppointmentService";
 
-// Giả sử bạn có 1 service để lấy appointment/order theo ID
 const BASE_URL = "http://localhost:3000";
-const appointmentService = {
-  getById: async (id) => {
-    const token = localStorage.getItem("token");
-    const response = await fetch(`${BASE_URL}/appointments/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error("Không lấy được thông tin lịch hẹn");
-    const result = await response.json();
-    return result.data;
-  },
-};
+
 const patient = JSON.parse(localStorage.getItem("patient")) || {};
 
 const SuccessPaymentPage = () => {
@@ -24,17 +14,17 @@ const SuccessPaymentPage = () => {
   const [err, setErr] = useState("");
 
   // Lấy orderId từ URL
-  const orderId = searchParams.get("vnp_TxnRef");
+  const appointmentId = searchParams.get("vnp_TxnRef");
 
   useEffect(() => {
     const fetchOrder = async () => {
-      if (!orderId) {
+      if (!appointmentId) {
         setErr("Không tìm thấy mã lịch hẹn (orderId)!");
         setLoading(false);
         return;
       }
       try {
-        const data = await appointmentService.getById(orderId);
+        const data = await appointmentService.getById(appointmentId);
         setOrder(data);
         console.log("Order data:", data);
       } catch (error) {
@@ -44,7 +34,7 @@ const SuccessPaymentPage = () => {
       }
     };
     fetchOrder();
-  }, [orderId]);
+  }, [appointmentId]);
 
   if (loading) return <div>Đang tải thông tin lịch hẹn...</div>;
   if (err) return <div className="text-red-600">Lỗi: {err}</div>;

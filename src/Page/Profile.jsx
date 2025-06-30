@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
-  Card,
-  CardContent,
-  Typography,
+  CardHeader,
   Avatar,
+  Typography,
   Grid,
   Divider,
   Button,
@@ -13,82 +12,64 @@ import {
   ListItem,
   ListItemText,
   Chip,
+  Container,
+  Paper,
+  ListItemSecondaryAction,
+  IconButton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-
-// Data user fake
-const FAKE_USER = {
-  name: "Nguyễn Văn A",
-  email: "nguyenvana@gmail.com",
-  phone: "0987654321",
-  gender: "Nam",
-  address: "123 Đường ABC, Quận 1, TP.HCM",
-  avatar: ""
-};
-
-// Data lịch khám fake
-const FAKE_APPOINTMENTS = [
-  {
-    _id: "1",
-    serviceName: "Khám tổng quát",
-    status: "Đã xác nhận",
-    doctorName: "BS. Nguyễn Văn A",
-    date: "2025-07-01T00:00:00.000Z",
-    time: "2025-07-01T08:30:00.000Z"
-  },
-  {
-    _id: "2",
-    serviceName: "Tư vấn HIV",
-    status: "Đang chờ",
-    doctorName: "BS. Trần Thị B",
-    date: "2025-07-03T00:00:00.000Z",
-    time: "2025-07-03T10:00:00.000Z"
-  },
-  {
-    _id: "3",
-    serviceName: "Lấy mẫu máu",
-    status: "Đã hủy",
-    doctorName: "BS. Nguyễn Văn C",
-    date: "2025-07-05T00:00:00.000Z",
-    time: "2025-07-05T15:00:00.000Z"
-  }
-];
+import PaymentIcon from "@mui/icons-material/Payment";
+import appointmentService from "../Services/CusService/AppointmentService";
+import { useNavigate } from "react-router-dom";
 
 function formatDate(dateStr) {
   if (!dateStr) return "Không xác định";
   const date = new Date(dateStr);
-  const d = String(date.getDate()).padStart(2, "0");
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const y = date.getFullYear();
-  return `${d}/${m}/${y}`;
+  return `${String(date.getDate()).padStart(2, "0")}/${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
 }
-function formatTime(timeStr) {
-  if (!timeStr) return "--:--";
-  const date = new Date(timeStr);
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+function formatTime(isoString) {
+  const date = new Date(isoString);
+  const adjustedDate = new Date(date.getTime() - 7 * 60 * 60 * 1000);
+  return adjustedDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
+   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-
-  // Lịch khám
   const [appointments, setAppointments] = useState([]);
   const [loadingAppointments, setLoadingAppointments] = useState(true);
 
   useEffect(() => {
-    // Fake loading user 0.6s
-    setTimeout(() => {
-      setUser(FAKE_USER);
-      setLoading(false);
-    }, 600);
+    const fetchAppointments = async () => {
+      try {
+        const data = await appointmentService.getAppointmentByToken();
+        console.log("Appointments data:", data);
+        setAppointments(data?.data || []);
+      } catch (error) {
+        console.error("Lỗi lấy lịch hẹn:", error);
+      } finally {
+        setLoadingAppointments(false);
+      }
+    };
 
-    // Fake loading lịch khám 0.8s
-    setTimeout(() => {
-      setAppointments(FAKE_APPOINTMENTS);
-      setLoadingAppointments(false);
-    }, 800);
+    // Fake loading user
+    setTimeout(() => setLoading(false), 600);
+
+    // Gọi lịch hẹn thực tế
+    fetchAppointments();
   }, []);
+
+  const handlePayment = (appointment) => {
+      navigate("/booking-payment", {
+          state: {
+            appointment
+          }
+        });
+  };
+
+  const patient = JSON.parse(localStorage.getItem("patient")) || {};
+  const user = JSON.parse(localStorage.getItem("user")) || {};
 
   if (loading) {
     return (
@@ -107,100 +88,158 @@ const Profile = () => {
   }
 
   return (
-    <Box sx={{ p: 4, backgroundColor: "#f4f6f8", minHeight: "100vh" }}>
-      <Card sx={{ maxWidth: 700, margin: "auto", boxShadow: 3, borderRadius: 4 }}>
-        <CardContent>
-          <Box display="flex" alignItems="center" gap={3}>
-            <Avatar
-              src={
-                user.avatar ||
-                "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=100"
-              }
-              alt={user.name || ""}
-              sx={{ width: 100, height: 100 }}
-            />
-            <Box>
-              <Typography variant="h5" fontWeight="bold">
-                {user.name}
+    <Box sx={{ backgroundColor: "#f5f7fa", minHeight: "100vh", py: 6 }}>
+      <Container maxWidth="lg">
+        <Paper
+          elevation={4}
+          sx={{
+            p: 4,
+            borderRadius: 3,
+            background: "linear-gradient(145deg, #ffffff, #f9f9f9)",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          }}
+        >
+          <CardHeader
+            avatar={
+              <Avatar
+                src={user.avatar || "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=100"}
+                sx={{ width: 100, height: 100, border: "2px solid #1976d2" }}
+              />
+            }
+            title={
+              <Typography variant="h4" fontWeight="bold" color="primary.main">
+                {user.name || "Chưa có tên"}
               </Typography>
-            </Box>
-          </Box>
-          <Divider sx={{ my: 3 }} />
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Email
+            }
+            subheader={
+              <Typography variant="subtitle1" color="text.secondary">
+                {user.email}
               </Typography>
-              <Typography>{user.email || "Chưa cập nhật"}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Số điện thoại
-              </Typography>
-              <Typography>{user.phone || "Chưa cập nhật"}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Giới tính
-              </Typography>
-              <Typography>{user.gender || "Chưa cập nhật"}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Địa chỉ
-              </Typography>
-              <Typography>{user.address || "Chưa cập nhật"}</Typography>
-            </Grid>
+            }
+            action={
+              <Button
+                variant="contained"
+                startIcon={<EditIcon />}
+                sx={{
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1,
+                  bgcolor: "#1976d2",
+                  "&:hover": { bgcolor: "#1565c0" },
+                }}
+              >
+                Chỉnh sửa
+              </Button>
+            }
+          />
+          <Divider sx={{ my: 3, borderColor: "#e0e0e0" }} />
+          <Grid container spacing={4}>
+            {[
+              { label: "Số điện thoại", value: patient.contactPhones },
+              { label: "Giới tính", value: user.gender },
+              { label: "Địa chỉ", value: user.address },
+              { label: "CCCD", value: patient.personalID },
+            ].map((item, idx) => (
+              <Grid key={idx} item xs={12} sm={6} md={3}>
+                <Typography variant="subtitle2" color="text.secondary" fontWeight="medium">
+                  {item.label}
+                </Typography>
+                <Typography variant="body1" sx={{ mt: 0.5 }}>
+                  {item.value || "Chưa cập nhật"}
+                </Typography>
+              </Grid>
+            ))}
           </Grid>
+        </Paper>
 
-          <Box textAlign="right" mt={4}>
-            <Button variant="contained" startIcon={<EditIcon />} sx={{ borderRadius: 2 }}>
-              Chỉnh sửa hồ sơ
-            </Button>
-          </Box>
-        </CardContent>
-      </Card>
-
-      {/* DANH SÁCH LỊCH KHÁM */}
-      <Card sx={{ maxWidth: 700, margin: "32px auto 0 auto", boxShadow: 1, borderRadius: 3 }}>
-        <CardContent>
-          <Typography variant="h6" fontWeight="bold" mb={2}>
+        {/* DANH SÁCH LỊCH KHÁM */}
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            borderRadius: 3,
+            mt: 4,
+            background: "linear-gradient(145deg, #ffffff, #f9f9f9)",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          }}
+        >
+          <Typography variant="h5" fontWeight="bold" mb={3} color="primary.main">
             Lịch khám đã đặt
           </Typography>
           {loadingAppointments ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-              <CircularProgress size={28} />
+            <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
+              <CircularProgress size={32} />
             </Box>
           ) : appointments.length === 0 ? (
-            <Typography>Chưa có lịch khám nào.</Typography>
+            <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+              Chưa có lịch khám nào.
+            </Typography>
           ) : (
-            <List>
+            <List disablePadding>
               {appointments.map((ap, idx) => (
-                <ListItem key={ap._id || idx} divider>
+                <ListItem
+                  key={ap._id || idx}
+                  divider
+                  sx={{
+                    py: 2,
+                    borderRadius: 2,
+                    "&:hover": { backgroundColor: "#f0f4f8" },
+                    transition: "background-color 0.3s",
+                  }}
+                >
                   <ListItemText
                     primary={
-                      <span>
-                        <b>Dịch vụ:</b> {ap.serviceName || "Không xác định"}{" "}
-                        <Chip label={ap.status || "Đang xử lý"} size="small" sx={{ ml: 1 }} />
-                      </span>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Typography variant="subtitle1" fontWeight="medium">
+                          {ap.serviceID.name || "Không xác định"}
+                        </Typography>
+                        <Chip
+                          label={ap.status || "Đang xử lý"}
+                          size="small"
+                          color={ap.status === "Đang chờ thanh toán" ? "warning" : "primary"}
+                          sx={{
+                            fontWeight: "medium",
+                            bgcolor: ap.status === "Đang chờ thanh toán" ? "#fff3e0" : "#e3f2fd",
+                          }}
+                        />
+                      </Box>
                     }
                     secondary={
-                      <>
-                        <div><b>Bác sĩ:</b> {ap.doctorName || "Chưa chỉ định"}</div>
-                        <div>
-                          <b>Ngày khám:</b> {formatDate(ap.date)}
-                          {" | "}
-                          <b>Giờ:</b> {formatTime(ap.time)}
-                        </div>
-                      </>
+                      <Box sx={{ mt: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          <b>Bác sĩ:</b> {ap.doctorID.userID.name || "Chưa chỉ định"}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                          <b>Ngày khám:</b> {formatDate(ap.date)} | <b>Giờ:</b> {formatTime(ap.startTime)}
+                        </Typography>
+                      </Box>
                     }
                   />
+                  {ap.status === "Chờ thanh toán" && (
+                    <ListItemSecondaryAction>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        startIcon={<PaymentIcon />}
+                        onClick={() => handlePayment(ap)}
+                        sx={{
+                          borderRadius: 2,
+                          px: 2,
+                          py: 0.5,
+                          fontSize: "0.875rem",
+                          "&:hover": { bgcolor: "#2e7d32" },
+                        }}
+                      >
+                        Thanh toán
+                      </Button>
+                    </ListItemSecondaryAction>
+                  )}
                 </ListItem>
               ))}
             </List>
           )}
-        </CardContent>
-      </Card>
+        </Paper>
+      </Container>
     </Box>
   );
 };

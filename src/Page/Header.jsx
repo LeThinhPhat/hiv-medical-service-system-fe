@@ -10,12 +10,12 @@ const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
 
-  // ✅ Lấy token từ localStorage
   const token = localStorage.getItem("token");
 
-  // ✅ Hàm logout: xóa token và chuyển hướng
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("patient");
     setAnchorEl(null);
     navigate("/signin");
   };
@@ -34,24 +34,12 @@ const Header = () => {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex space-x-6 text-gray-700 text-sm font-medium">
-          <Link to="/" className="hover:text-blue-700 transition">
-            Trang chủ
-          </Link>
-          <Link to="/about" className="hover:text-blue-700 transition">
-            Giới thiệu
-          </Link>
-          <Link to="/booking" className="hover:text-blue-700 transition">
-            Đặt lịch khám
-          </Link>
-          <Link to="/docs" className="hover:text-blue-700 transition">
-            Đội ngũ bác sĩ
-          </Link>
-          <Link to="/blogs" className="hover:text-blue-700 transition">
-            Blogs
-          </Link>
-          <Link to="/test" className="hover:text-blue-700 transition">
-            Test
-          </Link>
+          <Link to="/" className="hover:text-blue-700 transition">Trang chủ</Link>
+          <Link to="/about" className="hover:text-blue-700 transition">Giới thiệu</Link>
+          <Link to="/booking" className="hover:text-blue-700 transition">Đặt lịch khám</Link>
+          <Link to="/docs" className="hover:text-blue-700 transition">Đội ngũ bác sĩ</Link>
+          <Link to="/blogs" className="hover:text-blue-700 transition">Blogs</Link>
+          <Link to="/test" className="hover:text-blue-700 transition">Test</Link>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -63,14 +51,22 @@ const Header = () => {
 
         {/* Profile Icons */}
         <div className="hidden md:flex space-x-2">
-          {/* Xem Profile */}
-          <IconButton component={Link} to="/profile">
-            <PersonSearchIcon fontSize="large" sx={{ color: "#3B82F6" }} />
-          </IconButton>
+          {/* Nếu có token thì hiện nút xem hồ sơ, ngược lại hiện nút tra cứu cuộc hẹn */}
+          {token ? (
+            <IconButton component={Link} to="/profile">
+              <PersonSearchIcon fontSize="large" sx={{ color: "#3B82F6" }} />
+            </IconButton>
+          ) : (
+            <Link to="/search-appointment">
+              <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Tra cứu cuộc hẹn
+              </button>
+            </Link>
+          )}
 
-          {/* Menu tài khoản */}
+          {/* Menu tài khoản luôn hiển thị */}
           <IconButton onClick={handleProfileMenuOpen}>
-            <AccountCircleIcon fontSize="large" sx={{ color: "	#3B82F6" }} />
+            <AccountCircleIcon fontSize="large" sx={{ color: "#3B82F6" }} />
           </IconButton>
 
           {/* Dropdown Menu */}
@@ -95,48 +91,17 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu giữ nguyên nếu bạn vẫn dùng */}
       {menuOpen && (
         <div className="md:hidden px-4 pb-4">
           <nav className="flex flex-col space-y-2 text-gray-700 text-sm font-medium">
-            <Link to="/" onClick={toggleMenu} className="hover:text-yellow-700">
-              Trang chủ
-            </Link>
-            <Link
-              to="/about"
-              onClick={toggleMenu}
-              className="hover:text-yellow-700"
-            >
-              Giới thiệu
-            </Link>
-            <Link
-              to="/booking"
-              onClick={toggleMenu}
-              className="hover:text-yellow-700"
-            >
-              Đặt lịch khám
-            </Link>
-            <Link
-              to="/news"
-              onClick={toggleMenu}
-              className="hover:text-yellow-700"
-            >
-              Tin tức
-            </Link>
-            <Link
-              to="/blogs"
-              onClick={toggleMenu}
-              className="hover:text-yellow-700"
-            >
-              Blogs
-            </Link>
-            <Link
-              to="/test"
-              onClick={toggleMenu}
-              className="hover:text-yellow-700"
-            >
-              Test
-            </Link>
+            <Link to="/" onClick={toggleMenu} className="hover:text-yellow-700">Trang chủ</Link>
+            <Link to="/about" onClick={toggleMenu} className="hover:text-yellow-700">Giới thiệu</Link>
+            <Link to="/booking" onClick={toggleMenu} className="hover:text-yellow-700">Đặt lịch khám</Link>
+            <Link to="/news" onClick={toggleMenu} className="hover:text-yellow-700">Tin tức</Link>
+            <Link to="/blogs" onClick={toggleMenu} className="hover:text-yellow-700">Blogs</Link>
+            <Link to="/test" onClick={toggleMenu} className="hover:text-yellow-700">Test</Link>
+
             {token ? (
               <button
                 onClick={() => {
