@@ -29,11 +29,33 @@ const appointmentService = {
       throw error;
     }
   },
+getAppointmentsByPersonalID: async (personalID) => {
+  try {
+    console.log("Fetching appointments for Personal ID:", personalID);
+    const response = await fetch(`${BASE_URL}/patients/by-personal-id`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ personalID }),
+    });
 
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Không tìm thấy lịch hẹn");
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Lỗi khi lấy lịch hẹn theo Personal ID:", error);
+    throw error;
+  }
+},
   getById: async (id) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${BASE_URL}/appointments/${id}`, {
+      const response = await fetch(`${BASE_URL}/appointments/findOne/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const result = await response.json();
@@ -45,7 +67,30 @@ const appointmentService = {
       console.error("Error get appointment by ID:", error);
       throw error;
     }
-  }
+  },
+
+    getAppointmentByToken: async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${BASE_URL}/appointments/patienttoken`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      const result = await response.json();
+
+
+      return result;
+    } catch (error) {
+      console.error(`Error fetching patient data:`, error);
+      throw error;
+    }
+  },
 };
+
+
 
 export default appointmentService;
