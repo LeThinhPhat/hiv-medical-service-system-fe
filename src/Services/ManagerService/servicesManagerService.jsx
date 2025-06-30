@@ -11,6 +11,29 @@ const getAllServices = (token) => {
   });
 };
 
+// GET service by ID
+const getServiceById = (id, token) => {
+  return axios.get(`${API_BASE_URL}/services/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    },
+  });
+};
+
+// UPDATE service by ID
+const updateServiceById = (id, data, token) => {
+  return axios.patch(`${API_BASE_URL}/services/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+};
+
 export default {
   getAllServices,
+  getServiceById,
+  updateServiceById,
 };

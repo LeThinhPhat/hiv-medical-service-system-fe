@@ -33,8 +33,8 @@ const sidebarItems = [
     path: "/manager/service",
   },
   { text: "User", icon: <Person />, path: "/manager/user" },
-  { text: "Salaries", icon: <MonetizationOn />, path: "/manager/salaries" },
-  { text: "Rooms", icon: <Hotel />, path: "/manager/rooms" },
+  { text: "Phát đồ ARV", icon: <Newspaper />, path: "/manager/arv" },
+  { text: "Thuốc", icon: <Hotel />, path: "/manager/drugs" },
   { text: "Ambulance", icon: <LocalShipping />, path: "/manager/ambulance" },
   {
     text: "Event Management",
