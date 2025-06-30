@@ -7,7 +7,7 @@ const PatientList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPatientId, setSelectedPatientId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const pageSize = 5;
+  const pageSize = 10;
 
   const token = localStorage.getItem("token");
 
