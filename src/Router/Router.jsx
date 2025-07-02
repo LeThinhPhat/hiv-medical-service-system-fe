@@ -14,7 +14,7 @@ import SignIn from "../Page/SignIn";
 import SignUp from "../Page/SignUp";
 import ForgotPassword from "../Page/ForgotPassword";
 import ListDoctor from "../Components/Customer/Listdoctor";
-import DetailDoctor from "../Components/Customer/DetailDoctor";
+import DetailDoctor from "../Components/Customer/Detaildoctor";
 import BlogList from "../Components/Customer/BlogList";
 import BlogDetail from "../Components/Customer/BlogDetail";
 import Profile from "../Page/Profile";
