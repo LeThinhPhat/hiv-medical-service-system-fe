@@ -53,6 +53,7 @@ import UserDetail from "../Components/Manager/UserDetail";
 import ManagerDrugs from "../Components/Manager/ManagerDrugs";
 import DrugDetails from "../Components/Manager/DrugDetail";
 import SearchBooking from "../Components/Customer/SearchBooking";
+import TreatmentPlanPage from "../Components/Customer/TreatmentPlanPage ";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -63,6 +64,7 @@ const Router = createBrowserRouter([
       { path: "blogs", element: <BlogList /> },
       { path: "blogs/:id", element: <BlogDetail /> },
       { path: "booking", element: <Booking /> },
+      { path: "/treatment-plan", element: <TreatmentPlanPage /> },
       { path: "search-appointment", element: <SearchBooking /> },
       { path: "booking-payment", element: <BookingPaymentPage /> },
       { path: "profile", element: <Profile /> },

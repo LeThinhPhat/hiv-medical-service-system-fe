@@ -151,7 +151,7 @@ const DetailDoctor = () => {
                 </Box>
                 <Button
                   component={Link}
-                  to="/doctors"
+                  to="/docs"
                   variant="contained"
                   color="primary"
                   sx={{

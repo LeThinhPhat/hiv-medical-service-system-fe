@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { IconButton, Menu as MuiMenu, MenuItem } from "@mui/material";
+import {
+  IconButton,
+  Menu as MuiMenu,
+  MenuItem
+} from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
+import AssignmentIcon from "@mui/icons-material/Assignment"; // 👉 Icon lộ trình điều trị
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -51,7 +56,14 @@ const Header = () => {
 
         {/* Profile Icons */}
         <div className="hidden md:flex space-x-2">
-          {/* Nếu có token thì hiện nút xem hồ sơ, ngược lại hiện nút tra cứu cuộc hẹn */}
+       
+          {token && (
+            <IconButton component={Link} to="/treatment-plan">
+              <AssignmentIcon fontSize="large" sx={{ color: "#3B82F6" }} />
+            </IconButton>
+          )}
+
+      
           {token ? (
             <IconButton component={Link} to="/profile">
               <PersonSearchIcon fontSize="large" sx={{ color: "#3B82F6" }} />
@@ -64,7 +76,9 @@ const Header = () => {
             </Link>
           )}
 
-          {/* Menu tài khoản luôn hiển thị */}
+          
+
+          {/* Menu tài khoản */}
           <IconButton onClick={handleProfileMenuOpen}>
             <AccountCircleIcon fontSize="large" sx={{ color: "#3B82F6" }} />
           </IconButton>
@@ -91,7 +105,7 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile Menu giữ nguyên nếu bạn vẫn dùng */}
+      {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden px-4 pb-4">
           <nav className="flex flex-col space-y-2 text-gray-700 text-sm font-medium">
@@ -101,6 +115,14 @@ const Header = () => {
             <Link to="/news" onClick={toggleMenu} className="hover:text-yellow-700">Tin tức</Link>
             <Link to="/blogs" onClick={toggleMenu} className="hover:text-yellow-700">Blogs</Link>
             <Link to="/test" onClick={toggleMenu} className="hover:text-yellow-700">Test</Link>
+
+            {token && (
+              <Link to="/treatment-plan" onClick={toggleMenu}>
+                <button className="w-full text-left px-4 py-2 text-blue-600 hover:underline">
+                  Xem lộ trình điều trị
+                </button>
+              </Link>
+            )}
 
             {token ? (
               <button
