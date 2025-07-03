@@ -53,8 +53,8 @@ import UserDetail from "../Components/Manager/UserDetail";
 import ManagerDrugs from "../Components/Manager/ManagerDrugs";
 import DrugDetails from "../Components/Manager/DrugDetail";
 import SearchBooking from "../Components/Customer/SearchBooking";
-import ManagerDrugs from "../Components/Manager/ManagerDrugs";
-import DrugDetails from "../Components/Manager/DrugDetail";
+import DetailTreatment from "../Components/Doctor/DetailTreatment";
+import CreateTreatment from "../Components/Doctor/CreateTreatment";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -155,6 +155,14 @@ const Router = createBrowserRouter([
       {
         path: "doctorsappoinment/medical-records/personal-id/:patientID",
         element: <ViewMedicalRecord />,
+      },
+      {
+        path: "doctorsappoinment/medical-records/personal-id/treatment/:id",
+        element: <DetailTreatment />,
+      },
+      {
+        path: "doctorsappoinment/medical-records/personal-id/createtreatment/:id",
+        element: <CreateTreatment />,
       },
     ],
   },
