@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import medicalRecordService from "../../Services/DoctorService/medicalRecordService";
 import createMedicalPersonalService from "../../Services/DoctorService/createMedicalPersonalService";
-import treatmentService from "../../Services/DoctorService/treatmentService";
 import {
   Button,
   TextField,
@@ -15,18 +14,12 @@ const ViewMedicalRecord = () => {
   const { patientID } = useParams();
   const [medicalRecord, setMedicalRecord] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     diagnosis: "",
     symptoms: "",
     clinicalNotes: "",
-  });
-
-  const [submitting, setSubmitting] = useState(false);
-  const [showTreatmentForm, setShowTreatmentForm] = useState(false);
-  const [treatmentData, setTreatmentData] = useState({
-    note: "",
-    treatmentDate: new Date().toISOString().slice(0, 16),
   });
 
   const token = localStorage.getItem("token");
@@ -69,25 +62,6 @@ const ViewMedicalRecord = () => {
       console.error(error);
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleCreateTreatment = async (e) => {
-    e.preventDefault();
-    try {
-      const treatmentPayload = {
-        note: treatmentData.note,
-        treatmentDate: new Date(treatmentData.treatmentDate).toISOString(),
-        medicalRecordID: medicalRecord._id,
-      };
-
-      await treatmentService.createTreatment(treatmentPayload, token);
-      alert("✅ Tạo treatment thành công");
-      setShowTreatmentForm(false);
-      fetchRecord(); // Refresh medical record to get updated treatmentID
-    } catch (error) {
-      console.error("❌ Lỗi khi tạo treatment:", error);
-      alert("❌ Lỗi khi tạo treatment");
     }
   };
 
@@ -135,7 +109,7 @@ const ViewMedicalRecord = () => {
                 {medicalRecord.treatmentID.map((id, index) => (
                   <li key={id} className="flex items-center justify-between">
                     <span>
-                      Lần {index + 1}: {id}
+                      Lần Khám {index + 1}: {id}
                     </span>
                     <Link
                       to={`/doctor/doctorsappoinment/medical-records/personal-id/treatment/${id}`}
@@ -149,56 +123,14 @@ const ViewMedicalRecord = () => {
             </div>
           )}
 
-          {/* Tạo Treatment */}
+          {/* Link đến form tạo treatment mới */}
           <div className="mt-6">
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => setShowTreatmentForm(!showTreatmentForm)}
+            <Link
+              to={`/doctor/doctorsappoinment/medical-records/personal-id/create-treatment/${medicalRecord._id}`}
+              className="text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded inline-block"
             >
               ➕ Tạo treatment mới
-            </Button>
-
-            {showTreatmentForm && (
-              <form onSubmit={handleCreateTreatment} className="mt-4 space-y-4">
-                <TextField
-                  label="Ghi chú (note)"
-                  name="note"
-                  value={treatmentData.note}
-                  onChange={(e) =>
-                    setTreatmentData({
-                      ...treatmentData,
-                      note: e.target.value,
-                    })
-                  }
-                  fullWidth
-                  required
-                />
-
-                <TextField
-                  label="Ngày điều trị"
-                  type="datetime-local"
-                  fullWidth
-                  required
-                  value={treatmentData.treatmentDate}
-                  onChange={(e) =>
-                    setTreatmentData({
-                      ...treatmentData,
-                      treatmentDate: e.target.value,
-                    })
-                  }
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-
-                <Box display="flex" justifyContent="flex-end">
-                  <Button variant="contained" type="submit" color="primary">
-                    ✅ Xác nhận tạo Treatment
-                  </Button>
-                </Box>
-              </form>
-            )}
+            </Link>
           </div>
         </div>
       ) : (

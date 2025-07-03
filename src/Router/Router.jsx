@@ -28,7 +28,6 @@ import AppointmentList from "../Components/Staff/AppointmentList";
 import Manager from "../Components/Manager/Manager";
 import ManagerDoctorList from "../Components/Manager/ManagerDoctorList";
 import Doctor from "../Components/Doctor/Doctor";
-import AppointmentFake from "../Components/Doctor/AppointmentFake";
 import BookingPage from "../Components/Customer/BookingStep/BookingPage";
 import BookingConfirmPage from "../Components/Customer/BookingStep/BookingConfirmPage";
 
@@ -118,7 +117,6 @@ const Router = createBrowserRouter([
     element: <DoctorLayout />,
     children: [
       { path: "", element: <Doctor /> },
-      { path: "appointments", element: <AppointmentFake /> },
       { path: "my-patients", element: <PatientsList /> },
       // {
       //   path: "profile-doctor",
@@ -161,7 +159,7 @@ const Router = createBrowserRouter([
         element: <DetailTreatment />,
       },
       {
-        path: "doctorsappoinment/medical-records/personal-id/createtreatment/:id",
+        path: "doctorsappoinment/medical-records/personal-id/create-treatment/:recordID",
         element: <CreateTreatment />,
       },
     ],
