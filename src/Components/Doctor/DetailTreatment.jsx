@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import treatmentService from "../../Services/DoctorService/treatmentService";
 import { Box, Typography, CircularProgress } from "@mui/material";
-
 const DetailTreatment = () => {
   const { id } = useParams();
   const [treatment, setTreatment] = useState(null);
