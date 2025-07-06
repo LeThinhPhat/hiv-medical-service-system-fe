@@ -78,14 +78,14 @@ const DoctorAppointments = () => {
                   >
                     Xem hồ sơ
                   </button>
-                  <button
+                  {/* <button
                     className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
                     onClick={() =>
                       navigate(`medical-records/create/${appt.patientID?._id}`)
                     }
                   >
                     Tạo bệnh án
-                  </button>
+                  </button> */}
                 </td>
               </tr>
             ))}

@@ -28,7 +28,6 @@ import AppointmentList from "../Components/Staff/AppointmentList";
 import Manager from "../Components/Manager/Manager";
 import ManagerDoctorList from "../Components/Manager/ManagerDoctorList";
 import Doctor from "../Components/Doctor/Doctor";
-import AppointmentFake from "../Components/Doctor/AppointmentFake";
 import BookingPage from "../Components/Customer/BookingStep/BookingPage";
 import BookingConfirmPage from "../Components/Customer/BookingStep/BookingConfirmPage";
 
@@ -54,6 +53,9 @@ import ManagerDrugs from "../Components/Manager/ManagerDrugs";
 import DrugDetails from "../Components/Manager/DrugDetail";
 import SearchBooking from "../Components/Customer/SearchBooking";
 import TreatmentPlanPage from "../Components/Customer/TreatmentPlanPage ";
+import DetailTreatment from "../Components/Doctor/DetailTreatment";
+import CreateTreatment from "../Components/Doctor/CreateTreatment";
+
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -118,7 +120,6 @@ const Router = createBrowserRouter([
     element: <DoctorLayout />,
     children: [
       { path: "", element: <Doctor /> },
-      { path: "appointments", element: <AppointmentFake /> },
       { path: "my-patients", element: <PatientsList /> },
       // {
       //   path: "profile-doctor",
@@ -155,6 +156,14 @@ const Router = createBrowserRouter([
       {
         path: "doctorsappoinment/medical-records/personal-id/:patientID",
         element: <ViewMedicalRecord />,
+      },
+      {
+        path: "doctorsappoinment/medical-records/personal-id/treatment/:id",
+        element: <DetailTreatment />,
+      },
+      {
+        path: "doctorsappoinment/medical-records/personal-id/create-treatment/:recordID",
+        element: <CreateTreatment />,
       },
     ],
   },
