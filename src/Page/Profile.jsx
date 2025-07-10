@@ -15,7 +15,6 @@ import {
   Container,
   Paper,
   ListItemSecondaryAction,
-  IconButton,
   TextField,
   Card,
   CardContent,
@@ -135,12 +134,20 @@ const Profile = () => {
     switch (status) {
       case "Chờ thanh toán":
         return { color: "warning", bgcolor: "#fff8e1", textColor: "#ed6c02", borderColor: "#ed6c02" };
-      case "Đã thanh toán":
-        return { color: "success", bgcolor: "#e8f5e8", textColor: "#2e7d32", borderColor: "#2e7d32" };
-      case "Hoàn thành":
-        return { color: "info", bgcolor: "#e3f2fd", textColor: "#0277bd", borderColor: "#0277bd" };
-      case "Đã hủy":
+      case "Thanh toán thất bại":
         return { color: "error", bgcolor: "#ffebee", textColor: "#d32f2f", borderColor: "#d32f2f" };
+      case "Đang xét duyệt":
+        return { color: "default", bgcolor: "#f5f5f5", textColor: "#616161", borderColor: "#616161" };
+      case "Hoàn tất đặt lịch":
+        return { color: "success", bgcolor: "#e8f5e8", textColor: "#2e7d32", borderColor: "#2e7d32" };
+      case "Hủy bởi người khách hàng":
+        return { color: "error", bgcolor: "#ffcccb", textColor: "#b71c1c", borderColor: "#b71c1c" };
+      case "Hủy bởi nhân viên":
+        return { color: "error", bgcolor: "#ffcdd2", textColor: "#c62828", borderColor: "#c62828" };
+      case "Đã hủy & hoàn tiền bởi nhân viên":
+        return { color: "info", bgcolor: "#e0f7fa", textColor: "#0277bd", borderColor: "#0277bd" };
+      case "Hoàn tất quá trình khám":
+        return { color: "success", bgcolor: "#c8e6c9", textColor: "#1b5e20", borderColor: "#1b5e20" };
       default:
         return { color: "default", bgcolor: "#f5f5f5", textColor: "#616161", borderColor: "#616161" };
     }
@@ -470,14 +477,16 @@ const Profile = () => {
                       border: "1px solid #e0e0e0",
                       "&:hover": { 
                         bgcolor: "#f5f5f5"
-                      }
+                      },
+                      position: "relative",
+                      alignItems: "flex-start"
                     }}
                   >
                     <ListItemText
                       primary={
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
                           <Typography variant="subtitle1" fontWeight="600" color="#212121">
-                            {ap.serviceID.name || "Không xác định"}
+                            {ap.serviceID?.name || "Không xác định"}
                           </Typography>
                           <Chip 
                             label={ap.status || "Đang xử lý"} 
@@ -494,7 +503,7 @@ const Profile = () => {
                       secondary={
                         <Box>
                           <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                            <strong>Bác sĩ:</strong> {ap.doctorID.userID.name || "Chưa chỉ định"}
+                            <strong>Bác sĩ:</strong> {ap.doctorID?.userID?.name || "Chưa chỉ định"}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             <strong>Thời gian:</strong> {formatDate(ap.date)} - {formatTime(ap.startTime)}
@@ -502,21 +511,36 @@ const Profile = () => {
                         </Box>
                       }
                     />
-                    {ap.status === "Chờ thanh toán" && (
-                      <ListItemSecondaryAction>
+                    <ListItemSecondaryAction sx={{ top: 16, transform: "none" }}>
+                      {ap.status === "Chờ thanh toán" ? (
                         <Button 
                           variant="contained" 
                           startIcon={<PaymentIcon />} 
                           onClick={() => handlePayment(ap)} 
                           sx={{ 
                             bgcolor: "#0277bd",
-                            "&:hover": { bgcolor: "#01579b" }
+                            "&:hover": { bgcolor: "#01579b" },
+                            borderRadius: 2,
+                            textTransform: "none",
+                            fontWeight: 500
                           }}
                         >
                           Thanh toán
                         </Button>
-                      </ListItemSecondaryAction>
-                    )}
+                      ) : ap.status !== "Thanh toán thất bại" ? (
+                        <Chip
+                          label="Đã thanh toán"
+                          size="small"
+                          sx={{
+                            bgcolor: "#e8f5e8",
+                            color: "#2e7d32",
+                            border: "1px solid #2e7d32",
+                            fontWeight: "500",
+                            borderRadius: 2,
+                          }}
+                        />
+                      ) : null}
+                    </ListItemSecondaryAction>
                   </ListItem>
                 );
               })}

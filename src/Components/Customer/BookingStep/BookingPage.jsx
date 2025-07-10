@@ -7,14 +7,13 @@ import ServicesService from "../../../Services/ServicesService";
 
 // Hàm trả về yyyy-MM-dd hôm nay
 const today = new Date();
-const pad = (v) => String(v).padStart(2, '0');
+const pad = (v) => String(v).padStart(2, "0");
 const defaultDate = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
 
 function formatTime(isoString) {
   const date = new Date(isoString);
-  // Trừ đi 7 giờ (chênh lệch UTC và UTC+7) để hiển thị đúng giờ địa phương
   const adjustedDate = new Date(date.getTime() - 7 * 60 * 60 * 1000);
-  return adjustedDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" , hour12: false });
+  return adjustedDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
 function formatDate(isoDateString) {
@@ -30,7 +29,7 @@ const BookingPage = () => {
   const { doctorId } = useParams();
   const navigate = useNavigate();
 
-  const [selectedDate, setSelectedDate] = useState(defaultDate); // yyyy-MM-dd
+  const [selectedDate, setSelectedDate] = useState(defaultDate);
   const [schedule, setSchedule] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [doctorInfo, setDoctorInfo] = useState(null);
@@ -39,20 +38,17 @@ const BookingPage = () => {
   const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState("");
 
-  const userRole = localStorage.getItem("role") || "patient";
+  const userRole = JSON.parse(localStorage.getItem("patient"));
 
   // Lấy thông tin bác sĩ
   useEffect(() => {
     const fetchDoctorInfo = async () => {
-      setLoadingDoctor(true);
-      setError(null);
       try {
+        setLoadingDoctor(true);
         const info = await docListService.getDoctorById(doctorId);
-        const services = await ServicesService.getAllService();
         setDoctorInfo(info);
-        setServices(services);
       } catch (err) {
-        setError("Không thể tải thông tin bác sĩ. Vui lòng thử lại.", err);
+        setError("Không thể tải thông tin bác sĩ. Vui lòng thử lại.",err);
         setDoctorInfo(null);
       } finally {
         setLoadingDoctor(false);
@@ -61,7 +57,35 @@ const BookingPage = () => {
     if (doctorId) fetchDoctorInfo();
   }, [doctorId]);
 
-  // Lấy lịch khám theo ngày và dịch vụ
+  // Lọc dịch vụ dựa vào patient
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoadingDoctor(true); // hoặc setLoadingServices nếu bạn tách riêng state
+        const result = await ServicesService.getAllService();
+        const patient = JSON.parse(localStorage.getItem("patient"));
+
+        let filteredServices = result;
+        if (!patient || !patient.medicalRecordID || patient.medicalRecordID.length === 0) {
+          filteredServices = result.filter(
+            (service) =>
+              service.name && service.name.toLowerCase().includes("tổng quát")
+          );
+        }
+
+        setServices(filteredServices);
+      } catch (err) {
+        console.error("Error fetching services:", err);
+        setError("Không thể tải danh sách dịch vụ. Vui lòng thử lại.");
+      } finally {
+        setLoadingDoctor(false);
+      }
+    };
+
+    if (doctorId) fetchServices();
+  }, [doctorId]);
+
+  // Lấy lịch khám
   useEffect(() => {
     const fetchSchedule = async () => {
       if (!selectedService) {
@@ -110,7 +134,7 @@ const BookingPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto mt-8 p-4 bg-transparent">
-      {/* Profile Card */}
+      {/* Profile */}
       <div className="relative flex flex-col items-center mb-10">
         <div className="bg-white shadow-md rounded-lg pt-16 pb-8 w-full flex flex-col items-center relative border border-gray-200">
           <div className="absolute -top-12 flex justify-center w-full">
@@ -119,68 +143,47 @@ const BookingPage = () => {
                 <div className="w-24 h-24 rounded-full bg-gray-200 animate-pulse flex items-center justify-center text-gray-500 text-4xl font-bold">
                   DR
                 </div>
-              ) : doctorInfo ? (
-                doctorInfo.avatar ? (
-                  <img
-                    src={doctorInfo.avatar}
-                    alt={doctorInfo.userID.name || "Doctor"}
-                    className="w-24 h-24 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-blue-400 flex items-center justify-center text-white text-4xl font-bold">
-                    {getInitials(doctorInfo.userID.name)}
-                  </div>
-                )
+              ) : doctorInfo?.avatar ? (
+                <img
+                  src={doctorInfo.avatar}
+                  alt={doctorInfo.userID.name || "Doctor"}
+                  className="w-24 h-24 rounded-full object-cover"
+                />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-4xl font-bold">
-                  DR
+                <div className="w-24 h-24 rounded-full bg-blue-400 flex items-center justify-center text-white text-4xl font-bold">
+                  {getInitials(doctorInfo?.userID?.name)}
                 </div>
               )}
             </div>
           </div>
           <div className="mt-3 flex flex-col items-center">
-            {loadingDoctor ? (
-              <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
-            ) : (
-              <h1 className="text-3xl font-semibold text-gray-700 flex items-center gap-2">
-                <FaUserMd className="text-blue-600" />
-                {doctorInfo?.userID?.name || "Tên bác sĩ"}
-              </h1>
-            )}
-            <div className="flex flex-col gap-2 mt-4 text-center w-full max-w-xs">
-              {loadingDoctor ? (
-                <>
-                  <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mx-auto"></div>
-                  <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mx-auto"></div>
-                  <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mx-auto"></div>
-                  <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mx-auto"></div>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center gap-2 text-gray-700 justify-center">
-                    <FaStethoscope className="text-blue-600" />
-                    {doctorInfo?.specializations || "Chuyên khoa chưa cập nhật"}
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700 justify-center">
-                    <FaEnvelope className="text-blue-600" />
-                    {doctorInfo?.email || "Email chưa cập nhật"}
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700 justify-center">
-                    <FaBriefcase className="text-blue-600" />
-                    Kinh nghiệm: {doctorInfo?.experiences?.[0] || "Chưa cập nhật"}
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700 justify-center">
-                    <FaRegBuilding className="text-blue-600" />
-                    Phòng: {doctorInfo?.room || "Chưa cập nhật"}
-                  </div>
-                </>
-              )}
+            <h1 className="text-3xl font-semibold text-gray-700 flex items-center gap-2">
+              <FaUserMd className="text-blue-600" />
+              {doctorInfo?.userID?.name || "Tên bác sĩ"}
+            </h1>
+            <div className="flex flex-col gap-2 mt-4 text-center w-full max-w-xs text-gray-700">
+              <div className="flex items-center gap-2 justify-center">
+                <FaStethoscope className="text-blue-600" />
+                {doctorInfo?.specializations || "Chuyên khoa chưa cập nhật"}
+              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <FaEnvelope className="text-blue-600" />
+                {doctorInfo?.email || "Email chưa cập nhật"}
+              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <FaBriefcase className="text-blue-600" />
+                Kinh nghiệm: {doctorInfo?.experiences?.[0] || "Chưa cập nhật"}
+              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <FaRegBuilding className="text-blue-600" />
+                Phòng: {doctorInfo?.room || "Chưa cập nhật"}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Error Message */}
+      {/* Error */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200 text-center">
           {error}
@@ -209,7 +212,6 @@ const BookingPage = () => {
 
       {/* Schedule */}
       <div className="bg-white rounded-lg shadow-md p-8 border border-gray-200">
-        {/* Date picker */}
         <div className="mb-6 flex items-center gap-3">
           <label htmlFor="date" className="font-semibold text-gray-700">
             Chọn ngày khám:
@@ -225,15 +227,13 @@ const BookingPage = () => {
           />
         </div>
 
-        {/* Chỉ hiển thị lịch khi đã chọn dịch vụ */}
         {!selectedService ? (
           <p className="text-center text-gray-500">
             Vui lòng chọn dịch vụ để xem lịch khám.
           </p>
         ) : schedule.length === 0 || schedule[0].slots.length === 0 ? (
           <p className="text-center text-gray-500">
-            Không có lịch làm việc cho bác sĩ này vào ngày{" "}
-            {formatDate(selectedDate)}
+            Không có lịch làm việc cho bác sĩ vào ngày {formatDate(selectedDate)}
           </p>
         ) : (
           <div>
@@ -265,8 +265,7 @@ const BookingPage = () => {
                 <span>
                   <span className="mr-1 text-gray-700">Bạn đã chọn:</span>
                   <b className="text-blue-600">
-                    {formatTime(selectedSlot.startTime)} -{" "}
-                    {formatTime(selectedSlot.endTime)}
+                    {formatTime(selectedSlot.startTime)} - {formatTime(selectedSlot.endTime)}
                   </b>
                 </span>
                 <button

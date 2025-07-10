@@ -25,8 +25,6 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [error, setError] = useState(null);
-
-  // State mới cho API slot riêng từng bác sĩ
   const [doctorSlots, setDoctorSlots] = useState(null);
   const [loadingDoctorSlot, setLoadingDoctorSlot] = useState(false);
   const [slotError, setSlotError] = useState(null);
@@ -42,7 +40,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
 
   useEffect(() => {
     if (!open) return;
-    setSelectedDoctor(null); // reset khi mở lại dialog
+    setSelectedDoctor(null);
     setDoctorSlots(null);
     setSlotError(null);
     const fetchDoctors = async () => {
@@ -50,37 +48,29 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
       setError(null);
       setDoctors([]);
       try {
-        // Giả định hàm này lấy về danh sách bác sĩ rảnh (hoặc tất cả bác sĩ, tùy logic cũ)
-        const res = await doctorSlotService.getDoctorSlots({
-          startTime: Starttime,
-        });
+        const res = await doctorSlotService.getDoctorSlots({ startTime: Starttime });
         setDoctors(res?.filter(Boolean));
       } catch (err) {
-        setError("Không thể tải danh sách bác sĩ.",err);
+        setError("Không thể tải danh sách bác sĩ.");
       }
       setLoading(false);
     };
     fetchDoctors();
-    // eslint-disable-next-line
   }, [open, data.date, data.time]);
 
-  // Khi chọn bác sĩ, kiểm tra slot ở thời điểm này
   const handleSelectDoctor = async (doctor) => {
     setSelectedDoctor(doctor);
     setLoadingDoctorSlot(true);
     setSlotError(null);
     setDoctorSlots(null);
     try {
-      const slots = await doctorSlotService.getDoctorSlotByDoctor(
-        doctor._id,
-        Starttime
-      );
+      const slots = await doctorSlotService.getDoctorSlotByDoctor(doctor._id, Starttime);
       setDoctorSlots(slots);
       if (!slots || slots.length === 0) {
         setSlotError("Bác sĩ này không có slot trống ở thời điểm này.");
       }
     } catch (err) {
-      setSlotError("Bác sĩ này không có slot trống ở thời điểm này.",err);
+      setSlotError("Bác sĩ này không có slot trống ở thời điểm này.");
     }
     setLoadingDoctorSlot(false);
   };
@@ -95,30 +85,22 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
     onClose();
   };
 
-  // Lấy avatar giả nếu chưa có ảnh thật
   const getAvatar = (doctor) => {
-    if (doctor.userID?.avatar || doctor.avatar) {
-      return (
-        <Avatar
-          sx={{ width: 80, height: 80, boxShadow: 2, mr: 3 }}
-          src={doctor.userID?.avatar || doctor.avatar}
-        >
-          {doctor.userID?.name?.[0]?.toUpperCase() || "D"}
-        </Avatar>
-      );
-    }
-    const index =
-      doctor._id?.charCodeAt(doctor._id.length - 1) % 2 ||
-      Math.floor(Math.random() * 2);
-    const fakeImg = `https://randomuser.me/api/portraits/${
-      index === 0 ? "men" : "women"
-    }/${Math.abs(doctor._id?.charCodeAt(0) % 99)}.jpg`;
+    const initials = doctor.userID?.name?.[0]?.toUpperCase() || "D";
     return (
       <Avatar
-        sx={{ width: 80, height: 80, boxShadow: 2, mr: 3 }}
-        src={fakeImg}
+        src={doctor.userID?.avatar || doctor.avatar}
+        sx={{
+          width: 72,
+          height: 72,
+          bgcolor: "#e0f2fe",
+          fontSize: "1.8rem",
+          fontWeight: "bold",
+          boxShadow: 2,
+          mr: 2,
+        }}
       >
-        {doctor.userID?.name?.[0]?.toUpperCase() || "D"}
+        {initials}
       </Avatar>
     );
   };
@@ -132,183 +114,165 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
       sx={{
         "& .MuiDialog-paper": {
           borderRadius: 4,
-          boxShadow: "0 6px 24px rgba(0, 0, 0, 0.15)",
+          boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
           backgroundColor: "#f9fafb",
-          width: "90%",
-          maxHeight: "90vh",
         },
       }}
     >
       <DialogTitle
         sx={{
-          p: 4,
+          p: 3,
           display: "flex",
           alignItems: "center",
-          backgroundColor: "#e3f2fd",
-          borderBottom: "1px solid #e0e0e0",
+          background: "linear-gradient(to right, #3b82f6, #60a5fa)",
+          color: "#fff",
         }}
       >
-        <Typography
-          variant="h5"
-          sx={{ flexGrow: 1, fontWeight: 600, color: "#1976d2" }}
-        >
-          Vui lòng chọn bác sĩ khám
+        <Typography variant="h5" sx={{ flexGrow: 1, fontWeight: 700 }}>
+          Chọn bác sĩ khám
         </Typography>
-        <IconButton onClick={onClose} sx={{ color: "#546e7a" }}>
-          <CloseIcon sx={{ fontSize: 32 }} />
+        <IconButton onClick={onClose} sx={{ color: "#fff" }}>
+          <CloseIcon sx={{ fontSize: 28 }} />
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers sx={{ p: 5, backgroundColor: "#fff" }}>
+
+      <DialogContent sx={{ p: 4, backgroundColor: "#fff" }}>
         {loading && (
           <Box
             sx={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              height: 300,
+              minHeight: 200,
+              flexDirection: "column",
+              gap: 2,
             }}
           >
-            <CircularProgress color="primary" size={60} />
-            <Typography variant="body1" sx={{ ml: 3, color: "#546e7a" }}>
-              Loading available doctors...
+            <CircularProgress color="primary" size={50} />
+            <Typography variant="body1" sx={{ color: "#475569", fontWeight: 500 }}>
+              Đang tải danh sách bác sĩ...
             </Typography>
           </Box>
         )}
+
         {error && (
           <Alert
             severity="error"
             sx={{
-              mt: 4,
-              mb: 3,
-              borderRadius: 3,
-              backgroundColor: "#fef2f2",
+              mt: 3,
+              mb: 2,
+              borderRadius: 2,
+              bgcolor: "#fee2e2",
               color: "#b91c1c",
-              fontSize: "1.1rem",
+              fontSize: "1rem",
+              fontWeight: 500,
+              p: 2,
             }}
           >
             {error}
           </Alert>
         )}
+
         {!loading && doctors.length === 0 && !error && (
           <Alert
             severity="warning"
             sx={{
-              mt: 4,
-              mb: 3,
-              borderRadius: 3,
-              backgroundColor: "#fefce8",
+              mt: 3,
+              mb: 2,
+              borderRadius: 2,
+              bgcolor: "#fefce8",
               color: "#a16207",
-              fontSize: "1.1rem",
+              fontSize: "1rem",
+              fontWeight: 500,
+              p: 2,
             }}
           >
             Không có bác sĩ nào khả dụng ở khung giờ này.
           </Alert>
         )}
+
         <Grid container spacing={3}>
           {doctors.map((doctor) => (
             <Grid item xs={12} sm={6} md={4} key={doctor._id}>
               <Card
                 onClick={() => handleSelectDoctor(doctor)}
                 sx={{
-                  borderRadius: 3,
                   p: 3,
+                  borderRadius: 3,
+                  transition: "all 0.3s ease",
+                  border: selectedDoctor?._id === doctor._id ? "2px solid #2563eb" : "1px solid #e2e8f0",
+                  bgcolor: selectedDoctor?._id === doctor._id ? "#eff6ff" : "#ffffff",
                   cursor: "pointer",
-                  border:
-                    selectedDoctor?._id === doctor._id
-                      ? "3px solid #1976d2"
-                      : "1px solid #e0e0e0",
-                  backgroundColor:
-                    selectedDoctor?._id === doctor._id ? "#e3f2fd" : "#fff",
-                  transition: "all 0.2s",
                   "&:hover": {
-                    boxShadow: "0 6px 16px rgba(0, 0, 0, 0.15)",
-                    transform: "translateY(-3px)",
+                    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+                    transform: "translateY(-4px)",
                   },
                   position: "relative",
-                  minHeight: 200,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
                 }}
               >
                 {selectedDoctor?._id === doctor._id && (
                   <Chip
-                    icon={<HealthAndSafetyIcon sx={{ fontSize: 24 }} />}
-                    label="Đang chọn"
-                    color="primary"
-                    size="medium"
+                    icon={<HealthAndSafetyIcon sx={{ color: "#fff !important", fontSize: 20 }} />}
+                    label="Đã chọn"
                     sx={{
                       position: "absolute",
                       top: 16,
                       right: 16,
-                      zIndex: 1,
-                      backgroundColor: "#1976d2",
+                      bgcolor: "#3b82f6",
                       color: "#fff",
-                      fontSize: "1rem",
+                      fontWeight: 600,
+                      fontSize: "0.9rem",
+                      px: 1,
                     }}
                   />
                 )}
-                <Box display="flex" alignItems="center" mb={3}>
+                <Box display="flex" alignItems="center" mb={2}>
                   {getAvatar(doctor)}
                   <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: 500, color: "#374151" }}
-                    >
+                    <Typography variant="h6" fontWeight={700} color="primary.dark">
                       {doctor.userID?.name || "Bác sĩ"}
                     </Typography>
-                    <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      sx={{ color: "#546e7a" }}
-                    >
-                      {doctor.specializations || "Chưa cập nhật chuyên môn"}
+                    <Typography variant="body2" color="text.secondary">
+                      {doctor.specializations || "Chuyên môn chưa cập nhật"}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ color: "#546e7a" }}
-                    >
-                      Số phòng: <b>{doctor.room || "N/A"}</b>
+                    <Typography variant="body2" color="text.secondary" mt={0.5}>
+                      Số phòng: <strong>{doctor.room || "N/A"}</strong>
                     </Typography>
                   </Box>
                 </Box>
-                <Box display="flex" alignItems="center">
-                  <PersonIcon sx={{ color: "#1976d2", mr: 1, fontSize: 24 }} />
-                  <Box>
-                    {doctor.userID?.email && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ display: "block", color: "#546e7a" }}
-                      >
-                        📧 {doctor.userID.email}
-                      </Typography>
-                    )}
-                    {doctor.userID?.phone && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ display: "block", color: "#546e7a" }}
-                      >
-                        ☎️ {doctor.userID.phone}
-                      </Typography>
-                    )}
-                  </Box>
+
+                <Box mt={1}>
+                  {doctor.userID?.email && (
+                    <Typography variant="body2" color="text.secondary" mb={0.5}>
+                      📧 {doctor.userID.email}
+                    </Typography>
+                  )}
+                  {doctor.userID?.phone && (
+                    <Typography variant="body2" color="text.secondary">
+                      ☎️ {doctor.userID.phone}
+                    </Typography>
+                  )}
                 </Box>
-                {/* Thêm phần thông báo slot */}
+
                 {selectedDoctor?._id === doctor._id && (
                   <Box mt={2}>
-                    {loadingDoctorSlot && (
-                      <Typography color="primary">
+                    {loadingDoctorSlot ? (
+                      <Typography color="primary" fontWeight={500}>
                         Đang kiểm tra slot trống...
                       </Typography>
-                    )}
-                    {slotError && (
-                      <Typography color="error">{slotError}</Typography>
-                    )}
-                    {doctorSlots && doctorSlots.length > 0 && (
-                      <Typography color="success.main">
-                        Bác sĩ này còn {doctorSlots.length} slot khả dụng.
+                    ) : slotError ? (
+                      <Typography color="error" fontWeight={500}>
+                        {slotError}
                       </Typography>
-                    )}
+                    ) : doctorSlots?.length > 0 ? (
+                      <Typography color="success.main" fontWeight={500}>
+                        {doctorSlots.length} slot khả dụng
+                      </Typography>
+                    ) : null}
                   </Box>
                 )}
               </Card>
@@ -316,49 +280,50 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
           ))}
         </Grid>
       </DialogContent>
+
       <DialogActions
         sx={{
-          p: 4,
-          borderTop: "1px solid #e0e0e0",
-          backgroundColor: "#f9fafb",
+          p: 3,
+          borderTop: "1px solid #e5e7eb",
+          bgcolor: "#f8fafc",
+          justifyContent: "space-between",
         }}
       >
         <Button
           onClick={onBack}
-          color="inherit"
           sx={{
             textTransform: "none",
-            color: "#546e7a",
-            fontSize: "1.1rem",
+            color: "#475569",
+            fontSize: "1rem",
+            fontWeight: 600,
             px: 4,
-            "&:hover": { backgroundColor: "#f1f5f9" },
+            py: 1,
+            borderRadius: "8px",
+            "&:hover": { bgcolor: "#e5e7eb" },
           }}
         >
-          Back
+          Quay lại
         </Button>
         <Button
           variant="contained"
-          color="primary"
           onClick={handleNext}
-          disabled={
-            !selectedDoctor ||
-            loadingDoctorSlot ||
-            (doctorSlots && doctorSlots.length === 0)
-          }
+          disabled={!selectedDoctor || loadingDoctorSlot || (doctorSlots && doctorSlots.length === 0)}
           sx={{
+            px: 5,
+            py: 1.5,
+            borderRadius: 2,
+            fontWeight: 600,
+            fontSize: "1rem",
             textTransform: "none",
-            borderRadius: 3,
-            px: 6,
-            fontSize: "1.1rem",
-            backgroundColor: "#1976d2",
-            "&:hover": { backgroundColor: "#1565c0" },
+            bgcolor: "#3b82f6",
+            "&:hover": { bgcolor: "#1d4ed8" },
             "&.Mui-disabled": {
-              backgroundColor: "#e0e0e0",
-              color: "#9e9e9e",
+              bgcolor: "#d1d5db",
+              color: "#6b7280",
             },
           }}
         >
-          Tiếp tục đến xác nhận
+          Tiếp tục
         </Button>
       </DialogActions>
     </Dialog>
