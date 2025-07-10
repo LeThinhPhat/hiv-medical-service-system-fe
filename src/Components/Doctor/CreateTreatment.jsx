@@ -1,109 +1,3 @@
-// import React, { useState } from "react";
-// import { useParams } from "react-router-dom";
-// import {
-//   TextField,
-//   Button,
-//   Box,
-//   Typography,
-//   CircularProgress,
-// } from "@mui/material";
-// import treatmentService from "../../Services/DoctorService/treatmentService";
-// import CreateTestResult from "./CreateTestResult";
-
-// const CreateTreatment = () => {
-//   const { recordID } = useParams();
-//   const token = localStorage.getItem("token");
-
-//   const [treatmentData, setTreatmentData] = useState({
-//     note: "",
-//     treatmentDate: new Date().toISOString().slice(0, 16),
-//   });
-//   const [submitting, setSubmitting] = useState(false);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setSubmitting(true);
-
-//     try {
-//       const treatmentPayload = {
-//         note: treatmentData.note,
-//         treatmentDate: new Date(treatmentData.treatmentDate).toISOString(),
-//         medicalRecordID: recordID,
-//       };
-
-//       await treatmentService.createTreatment(treatmentPayload, token);
-//       alert("✅ Tạo treatment thành công");
-
-//       // Reset form để tạo tiếp nếu muốn
-//       setTreatmentData({
-//         note: "",
-//         treatmentDate: new Date().toISOString().slice(0, 16),
-//       });
-//     } catch (error) {
-//       console.error("❌ Lỗi khi tạo treatment:", error);
-//       alert("❌ Lỗi khi tạo treatment");
-//     } finally {
-//       setSubmitting(false);
-//     }
-//   };
-
-//   return (
-//     <div className="max-w-lg mx-auto mt-8 p-6 bg-white shadow rounded">
-//       <Typography variant="h5" className="mb-4 text-blue-700">
-//         ➕ Tạo điều trị mới
-//       </Typography>
-
-//       <form onSubmit={handleSubmit} className="space-y-4">
-//         <TextField
-//           label="Ghi chú (note)"
-//           name="note"
-//           value={treatmentData.note}
-//           onChange={(e) =>
-//             setTreatmentData({ ...treatmentData, note: e.target.value })
-//           }
-//           fullWidth
-//           required
-//         />
-
-//         <TextField
-//           label="Ngày điều trị"
-//           type="datetime-local"
-//           value={treatmentData.treatmentDate}
-//           onChange={(e) =>
-//             setTreatmentData({
-//               ...treatmentData,
-//               treatmentDate: e.target.value,
-//             })
-//           }
-//           fullWidth
-//           required
-//           InputLabelProps={{
-//             shrink: true,
-//           }}
-//         />
-
-//         <Box display="flex" justifyContent="flex-end">
-//           <Button
-//             variant="contained"
-//             color="primary"
-//             type="submit"
-//             disabled={submitting}
-//           >
-//             {submitting ? (
-//               <CircularProgress size={24} color="inherit" />
-//             ) : (
-//               "✅ Tạo Treatment"
-//             )}
-//           </Button>
-//         </Box>
-//       </form>
-//       <CreateTestResult />
-//     </div>
-//   );
-// };
-
-// export default CreateTreatment;
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -112,88 +6,135 @@ import {
   Box,
   Typography,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
+import { Add, Delete } from "@mui/icons-material";
 import treatmentService from "../../Services/DoctorService/treatmentService";
-import CreateTestResult from "./CreateTestResult";
+import SuggestTreatment from "./SuggestTreatment"; // ✅ Gọi component gợi ý
 
 const CreateTreatment = () => {
   const { recordID } = useParams();
   const token = localStorage.getItem("token");
 
-  const [treatmentData, setTreatmentData] = useState({
-    note: "",
-    treatmentDate: new Date().toISOString().slice(0, 16),
-  });
+  const [note, setNote] = useState("");
+  const [testResults, setTestResults] = useState([
+    { test_type: "", test_results: "", description: "" },
+  ]);
   const [submitting, setSubmitting] = useState(false);
-  const [newTreatmentID, setNewTreatmentID] = useState(null);
+  const [treatmentID, setTreatmentID] = useState(null); // ✅ để truyền qua SuggestTreatment
+
+  const handleTestResultChange = (index, field, value) => {
+    const updated = [...testResults];
+    updated[index][field] = value;
+    setTestResults(updated);
+  };
+
+  const addTestResult = () => {
+    setTestResults([
+      ...testResults,
+      { test_type: "", test_results: "", description: "" },
+    ]);
+  };
+
+  const removeTestResult = (index) => {
+    const updated = [...testResults];
+    updated.splice(index, 1);
+    setTestResults(updated);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
+    const payload = {
+      medicalRecordID: recordID,
+      note,
+      testResults,
+    };
+
     try {
-      const treatmentPayload = {
-        note: treatmentData.note,
-        treatmentDate: new Date(treatmentData.treatmentDate).toISOString(),
-        medicalRecordID: recordID,
-      };
+      const res = await treatmentService.createTreatment(token, payload);
+      const createdID = res.data?._id || res.data?.data?._id;
 
-      const res = await treatmentService.createTreatment(
-        treatmentPayload,
-        token
-      );
-      const createdTreatment = res.data || res;
+      if (!createdID) {
+        throw new Error("Không tìm thấy treatmentID");
+      }
 
-      setNewTreatmentID(createdTreatment._id);
-
+      setTreatmentID(createdID);
       alert("✅ Tạo treatment thành công");
 
-      setTreatmentData({
-        note: "",
-        treatmentDate: new Date().toISOString().slice(0, 16),
-      });
+      // Reset form nếu muốn
+      setNote("");
+      setTestResults([{ test_type: "", test_results: "", description: "" }]);
     } catch (error) {
       console.error("❌ Lỗi khi tạo treatment:", error);
-      alert("❌ Lỗi khi tạo treatment");
+      alert("❌ Tạo treatment thất bại");
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-8 p-6 bg-white shadow rounded">
+    <div className="max-w-3xl mx-auto mt-8 p-6 bg-white shadow rounded">
       <Typography variant="h5" className="mb-4 text-blue-700">
         ➕ Tạo điều trị mới
       </Typography>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <TextField
           label="Ghi chú (note)"
-          name="note"
-          value={treatmentData.note}
-          onChange={(e) =>
-            setTreatmentData({ ...treatmentData, note: e.target.value })
-          }
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
           fullWidth
           required
         />
 
-        <TextField
-          label="Ngày điều trị"
-          type="datetime-local"
-          value={treatmentData.treatmentDate}
-          onChange={(e) =>
-            setTreatmentData({
-              ...treatmentData,
-              treatmentDate: e.target.value,
-            })
-          }
-          fullWidth
-          required
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
+        <Typography variant="h6" className="text-gray-800">
+          🧪 Kết quả xét nghiệm
+        </Typography>
+
+        {testResults.map((result, index) => (
+          <Box key={index} className="grid grid-cols-12 gap-4 items-center">
+            <TextField
+              label="Loại xét nghiệm"
+              value={result.test_type}
+              onChange={(e) =>
+                handleTestResultChange(index, "test_type", e.target.value)
+              }
+              className="col-span-3"
+              required
+            />
+            <TextField
+              label="Kết quả"
+              value={result.test_results}
+              onChange={(e) =>
+                handleTestResultChange(index, "test_results", e.target.value)
+              }
+              className="col-span-3"
+              required
+            />
+            <TextField
+              label="Mô tả"
+              value={result.description}
+              onChange={(e) =>
+                handleTestResultChange(index, "description", e.target.value)
+              }
+              className="col-span-5"
+            />
+            <IconButton onClick={() => removeTestResult(index)}>
+              <Delete color="error" />
+            </IconButton>
+          </Box>
+        ))}
+
+        <Button
+          startIcon={<Add />}
+          onClick={addTestResult}
+          variant="outlined"
+          color="primary"
+        >
+          Thêm xét nghiệm
+        </Button>
 
         <Box display="flex" justifyContent="flex-end">
           <Button
@@ -211,13 +152,9 @@ const CreateTreatment = () => {
         </Box>
       </form>
 
-      {newTreatmentID && (
-        <div className="mt-8">
-          <Typography variant="h6" className="text-green-700 mb-2">
-            🧪 Nhập kết quả xét nghiệm cho treatment vừa tạo:
-          </Typography>
-          <CreateTestResult treatmentID={newTreatmentID} />
-        </div>
+      {/* ✅ Hiển thị gợi ý nếu có treatmentID */}
+      {treatmentID && (
+        <SuggestTreatment treatmentID={treatmentID} token={token} />
       )}
     </div>
   );
