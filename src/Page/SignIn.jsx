@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../Services/authService"; // Đảm bảo đúng đường dẫn tới service
@@ -15,8 +14,7 @@ const SignIn = () => {
   useEffect(() => {
     if (token) {
       const role = token.data.data.user.role.name;
-      
-      // Điều hướng theo vai trò
+
       if (role === "CUSTOMER_ROLE") {
         navigate("/");
       } else if (role === "STAFF_ROLE") {
@@ -40,15 +38,14 @@ const SignIn = () => {
       const response = await authService.signin({ email, password });
       const accessToken = response.data.data.access_token;
 
-      // ✅ Lưu token và doctorId
       localStorage.setItem("token", accessToken);
-      localStorage.setItem("user", JSON.stringify(response.data.data.user)); 
+      localStorage.setItem("user", JSON.stringify(response.data.data.user));
 
-      setToken(response); // Trigger useEffect
+      setToken(response);
     } catch (err) {
-      console.error("Login error:", err);
+      console.error("Lỗi đăng nhập:", err);
       setError(
-        err.response?.data?.message || "Login failed. Please try again."
+        err.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại."
       );
     } finally {
       setLoading(false);
@@ -58,7 +55,6 @@ const SignIn = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md relative">
-        {/* Nút Back ở góc trái trên cùng */}
         <button
           onClick={() => navigate("/")}
           className="absolute top-4 left-4 text-sm text-blue-600 hover:underline flex items-center"
@@ -77,11 +73,11 @@ const SignIn = () => {
               d="M15 19l-7-7 7-7"
             ></path>
           </svg>
-          Back
+          Trở về
         </button>
 
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-          Sign In
+          Đăng nhập
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -97,7 +93,7 @@ const SignIn = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your email"
+              placeholder="Nhập email của bạn"
               required
             />
           </div>
@@ -106,7 +102,7 @@ const SignIn = () => {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700"
             >
-              Password
+              Mật khẩu
             </label>
             <input
               id="password"
@@ -114,7 +110,7 @@ const SignIn = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
+              placeholder="Nhập mật khẩu"
               required
             />
           </div>
@@ -124,7 +120,7 @@ const SignIn = () => {
               to="/forgot-password"
               className="text-sm text-blue-600 hover:underline"
             >
-              Forgot Password?
+              Quên mật khẩu?
             </Link>
           </div>
           <button
@@ -132,13 +128,13 @@ const SignIn = () => {
             disabled={loading}
             className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {loading ? "Signing In..." : "Sign In"}
+            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
+          Chưa có tài khoản?{" "}
           <Link to="/register" className="text-blue-600 hover:underline">
-            Sign Up
+            Đăng ký
           </Link>
         </p>
       </div>

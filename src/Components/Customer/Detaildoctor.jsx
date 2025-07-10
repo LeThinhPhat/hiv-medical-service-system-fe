@@ -9,6 +9,7 @@ import {
   Button,
   CircularProgress,
   Fade,
+  Tooltip,
 } from "@mui/material";
 import docService from "../../Services/CusService/docterListService";
 
@@ -17,6 +18,12 @@ const DetailDoctor = () => {
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    setToken(savedToken);
+  }, []);
 
   useEffect(() => {
     const fetchDoctorDetails = async () => {
@@ -149,27 +156,73 @@ const DetailDoctor = () => {
                     <strong>Ngày tham gia:</strong> {doctor.createdAt}
                   </Typography>
                 </Box>
-                <Button
-                  component={Link}
-                  to="/doctors"
-                  variant="contained"
-                  color="primary"
-                  sx={{
-                    mt: 4,
-                    px: 4,
-                    py: 1.5,
-                    borderRadius: 2,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    "&:hover": {
-                      bgcolor: "primary.dark",
-                      transform: "translateY(-2px)",
-                      transition: "all 0.2s ease",
-                    },
-                  }}
-                >
-                  Quay lại danh sách bác sĩ
-                </Button>
+
+                {/* Action Buttons */}
+                <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
+                  {token ? (
+                    <Button
+                      component={Link}
+                      to={`/book/${doctor.id}`}
+                      variant="contained"
+                      color="primary"
+                      sx={{
+                        px: 4,
+                        py: 1.5,
+                        borderRadius: 2,
+                        textTransform: "none",
+                        fontWeight: 600,
+                        "&:hover": {
+                          bgcolor: "primary.dark",
+                          transform: "translateY(-2px)",
+                          transition: "all 0.2s ease",
+                        },
+                      }}
+                    >
+                      Đặt lịch khám
+                    </Button>
+                  ) : (
+                    <Tooltip title="Vui lòng đăng nhập để đặt lịch khám">
+                      <span>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          disabled
+                          sx={{
+                            px: 4,
+                            py: 1.5,
+                            borderRadius: 2,
+                            textTransform: "none",
+                            fontWeight: 600,
+                            opacity: 0.6,
+                          }}
+                        >
+                          Đặt lịch khám
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  )}
+
+                  <Button
+                    component={Link}
+                    to="/docs"
+                    variant="outlined"
+                    color="primary"
+                    sx={{
+                      px: 4,
+                      py: 1.5,
+                      borderRadius: 2,
+                      textTransform: "none",
+                      fontWeight: 600,
+                      "&:hover": {
+                        bgcolor: "#f0f0f0",
+                        transform: "translateY(-2px)",
+                        transition: "all 0.2s ease",
+                      },
+                    }}
+                  >
+                    Quay lại danh sách bác sĩ
+                  </Button>
+                </Box>
               </Box>
             </Box>
           </Paper>

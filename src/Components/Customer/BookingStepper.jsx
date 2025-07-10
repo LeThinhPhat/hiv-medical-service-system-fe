@@ -32,8 +32,7 @@ const BookingStepper = () => {
     // Nếu ở Step3 -> redirect sang BookingConfirmPage
     if (activeStep === 2) {
       const { doctor, slot, date, service } = { ...formData, ...stepData };
-      console.log("check:", formData);
-      console.log("Final booking data:", { doctor, slot, date, service });
+     
       navigate("booking/confirm", {
         state: { doctor, slot, date, service }
       });
