@@ -62,20 +62,12 @@ const Header = () => {
               <AssignmentIcon fontSize="large" sx={{ color: "#3B82F6" }} />
             </IconButton>
           )}
-
       
-          {token ? (
-            <IconButton component={Link} to="/profile">
-              <PersonSearchIcon fontSize="large" sx={{ color: "#3B82F6" }} />
-            </IconButton>
-          ) : (
-            <Link to="/search-appointment">
-              <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                Tra cứu cuộc hẹn
-              </button>
-            </Link>
-          )}
-
+         {token && (
+  <IconButton component={Link} to="/profile">
+    <PersonSearchIcon fontSize="large" sx={{ color: "#3B82F6" }} />
+  </IconButton>
+)}
           
 
           {/* Menu tài khoản */}
