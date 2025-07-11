@@ -122,9 +122,9 @@ const SuggestTreatment = ({ treatmentID, token }) => {
   }
 
   return (
-    <div className="mt-10 space-y-6">
-      <h2 className="text-xl font-semibold text-green-700">
-        💊 Danh sách phác đồ gợi ý (chỉnh sửa trực tiếp)
+    <div className="mt-10 space-y-8">
+      <h2 className="text-xl font-bold text-green-700">
+        💊 Danh sách phác đồ gợi ý
       </h2>
 
       {regimens.map((regimen, idx) => {
@@ -132,26 +132,28 @@ const SuggestTreatment = ({ treatmentID, token }) => {
         return (
           <div
             key={regimen._id || idx}
-            className="border border-green-300 rounded-xl shadow-sm p-6 bg-white"
+            className="border border-green-300 rounded-xl shadow-md bg-white p-6"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* LEFT: Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* LEFT: Thông tin */}
               <div>
-                <h3 className="text-lg font-bold text-green-800">
+                <h3 className="text-lg font-semibold text-green-800 mb-2">
                   {regimen.name} ({regimen.regimenType})
                 </h3>
-                <p className="text-sm mt-2">
+
+                <p className="text-sm mb-1">
                   📄 <strong>Mô tả:</strong> {regimen.description}
                 </p>
-                <p className="text-sm mt-1">
+                <p className="text-sm mb-1">
                   ⚠️ <strong>Tác dụng phụ:</strong> {regimen.sideEffects}
                 </p>
 
                 <Divider className="my-3" />
-                <h4 className="font-semibold mb-1 text-sm">
+
+                <h4 className="font-semibold mb-2 text-sm">
                   🧪 Tiêu chí áp dụng:
                 </h4>
-                <List dense>
+                <List dense className="pl-3">
                   {regimen.criteria.map((c, i) => (
                     <ListItem key={i} disablePadding>
                       <ListItemText
@@ -163,14 +165,14 @@ const SuggestTreatment = ({ treatmentID, token }) => {
                 </List>
               </div>
 
-              {/* RIGHT: Editable Drugs */}
-              <div>
-                <h4 className="font-semibold text-sm mb-2">
-                  💊 Chỉnh sửa thuốc:
+              {/* RIGHT: Danh sách thuốc chỉnh sửa */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-sm text-gray-700">
+                  💊 Chỉnh sửa liều lượng & tần suất:
                 </h4>
                 {editable?.customDrugs.map((drug, i) => (
-                  <div key={i} className="mb-4">
-                    <p className="font-medium">
+                  <div key={i} className="p-4 border rounded-lg bg-gray-50">
+                    <p className="font-medium text-gray-800 mb-2">
                       {drug.genericName} ({drug.manufacturer})
                     </p>
                     <TextField
@@ -185,7 +187,7 @@ const SuggestTreatment = ({ treatmentID, token }) => {
                       className="mb-2"
                     />
                     <TextField
-                      label="Số lần dùng (phân tách bằng dấu phẩy)"
+                      label="Số lần dùng (ngăn cách bởi dấu phẩy)"
                       value={drug.frequency.join(", ")}
                       onChange={(e) =>
                         handleFrequencyChange(regimen._id, i, e.target.value)

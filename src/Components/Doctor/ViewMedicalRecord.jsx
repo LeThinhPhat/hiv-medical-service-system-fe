@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
 import medicalRecordService from "../../Services/DoctorService/medicalRecordService";
 import createMedicalPersonalService from "../../Services/DoctorService/createMedicalPersonalService";
 import {
@@ -12,9 +12,14 @@ import {
 
 const ViewMedicalRecord = () => {
   const { patientID } = useParams();
+  const location = useLocation();
   const [medicalRecord, setMedicalRecord] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  // ✅ Lấy serviceId và serviceName nếu được truyền từ trang trước
+  const serviceId = location.state?.serviceId || "";
+  const serviceName = location.state?.serviceName || "";
 
   const [formData, setFormData] = useState({
     diagnosis: "",
@@ -50,10 +55,12 @@ const ViewMedicalRecord = () => {
     setSubmitting(true);
 
     try {
+      // ✅ Truyền thêm serviceId nếu có
       const created = await createMedicalPersonalService(
         patientID,
         formData,
-        token
+        token,
+        serviceId
       );
       alert("✅ Tạo hồ sơ bệnh án thành công");
       setMedicalRecord(created.data);
@@ -72,6 +79,13 @@ const ViewMedicalRecord = () => {
       <h2 className="text-2xl font-bold mb-4 text-blue-700">
         📝 Chi tiết hồ sơ bệnh án
       </h2>
+
+      {/* ✅ Hiển thị dịch vụ y tế nếu có */}
+      {serviceId && (
+        <p className="mb-4 text-gray-700">
+          <strong>Dịch vụ y tế:</strong> [{serviceId}] {serviceName}
+        </p>
+      )}
 
       {medicalRecord ? (
         <div className="space-y-3 text-gray-800">
@@ -124,14 +138,16 @@ const ViewMedicalRecord = () => {
           )}
 
           {/* Link đến form tạo treatment mới */}
-          <div className="mt-6">
-            <Link
-              to={`/doctor/doctorsappoinment/medical-records/personal-id/create-treatment/${medicalRecord._id}`}
-              className="text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded inline-block"
-            >
-              ➕ Tạo treatment mới
-            </Link>
-          </div>
+          {serviceName !== "Kiểm tra tổng quát" && (
+            <div className="mt-6">
+              <Link
+                to={`/doctor/doctorsappoinment/medical-records/personal-id/create-treatment/${medicalRecord._id}`}
+                className="text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded inline-block"
+              >
+                ➕ Tạo treatment mới
+              </Link>
+            </div>
+          )}
         </div>
       ) : (
         <form onSubmit={handleCreateMedicalRecord} className="space-y-4">
