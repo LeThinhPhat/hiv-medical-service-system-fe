@@ -9,11 +9,18 @@ import {
   CardContent,
   Button,
   Divider,
+  ToggleButtonGroup,
+  ToggleButton,
+  Stack,
+  Paper,
 } from "@mui/material";
-import EventIcon from "@mui/icons-material/Event";
-import PersonIcon from "@mui/icons-material/Person";
-import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
-import PaymentIcon from "@mui/icons-material/Payment";
+import {
+  Event as EventIcon,
+  Person as PersonIcon,
+  MedicalServices as MedicalServicesIcon,
+  Payment as PaymentIcon,
+} from "@mui/icons-material";
+import React, { useState } from "react";
 
 function formatTime(isoString) {
   const date = new Date(isoString);
@@ -37,140 +44,187 @@ function formatDate(isoDateString) {
 const BookingPaymentPage = () => {
   const location = useLocation();
   const { info, appointment } = location.state || {};
-
-  console.log("BookingPaymentPage location state:", appointment);
+  const [paymentMethod, setPaymentMethod] = useState("bank");
 
   const handlePayment = async () => {
     try {
-      const { paymentUrl } = await paymentService.createPayment({
-        appointmentID: appointment._id,
-      });
-      window.location.href = paymentUrl;
+      if (paymentMethod === "wallet") {
+        // Gọi API cho thanh toán ví
+        await paymentService.payWithWallet({
+          appointmentID: appointment._id,
+        });
+        toast.success("Thanh toán bằng ví thành công!");
+      } else {
+        // Gọi API cho thanh toán chuyển khoản
+        const { paymentUrl } = await paymentService.createPayment({
+          appointmentID: appointment._id,
+          method: paymentMethod,
+        });
+        window.location.href = paymentUrl;
+      }
     } catch (err) {
-      toast.error("Tạo thanh toán thất bại!");
-      throw err;
+      toast.error(`Tạo thanh toán thất bại vì ${err.message}`);
     }
   };
+
+  const InfoRow = ({ icon: Icon, label, value, bold }) => (
+    <Box display="flex" alignItems="center" gap={1.5} mb={1.5}>
+      <Icon sx={{ color: "#2563eb", fontSize: 22 }} />
+      <Typography
+        variant="body1"
+        sx={{
+          color: "#475569",
+          fontWeight: bold ? 600 : 500,
+        }}
+      >
+        <b>{label}</b> {value}
+      </Typography>
+    </Box>
+  );
 
   return (
     <Box
       sx={{
-        maxWidth: "md",
+        maxWidth: 700,
         mx: "auto",
-        mt: 8,
-        p: { xs: 2, sm: 4 },
-        bgcolor: "#f8fafc",
-        borderRadius: "16px",
-        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+        mt: 6,
+        mb: 6,
+        p: 3,
+        bgcolor: "#f9fafb",
       }}
     >
-      <Typography
-        variant="h4"
+      <Paper
+        elevation={4}
         sx={{
-          fontWeight: 700,
-          color: "#1e293b",
+          px: 4,
+          py: 3,
+          borderRadius: 3,
+          background: "linear-gradient(to right, #3b82f6, #60a5fa)",
+          color: "#fff",
           textAlign: "center",
           mb: 4,
-          py: 2,
-          bgcolor: "linear-gradient(to right, #3b82f6, #60a5fa)",
-          background: "#3b82f6",
-          borderRadius: "12px",
         }}
       >
-        Thanh toán lịch hẹn
-      </Typography>
+        <Typography variant="h5" fontWeight={700}>
+          Thanh Toán Lịch Hẹn
+        </Typography>
+      </Paper>
+
       <Card
         sx={{
-          borderRadius: "12px",
-          border: "2px solid #e5e7eb",
-          bgcolor: "#fff",
-          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+          borderRadius: 3,
+          bgcolor: "#ffffff",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
           mb: 4,
         }}
       >
         <CardContent sx={{ p: 4 }}>
-          <Box display="flex" alignItems="center" mb={2}>
-            <EventIcon sx={{ color: "#3b82f6", mr: 1.5, fontSize: 24 }} />
-            <Typography variant="body1" sx={{ fontWeight: 600, color: "#1e293b" }}>
-              Mã lịch hẹn: <span style={{ color: "#3b82f6" }}>{appointment._id || "N/A"}</span>
-            </Typography>
-          </Box>
-          <Divider sx={{ my: 2, bgcolor: "#e5e7eb" }} />
-          <Box display="flex" alignItems="center" mb={2}>
-            <PersonIcon sx={{ color: "#3b82f6", mr: 1.5, fontSize: 24 }} />
-            <Typography variant="body1" sx={{ fontWeight: 500, color: "#475569" }}>
-              <b>Bệnh nhân:</b> {appointment.patientID?.userID?.name || appointment.patientID?.name}
-            </Typography>
-          </Box>
-          <Box display="flex" alignItems="center" mb={2}>
-            <PersonIcon sx={{ color: "#3b82f6", mr: 1.5, fontSize: 24 }} />
-            <Typography variant="body1" sx={{ fontWeight: 500, color: "#475569" }}>
-              <b>CCCD:</b> {appointment.patientID.personalID}
-            </Typography>
-          </Box>
-          <Box display="flex" alignItems="center" mb={2}>
-            <PersonIcon sx={{ color: "#3b82f6", mr: 1.5, fontSize: 24 }} />
-            <Typography variant="body1" sx={{ fontWeight: 500, color: "#475569" }}>
-              <b>SĐT:</b> {info?.phone || "Không có"}
-            </Typography>
-          </Box>
-          <Box display="flex" alignItems="center" mb={2}>
-            <MedicalServicesIcon sx={{ color: "#3b82f6", mr: 1.5, fontSize: 24 }} />
-            <Typography variant="body1" sx={{ fontWeight: 500, color: "#475569" }}>
-              <b>Bác sĩ:</b> {appointment.doctorID.userID?.name}
-            </Typography>
-          </Box>
-          <Box display="flex" alignItems="center" mb={2}>
-            <EventIcon sx={{ color: "#3b82f6", mr: 1.5, fontSize: 24 }} />
-            <Typography variant="body1" sx={{ fontWeight: 500, color: "#475569" }}>
-              <b>Ngày:</b> {formatDate(appointment.date)}
-            </Typography>
-          </Box>
-          <Box display="flex" alignItems="center" mb={2}>
-            <EventIcon sx={{ color: "#3b82f6", mr: 1.5, fontSize: 24 }} />
-            <Typography variant="body1" sx={{ fontWeight: 500, color: "#475569" }}>
-              <b>Giờ:</b> {formatTime(appointment.startTime)} -{" "}
-              {formatTime(
-                appointment.doctorSlotID.length >= 2
-                  ? appointment.doctorSlotID[1].endTime
-                  : appointment.doctorSlotID[0].endTime
-              )}
-            </Typography>
-          </Box>
-          <Box display="flex" alignItems="center" mb={2}>
-            <MedicalServicesIcon sx={{ color: "#3b82f6", mr: 1.5, fontSize: 24 }} />
-            <Typography variant="body1" sx={{ fontWeight: 500, color: "#475569" }}>
-              <b>Dịch vụ:</b> {appointment.serviceID.name}
-            </Typography>
-          </Box>
-          <Box display="flex" alignItems="center">
-            <PaymentIcon sx={{ color: "#3b82f6", mr: 1.5, fontSize: 24 }} />
-            <Typography variant="body1" sx={{ fontWeight: 600, color: "#1e293b" }}>
-              <b>Giá tiền:</b> {appointment.serviceID?.price?.toLocaleString("vi-VN")} ₫
-            </Typography>
-          </Box>
+          <Stack spacing={1.5}>
+            <InfoRow
+              icon={EventIcon}
+              label="Mã lịch hẹn:"
+              value={<span style={{ color: "#3b82f6" }}>{appointment._id}</span>}
+              bold
+            />
+            <Divider />
+            <InfoRow
+              icon={PersonIcon}
+              label="Bệnh nhân:"
+              value={
+                appointment.patientID?.userID?.name || appointment.patientID?.name
+              }
+            />
+            <InfoRow
+              icon={PersonIcon}
+              label="CCCD:"
+              value={appointment.patientID.personalID}
+            />
+            <InfoRow
+              icon={PersonIcon}
+              label="SĐT:"
+              value={info?.phone || "Không có"}
+            />
+            <InfoRow
+              icon={MedicalServicesIcon}
+              label="Bác sĩ:"
+              value={appointment.doctorID.userID?.name}
+            />
+            <InfoRow
+              icon={EventIcon}
+              label="Ngày:"
+              value={formatDate(appointment.date)}
+            />
+            <InfoRow
+              icon={EventIcon}
+              label="Giờ:"
+              value={`${formatTime(appointment.startTime)} - ${
+                formatTime(
+                  appointment.doctorSlotID.length >= 2
+                    ? appointment.doctorSlotID[1].endTime
+                    : appointment.doctorSlotID[0].endTime
+                )
+              }`}
+            />
+            <InfoRow
+              icon={MedicalServicesIcon}
+              label="Dịch vụ:"
+              value={appointment.serviceID.name}
+            />
+            <InfoRow
+              icon={PaymentIcon}
+              label="Giá tiền:"
+              value={`${appointment.serviceID?.price?.toLocaleString("vi-VN")} ₫`}
+              bold
+            />
+          </Stack>
         </CardContent>
       </Card>
+
+      {/* Chọn phương thức thanh toán */}
+      <Box sx={{ mb: 4, textAlign: "center" }}>
+        <Typography variant="h6" fontWeight={600} mb={2} color="#1e293b">
+          Chọn phương thức thanh toán
+        </Typography>
+        <ToggleButtonGroup
+          value={paymentMethod}
+          exclusive
+          onChange={(e, value) => {
+            if (value !== null) setPaymentMethod(value);
+          }}
+          aria-label="Phương thức thanh toán"
+        >
+          <ToggleButton
+            value="bank"
+            sx={{ px: 4, py: 1.5, fontWeight: 600 }}
+          >
+            Chuyển khoản
+          </ToggleButton>
+          <ToggleButton
+            value="wallet"
+            sx={{ px: 4, py: 1.5, fontWeight: 600 }}
+          >
+            Ví Tài Khoản
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+
       <Button
         variant="contained"
         onClick={handlePayment}
         fullWidth
         sx={{
           textTransform: "none",
-          borderRadius: "8px",
+          borderRadius: "12px",
           py: 1.5,
           fontSize: "1.1rem",
           fontWeight: 600,
           bgcolor: "#3b82f6",
           "&:hover": { bgcolor: "#2563eb" },
-          "&.Mui-disabled": {
-            bgcolor: "#d1d5db",
-            color: "#6b7280",
-          },
         }}
       >
         Thanh toán ngay
       </Button>
+
       <ToastContainer position="top-center" autoClose={2000} />
     </Box>
   );

@@ -31,9 +31,10 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import WcIcon from "@mui/icons-material/Wc";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import appointmentService from "../Services/CusService/AppointmentService";
-import { useNavigate } from "react-router-dom";
 import medicalRecordService from "../Services/DoctorService/medicalRecordService";
+import { useNavigate } from "react-router-dom";
 
 function formatDate(dateStr) {
   if (!dateStr) return "Không xác định";
@@ -54,9 +55,11 @@ const Profile = () => {
   const [loadingAppointments, setLoadingAppointments] = useState(true);
   const [medicalRecords, setMedicalRecords] = useState([]);
   const [loadingMedicalRecords, setLoadingMedicalRecords] = useState(true);
+  const [walletBalance, setWalletBalance] = useState(0);
 
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const patient = JSON.parse(localStorage.getItem("patient")) || {};
+  const wallet = patient.wallet || { balance: 0 };
 
   const [editMode, setEditMode] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -92,9 +95,11 @@ const Profile = () => {
       }
     };
 
+    setWalletBalance(wallet.balance);
+    setTimeout(() => setLoading(false), 600);
+
     fetchAppointments();
     fetchMedicalRecords();
-    setTimeout(() => setLoading(false), 600);
   }, []);
 
   const handleChange = (field) => (e) => {
@@ -153,8 +158,6 @@ const Profile = () => {
     }
   };
 
-  console.log("Appointments:", appointments);
-
   if (loading) {
     return (
       <Box 
@@ -190,14 +193,12 @@ const Profile = () => {
       py: 3 
     }}>
       <Container maxWidth="lg">
-        {/* Header với logo bệnh viện */}
         <Box sx={{ mb: 3, textAlign: "center" }}>
           <Typography variant="h4" sx={{ color: "#0277bd", fontWeight: 600, mb: 1 }}>
             HỒ SƠ BỆNH NHÂN
           </Typography>
         </Box>
 
-        {/* Thông tin cá nhân */}
         <Fade in={true} timeout={800}>
           <Paper 
             elevation={2} 
@@ -356,6 +357,13 @@ const Profile = () => {
                   key: "personalID", 
                   icon: <BadgeIcon sx={{ color: "#0277bd" }} /> 
                 },
+                { 
+                  label: "Số dư ví", 
+                  value: walletBalance.toLocaleString("vi-VN") + " VNĐ", 
+                  key: "walletBalance", 
+                  icon: <AccountBalanceWalletIcon sx={{ color: "#0277bd" }} />,
+                  editable: false
+                },
               ].map((item, idx) => (
                 <Grid key={idx} item xs={12} sm={6} md={3}>
                   <Box 
@@ -378,7 +386,7 @@ const Profile = () => {
                         {item.label}
                       </Typography>
                     </Box>
-                    {editMode ? (
+                    {editMode && item.editable !== false ? (
                       item.key === "gender" ? (
                         <TextField 
                           select 
@@ -433,7 +441,6 @@ const Profile = () => {
           </Paper>
         </Fade>
 
-        {/* Lịch khám */}
         <Paper 
           elevation={2} 
           sx={{ 
@@ -550,7 +557,6 @@ const Profile = () => {
           )}
         </Paper>
 
-        {/* Hồ sơ bệnh án */}
         <Paper 
           elevation={2} 
           sx={{ 
