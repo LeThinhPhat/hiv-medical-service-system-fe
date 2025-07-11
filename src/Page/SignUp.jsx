@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import authService from "../Services/authService";
 
 const SignUp = () => {
-  const navigate = useNavigate();
+ // const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     name: "", email: "", personalID: "", dob: "",
@@ -77,8 +76,10 @@ const SignUp = () => {
 
     try {
       await authService.signup(payload);
-      toast.success("Đăng ký thành công!");
-      navigate("/signin");
+      toast.success("Đăng ký thành công! Đang chuyển hướng đến Gmail...");
+setTimeout(() => {
+  window.location.href = "https://mail.google.com/mail/u/0/?ogbl#inbox";
+}, 1500);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
