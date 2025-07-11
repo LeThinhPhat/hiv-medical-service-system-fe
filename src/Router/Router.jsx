@@ -55,6 +55,10 @@ import SearchBooking from "../Components/Customer/SearchBooking";
 import TreatmentPlanPage from "../Components/Customer/TreatmentPlanPage ";
 import DetailTreatment from "../Components/Doctor/DetailTreatment";
 import CreateTreatment from "../Components/Doctor/CreateTreatment";
+import CheckIn from "../Components/Staff/CheckIn";
+import BlogEdit from "../Components/Staff/ContentManagement";
+import ContentManagement from "../Components/Staff/ContentManagement";
+import PendingAppointmentList from "../Components/Staff/PendingAppointmentList";
 
 const Router = createBrowserRouter([
   {
@@ -96,6 +100,10 @@ const Router = createBrowserRouter([
       { path: "", element: <Staff /> },
       { path: "/staff/appointmentlist", element: <AppointmentList /> },
       { path: "/staff/schedule", element: <DoctorSlot /> },
+      { path: "/staff/checkin", element: <CheckIn /> },
+      { path: "/staff/content", element: <ContentManagement /> },
+      { path: "/staff/pending-appointments", element: <PendingAppointmentList /> },
+
     ],
   },
   {
