@@ -153,6 +153,8 @@ const Profile = () => {
     }
   };
 
+  console.log("Appointments:", appointments);
+
   if (loading) {
     return (
       <Box 
@@ -506,7 +508,7 @@ const Profile = () => {
                             <strong>Bác sĩ:</strong> {ap.doctorID?.userID?.name || "Chưa chỉ định"}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            <strong>Thời gian:</strong> {formatDate(ap.date)} - {formatTime(ap.startTime)}
+                            <strong>Thời gian:</strong> {formatDate(ap.startTime)} - {formatTime(ap.startTime)}
                           </Typography>
                         </Box>
                       }

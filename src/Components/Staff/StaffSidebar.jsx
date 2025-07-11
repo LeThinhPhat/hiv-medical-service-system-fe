@@ -17,9 +17,14 @@ const navItems = [
     path: "/staff/dashboard",
   },
   {
-    label: "Reports",
+    label: "Cuộc hẹn chờ duyệt",
+    icon: <MdDashboard className="text-xl" />,
+    path: "/staff/pending-appointments",
+  },
+  {
+    label: "Check-in",
     icon: <FaChartLine className="text-xl" />,
-    path: "/staff/reports",
+    path: "/staff/checkin",
   },
   {
     label: "Appointment List",
@@ -32,9 +37,9 @@ const navItems = [
     path: "/staff/schedule",
   },
   {
-    label: "Messages",
+    label: "Content",
     icon: <FaComments className="text-xl" />,
-    path: "/staff/messages",
+    path: "/staff/content",
   },
   {
     label: "More Apps",
@@ -57,7 +62,7 @@ const StaffSidebar = () => {
         <div className="flex items-center space-x-3">
           <FaChartLine className="text-2xl text-blue-600" />
           <h1 className="text-2xl font-extrabold text-gray-800 tracking-tight">
-            HOMER
+            STAFF
           </h1>
         </div>
       </div>
