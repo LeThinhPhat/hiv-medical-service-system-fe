@@ -25,9 +25,13 @@ const DoctorProfile = () => {
       try {
         const token = localStorage.getItem("token");
         const today = new Date();
+        const dayOfWeek = today.getDay(); // CN = 0, T2 = 1, ...
+        const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
         const startDate = new Date(today);
-        const endDate = new Date(today);
-        startDate.setDate(startDate.getDate() - today.getDay());
+        startDate.setDate(today.getDate() + mondayOffset);
+
+        const endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + 6);
 
         const response = await doctorScheduleService.getScheduleByWeek(
@@ -134,7 +138,7 @@ const DoctorProfile = () => {
             <h3 className="text-lg font-semibold text-black">Lịch làm việc</h3>
             <button
               onClick={() => navigate("/doctor/calendar")}
-              className="flex items-center gap-2 text-sm text-black font-medium text-white bg-blue-500 px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition-colors duration-200"
+              className="flex items-center gap-2 text-sm text-white bg-blue-500 px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition-colors duration-200"
             >
               <span className="text-base">📅</span>
               <span>Xem chi tiết</span>
@@ -143,9 +147,13 @@ const DoctorProfile = () => {
 
           <div className="space-y-2">
             {Array.from({ length: 7 }).map((_, i) => {
+              const today = new Date();
+              const dayOfWeek = today.getDay(); // 0 = CN, 1 = T2, ...
+              const mondayOffset = dayOfWeek === 1 ? -6 : 1 - dayOfWeek;
               const current = new Date();
+              current.setDate(today.getDate() + mondayOffset + i);
               current.setHours(0, 0, 0, 0);
-              current.setDate(current.getDate() - current.getDay() + i);
+
               const formatted = current.toISOString().slice(0, 10);
 
               const weekday = current.toLocaleDateString("vi-VN", {
