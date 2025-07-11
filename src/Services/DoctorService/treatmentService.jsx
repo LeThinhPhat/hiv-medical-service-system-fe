@@ -42,7 +42,28 @@ const getTreatmentById = async (id, token) => {
   }
 };
 
+// Hàm cập nhật treatment theo ID
+const updateTreatment = async (id, token, data) => {
+  try {
+    const response = await axios.patch(`${API_URL}/${id}`, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating treatment:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
 export default {
   createTreatment,
   getTreatmentById,
+  updateTreatment,
 };

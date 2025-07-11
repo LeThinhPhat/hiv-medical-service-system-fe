@@ -72,12 +72,19 @@ const DoctorAppointments = () => {
                     className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
                     onClick={() =>
                       navigate(
-                        `medical-records/personal-id/${appt.patientID?.personalID}`
+                        `medical-records/personal-id/${appt.patientID?.personalID}`,
+                        {
+                          state: {
+                            serviceId: appt.serviceID._id,
+                            serviceName: appt.serviceID.name,
+                          },
+                        }
                       )
                     }
                   >
                     Xem hồ sơ
                   </button>
+
                   {/* <button
                     className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
                     onClick={() =>
