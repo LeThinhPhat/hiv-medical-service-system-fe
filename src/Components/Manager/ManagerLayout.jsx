@@ -3,26 +3,16 @@ import ManagerSidebar from "./ManagerSidebar";
 
 const ManagerLayout = () => {
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <ManagerSidebar />
-      <div className="flex-1 flex flex-col">
-        {/* <header className="bg-white shadow-sm p-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-700">
-            Manager Dashboard
-          </h2>
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">Nick Gonzalez</span>
-            <img
-              src="https://randomuser.me/api/portraits/men/75.jpg"
-              alt="Profile"
-              className="w-8 h-8 rounded-full"
-            />
-          </div>
-        </header> */}
-        <main className="flex-1 p-6 overflow-y-auto">
-          <div>
-            <Outlet />
-          </div>
+    <div className="flex h-screen overflow-hidden">
+      {/* Sidebar: chiều cao tự động, không scroll riêng */}
+      <div className="w-64 bg-white border-r shadow-md">
+        <ManagerSidebar />
+      </div>
+
+      {/* Main content: scroll riêng nếu nội dung dài */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 overflow-y-auto bg-gray-100 p-6">
+          <Outlet />
         </main>
       </div>
     </div>

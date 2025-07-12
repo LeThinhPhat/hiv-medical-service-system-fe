@@ -8,17 +8,16 @@ import {
   AccountBox,
   MiscellaneousServices,
   Person,
-  MonetizationOn,
   Hotel,
-  LocalShipping,
-  EventAvailable,
-  PhotoLibrary,
   Newspaper,
-  Widgets,
 } from "@mui/icons-material";
 
 const sidebarItems = [
-  { text: "Doctors", icon: <LocalHospital />, path: "/manager/doctors" },
+  {
+    text: "Lịch làm việc bác sĩ",
+    icon: <LocalHospital />,
+    path: "/manager/doctors",
+  },
   {
     text: "Doctor List",
     icon: <FormatListBulleted />,
@@ -35,15 +34,7 @@ const sidebarItems = [
   { text: "User", icon: <Person />, path: "/manager/user" },
   { text: "Phát đồ ARV", icon: <Newspaper />, path: "/manager/arv" },
   { text: "Thuốc", icon: <Hotel />, path: "/manager/drugs" },
-  { text: "Ambulance", icon: <LocalShipping />, path: "/manager/ambulance" },
-  {
-    text: "Event Management",
-    icon: <EventAvailable />,
-    path: "/manager/events",
-  },
-  { text: "Gallery", icon: <PhotoLibrary />, path: "/manager/gallery" },
-  { text: "News & Updates", icon: <Newspaper />, path: "/manager/news" },
-  { text: "UI Elements", icon: <Widgets />, path: "/manager/ui" },
+  { text: "Lịch làm việc", icon: <Hotel />, path: "/manager/schedule" },
 ];
 
 const ManagerSidebar = () => {
@@ -65,18 +56,18 @@ const ManagerSidebar = () => {
             d="M4 6h16M4 12h16m-7 6h7"
           />
         </svg>
-        <h1 className="text-xl font-bold">Medflex</h1>
+        <h1 className="text-xl font-bold">Manager</h1>
       </div>
 
       {/* Profile */}
       <div className="p-4 flex items-center border-b">
         <img
-          src="https://randomuser.me/api/portraits/men/75.jpg"
+          src="https://static.vecteezy.com/system/resources/previews/014/194/219/non_2x/businessman-manager-boss-man-an-office-worker-illustration-flat-design-vector.jpg"
           alt="Nick Gonzalez"
           className="w-12 h-12 rounded-full mr-3"
         />
         <div>
-          <p className="font-semibold text-gray-800">Manager</p>
+          <p className="font-semibold text-gray-800">Profile</p>
         </div>
       </div>
 

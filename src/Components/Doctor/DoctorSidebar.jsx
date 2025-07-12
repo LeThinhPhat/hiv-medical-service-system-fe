@@ -21,6 +21,27 @@ const DoctorSidebar = () => {
 
   const menuItems = [
     {
+      section: "Appointments",
+      items: [
+        {
+          label: "Appointments",
+          icon: <FaCalendarPlus />,
+          path: "/doctor/doctorsappoinment",
+        },
+
+        {
+          label: "Doctor Appointment",
+          icon: <FaStethoscope />,
+          path: "/doctor/appointments",
+        },
+        {
+          label: "Doctors Grid",
+          icon: <FaUserMd />,
+          path: "/doctors-grid",
+        },
+      ],
+    },
+    {
       section: "Dashboard",
       items: [
         {
@@ -47,27 +68,6 @@ const DoctorSidebar = () => {
           label: "Create Medical",
           icon: <FaFileMedical />,
           path: "/doctor/medical",
-        },
-      ],
-    },
-    {
-      section: "Appointments",
-      items: [
-        {
-          label: "Appointments",
-          icon: <FaCalendarPlus />,
-          path: "/doctor/appointments",
-        },
-
-        {
-          label: "Doctor Appointment",
-          icon: <FaStethoscope />,
-          path: "/doctor/doctorsappoinment",
-        },
-        {
-          label: "Doctors Grid",
-          icon: <FaUserMd />,
-          path: "/doctors-grid",
         },
       ],
     },
@@ -123,10 +123,9 @@ const DoctorSidebar = () => {
           className="w-12 h-12 mr-3 transform hover:scale-105 transition-transform"
         />
         <h1 className="text-2xl font-extrabold text-teal-600 tracking-tight">
-          Clinix
+          Doctor
         </h1>
       </div>
-
       {/* Menu */}
       <nav className="flex-1 p-4 overflow-y-auto">
         {menuItems.map((section, index) => (
@@ -149,10 +148,10 @@ const DoctorSidebar = () => {
 
       {/* Footer Settings */}
       <div className="p-4 border-t border-teal-100">
-        <Link to="/doctor/settings">
+        <Link to="/signin">
           <div className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition-colors">
             <FaUser className="mr-3" />
-            Settings
+            Logout
           </div>
         </Link>
       </div>
