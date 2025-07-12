@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MagnifyingGlassIcon, CalendarIcon } from "@heroicons/react/24/outline"; // Heroicons for icons
+import { MagnifyingGlassIcon, CalendarIcon } from "@heroicons/react/24/outline";
 import doctorAppointmentService from "../../Services/DoctorService/doctorAppointmentService";
 
 const DoctorAppointments = () => {
+  const navigate = useNavigate();
+  const today = new Date().toISOString().split("T")[0];
+
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchName, setSearchName] = useState("");
-  const [filterDate, setFilterDate] = useState("");
+  const [filterDate, setFilterDate] = useState(today);
   const [currentPage, setCurrentPage] = useState(1);
-  const navigate = useNavigate();
 
   const appointmentsPerPage = 10;
-  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const data = await doctorAppointmentService.getAppointmentsByToken();
         setAppointments(data);
-        setFilterDate(today);
       } catch (err) {
         console.error("Không thể tải danh sách cuộc hẹn:", err);
       } finally {
@@ -44,12 +44,12 @@ const DoctorAppointments = () => {
 
     if (filterDate) {
       filtered = filtered.filter((appt) => {
-        const apptDate = new Date(appt.startTime).toISOString().split("T")[0];
+        const apptDate = new Date(appt.createdAt).toISOString().split("T")[0];
         return apptDate === filterDate;
       });
     }
 
-    filtered.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+    filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     setFilteredAppointments(filtered.reverse());
     setCurrentPage(1);
   }, [searchName, filterDate, appointments]);
@@ -75,7 +75,6 @@ const DoctorAppointments = () => {
     setFilterDate(today);
   };
 
-  // Generate pagination buttons (show 5 pages at a time)
   const getPaginationRange = () => {
     const maxPagesToShow = 5;
     const startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
@@ -120,7 +119,7 @@ const DoctorAppointments = () => {
             className="pl-10 w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
-            aria-label="Lọc theo ngày"
+            aria-label="Lọc theo ngày tạo"
           />
         </div>
         <button
@@ -216,9 +215,6 @@ const DoctorAppointments = () => {
                             }
                           )
                         }
-                        aria-label={`Xem hồ sơ của ${
-                          appt.patientID?.name || "bệnh nhân"
-                        }`}
                       >
                         Xem hồ sơ
                       </button>
@@ -229,9 +225,6 @@ const DoctorAppointments = () => {
                             `medical-records/create/${appt.patientID?._id}`
                           )
                         }
-                        aria-label={`Tạo bệnh án cho ${
-                          appt.patientID?.name || "bệnh nhân"
-                        }`}
                       >
                         Tạo bệnh án
                       </button>
@@ -254,7 +247,6 @@ const DoctorAppointments = () => {
                 className="px-4 py-2 border rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 transition"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage <= 1}
-                aria-label="Trang trước"
               >
                 Trước
               </button>
@@ -267,7 +259,6 @@ const DoctorAppointments = () => {
                       : "bg-gray-100 hover:bg-gray-200"
                   } transition`}
                   onClick={() => handlePageChange(page)}
-                  aria-label={`Trang ${page}`}
                 >
                   {page}
                 </button>
@@ -279,7 +270,6 @@ const DoctorAppointments = () => {
                 className="px-4 py-2 border rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 transition"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage >= totalPages}
-                aria-label="Trang sau"
               >
                 Sau
               </button>
