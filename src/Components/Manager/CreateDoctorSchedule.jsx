@@ -1,311 +1,8 @@
-// import React, { useEffect, useState, useCallback } from "react";
-// import {
-//   Paper,
-//   Typography,
-//   Select,
-//   MenuItem,
-//   FormControl,
-//   InputLabel,
-//   Button,
-//   Box,
-//   Chip,
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableContainer,
-//   TableHead,
-//   TableRow,
-//   Alert,
-//   CircularProgress,
-//   Dialog,
-//   DialogTitle,
-//   DialogContent,
-//   DialogActions,
-// } from "@mui/material";
-// import { useTheme } from "@mui/material/styles";
-// import doctorService from "../../Services/ManagerService/doctorService";
-// import doctorScheduleService from "../../Services/ManagerService/createScheduleService";
-
-// const CreateDoctorScheduleWeek = () => {
-//   const theme = useTheme();
-//   const [doctors, setDoctors] = useState([]);
-//   const [startDate, setStartDate] = useState(() => {
-//     const today = new Date();
-//     today.setDate(today.getDate() - today.getDay());
-//     return today;
-//   });
-//   const [scheduleData, setScheduleData] = useState({});
-//   const [message, setMessage] = useState("");
-//   const [errorDetails, setErrorDetails] = useState("");
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
-
-//   useEffect(() => {
-//     const fetchDoctors = async () => {
-//       setIsLoading(true);
-//       try {
-//         const data = await doctorService.getAllDoctors();
-//         setDoctors(data || []);
-//       } catch (err) {
-//         console.error("Lỗi khi lấy danh sách bác sĩ:", err);
-//         setMessage("❌ Lỗi khi tải danh sách bác sĩ");
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-//     fetchDoctors();
-//   }, []);
-
-//   const daysOfWeek = Array.from({ length: 7 }, (_, i) => {
-//     const date = new Date(startDate);
-//     date.setDate(startDate.getDate() + i);
-//     const key = date.toISOString().slice(0, 10);
-//     const label = date.toLocaleDateString("vi-VN", {
-//       weekday: "long",
-//       day: "2-digit",
-//       month: "2-digit",
-//     });
-//     return { key, label };
-//   });
-
-//   const handleDoctorChange = useCallback((date, selectedDoctors) => {
-//     setScheduleData((prev) => ({
-//       ...prev,
-//       [date]: selectedDoctors,
-//     }));
-//   }, []);
-
-//   const handleSubmit = async () => {
-//     setIsLoading(true);
-//     try {
-//       const selectedDoctorIDs = new Set();
-//       const selectedDates = [];
-
-//       Object.entries(scheduleData).forEach(([date, doctorIDs]) => {
-//         doctorIDs.forEach((id) => selectedDoctorIDs.add(id));
-//         selectedDates.push(date);
-//       });
-
-//       if (selectedDoctorIDs.size === 0 || selectedDates.length === 0) {
-//         throw new Error("Vui lòng chọn ít nhất một bác sĩ và ngày!");
-//       }
-
-//       const payload = {
-//         doctorID: Array.from(selectedDoctorIDs),
-//         dates: selectedDates,
-//       };
-
-//       await doctorScheduleService.createSchedule(payload);
-//       setMessage("✅ Gửi lịch khám thành công!");
-//       setErrorDetails("");
-//       setScheduleData({});
-//     } catch (err) {
-//       console.error("❌ API Error:", err.response?.data || err.message);
-//       setMessage("❌ Gửi lịch khám thất bại");
-//       setErrorDetails(JSON.stringify(err.response?.data || err.message));
-//     } finally {
-//       setIsLoading(false);
-//       setOpenConfirmDialog(false);
-//     }
-//   };
-
-//   const handlePreviousWeek = () => {
-//     const newStart = new Date(startDate);
-//     newStart.setDate(startDate.getDate() - 7);
-//     setStartDate(newStart);
-//     setScheduleData({});
-//   };
-
-//   const handleNextWeek = () => {
-//     const newStart = new Date(startDate);
-//     newStart.setDate(startDate.getDate() + 7);
-//     setStartDate(newStart);
-//     setScheduleData({});
-//   };
-
-//   return (
-//     <Paper
-//       elevation={4}
-//       sx={{
-//         p: 4,
-//         maxWidth: "100%",
-//         mx: "auto",
-//         mt: 4,
-//         borderRadius: 2,
-//         backgroundColor: theme.palette.background.default,
-//       }}
-//     >
-//       <Typography variant="h5" fontWeight="bold" gutterBottom>
-//         Tạo Lịch Khám Theo Tuần
-//       </Typography>
-//       <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-//         Tuần từ {startDate.toLocaleDateString("vi-VN")} đến{" "}
-//         {new Date(
-//           startDate.getTime() + 6 * 24 * 60 * 60 * 1000
-//         ).toLocaleDateString("vi-VN")}
-//       </Typography>
-
-//       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
-//         <Button
-//           variant="outlined"
-//           onClick={handlePreviousWeek}
-//           sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
-//         >
-//           ← Tuần trước
-//         </Button>
-//         <Button
-//           variant="outlined"
-//           onClick={handleNextWeek}
-//           sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
-//         >
-//           Tuần sau →
-//         </Button>
-//       </Box>
-
-//       {isLoading && (
-//         <CircularProgress sx={{ display: "block", mx: "auto", my: 2 }} />
-//       )}
-
-//       <TableContainer
-//         component={Paper}
-//         sx={{ overflowX: "auto", borderRadius: 2 }}
-//       >
-//         <Table size="small">
-//           <TableHead>
-//             <TableRow>
-//               <TableCell
-//                 sx={{ fontWeight: "bold", bgcolor: theme.palette.grey[100] }}
-//               >
-//                 Ca / Ngày
-//               </TableCell>
-//               {daysOfWeek.map(({ key, label }) => (
-//                 <TableCell
-//                   key={key}
-//                   align="center"
-//                   sx={{
-//                     fontWeight: "bold",
-//                     bgcolor: theme.palette.grey[100],
-//                     ...(new Date(key).toDateString() ===
-//                       new Date().toDateString() && {
-//                       border: `2px solid ${theme.palette.primary.main}`,
-//                     }),
-//                   }}
-//                 >
-//                   {label}
-//                 </TableCell>
-//               ))}
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             <TableRow>
-//               <TableCell
-//                 sx={{ fontWeight: "bold", bgcolor: theme.palette.grey[50] }}
-//               >
-//                 Bác sĩ trực
-//               </TableCell>
-//               {daysOfWeek.map(({ key }) => (
-//                 <TableCell key={key} sx={{ bgcolor: theme.palette.grey[50] }}>
-//                   <FormControl fullWidth size="small">
-//                     <InputLabel>Chọn bác sĩ</InputLabel>
-//                     <Select
-//                       multiple
-//                       value={scheduleData[key] || []}
-//                       onChange={(e) => handleDoctorChange(key, e.target.value)}
-//                       renderValue={(selected) => (
-//                         <Box
-//                           sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
-//                         >
-//                           {selected.map((id) => {
-//                             const doc = doctors.find((d) => d._id === id);
-//                             return (
-//                               <Chip
-//                                 key={id}
-//                                 label={doc?.userID?.name || id}
-//                                 color="primary"
-//                                 size="small"
-//                               />
-//                             );
-//                           })}
-//                         </Box>
-//                       )}
-//                     >
-//                       {doctors.map((doc) => (
-//                         <MenuItem key={doc._id} value={doc._id}>
-//                           {doc.userID?.name || "Không rõ"}
-//                         </MenuItem>
-//                       ))}
-//                     </Select>
-//                   </FormControl>
-//                 </TableCell>
-//               ))}
-//             </TableRow>
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
-
-//       <Button
-//         variant="contained"
-//         color="success"
-//         fullWidth
-//         sx={{ mt: 3, fontWeight: "bold" }}
-//         onClick={() => setOpenConfirmDialog(true)}
-//         disabled={Object.keys(scheduleData).length === 0 || isLoading}
-//       >
-//         Gửi Lịch Khám
-//       </Button>
-
-//       {message && (
-//         <Alert
-//           severity={message.startsWith("✅") ? "success" : "error"}
-//           sx={{ mt: 2 }}
-//         >
-//           {message}
-//           {errorDetails && (
-//             <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-//               Chi tiết lỗi: {errorDetails}
-//             </Typography>
-//           )}
-//         </Alert>
-//       )}
-
-//       <Dialog
-//         open={openConfirmDialog}
-//         onClose={() => setOpenConfirmDialog(false)}
-//       >
-//         <DialogTitle>Xác nhận lịch khám</DialogTitle>
-//         <DialogContent>
-//           <Typography>Bạn có chắc chắn muốn gửi lịch khám sau?</Typography>
-//           <Box sx={{ mt: 2 }}>
-//             {Object.entries(scheduleData).map(([date, doctorIDs]) => (
-//               <Typography key={date}>
-//                 {date}:{" "}
-//                 {doctorIDs
-//                   .map(
-//                     (id) =>
-//                       doctors.find((d) => d._id === id)?.userID?.name || id
-//                   )
-//                   .join(", ")}
-//               </Typography>
-//             ))}
-//           </Box>
-//         </DialogContent>
-//         <DialogActions>
-//           <Button onClick={() => setOpenConfirmDialog(false)}>Hủy</Button>
-//           <Button onClick={handleSubmit} color="success" disabled={isLoading}>
-//             Xác nhận
-//           </Button>
-//         </DialogActions>
-//       </Dialog>
-//     </Paper>
-//   );
-// };
-
-// export default CreateDoctorScheduleWeek;
-
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { toast } from "react-hot-toast";
 import doctorService from "../../Services/ManagerService/doctorService";
 import doctorScheduleService from "../../Services/ManagerService/createScheduleService";
 
@@ -317,8 +14,6 @@ const CreateDoctorScheduleWeek = () => {
     return today;
   });
   const [scheduleData, setScheduleData] = useState({});
-  const [message, setMessage] = useState("");
-  const [errorDetails, setErrorDetails] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [openEventModal, setOpenEventModal] = useState(false);
@@ -333,7 +28,7 @@ const CreateDoctorScheduleWeek = () => {
         setDoctors(data || []);
       } catch (err) {
         console.error("Lỗi khi lấy danh sách bác sĩ:", err);
-        setMessage("❌ Lỗi khi tải danh sách bác sĩ");
+        toast.error("Lỗi khi tải danh sách bác sĩ");
       } finally {
         setIsLoading(false);
       }
@@ -410,13 +105,13 @@ const CreateDoctorScheduleWeek = () => {
       };
 
       await doctorScheduleService.createSchedule(payload);
-      setMessage("✅ Gửi lịch khám thành công!");
-      setErrorDetails("");
+      toast.success("Gửi lịch khám thành công!");
       setScheduleData({});
     } catch (err) {
       console.error("❌ API Error:", err.response?.data || err.message);
-      setMessage("❌ Gửi lịch khám thất bại");
-      setErrorDetails(JSON.stringify(err.response?.data || err.message));
+      toast.error(
+        `Gửi lịch khám thất bại: ${err.response?.data?.message || err.message}`
+      );
     } finally {
       setIsLoading(false);
       setOpenConfirmDialog(false);
@@ -443,9 +138,11 @@ const CreateDoctorScheduleWeek = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <div className=" container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg relative">
-        <h1 className="text-2xl font-bold mb-6">Lịch Khám Bác Sĩ</h1>
-        <div className="flex items-center mb-6 space-x-4">
+      <div className="container mx-auto mt-10 p-8 bg-white shadow-xl rounded-xl relative">
+        <h1 className="text-3xl font-bold mb-8 text-teal-600">
+          Lịch Khám Bác Sĩ
+        </h1>
+        <div className="flex items-center mb-8 space-x-6">
           <DatePicker
             label="Chọn tuần"
             value={startDate}
@@ -457,16 +154,18 @@ const CreateDoctorScheduleWeek = () => {
                 setScheduleData({});
               }
             }}
-            slotProps={{ textField: { className: "w-40" } }}
+            slotProps={{
+              textField: { className: "w-48 bg-teal-50 rounded-md" },
+            }}
           />
           <button
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+            className="px-5 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
             onClick={handlePreviousWeek}
           >
             ← Tuần trước
           </button>
           <button
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+            className="px-5 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
             onClick={handleNextWeek}
           >
             Tuần sau →
@@ -474,21 +173,23 @@ const CreateDoctorScheduleWeek = () => {
         </div>
 
         {isLoading && (
-          <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-10">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-teal-600"></div>
           </div>
         )}
 
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="flex space-x-4">
+          <div className="flex space-x-6">
             <Droppable droppableId="doctors">
               {(provided) => (
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="w-48 p-4 bg-gray-100 rounded-lg"
+                  className="w-56 p-6 bg-teal-50 rounded-xl shadow-sm"
                 >
-                  <h2 className="text-lg font-bold mb-4">Danh Sách Bác Sĩ</h2>
+                  <h2 className="text-xl font-semibold mb-4 text-teal-600">
+                    Danh Sách Bác Sĩ
+                  </h2>
                   {doctors.map((doc, index) => (
                     <Draggable
                       key={doc._id}
@@ -497,10 +198,10 @@ const CreateDoctorScheduleWeek = () => {
                     >
                       {(provided) => (
                         <div
-                          ref={provided.innerRefнин}
+                          ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className="bg-blue-500 text-white rounded-full px-3 py-1 mb-2 text-sm"
+                          className="bg-teal-600 text-white rounded-lg px-4 py-2 mb-3 text-sm shadow hover:bg-teal-700 transition-colors"
                         >
                           {doc.userID?.name || "Không rõ"}
                         </div>
@@ -512,27 +213,29 @@ const CreateDoctorScheduleWeek = () => {
               )}
             </Droppable>
 
-            <div className="flex-1 grid grid-cols-7 gap-2 bg-gray-100 p-4 rounded-lg">
+            <div className="flex-1 grid grid-cols-7 gap-4 bg-teal-50 p-6 rounded-xl shadow-sm">
               {daysOfWeek.map(({ key, label, date }) => (
                 <Droppable key={key} droppableId={key}>
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className={`p-4 rounded-lg border ${
+                      className={`p-5 rounded-lg border ${
                         scheduleData[key]?.length > 0
-                          ? "bg-green-100"
+                          ? "bg-teal-100"
                           : "bg-white"
                       } ${
                         date.toDateString() === new Date().toDateString()
-                          ? "border-blue-500 border-2"
-                          : "border-gray-300"
-                      } hover:bg-gray-50 min-h-[150px]`}
+                          ? "border-teal-500 border-2"
+                          : "border-gray-200"
+                      } hover:bg-teal-50 transition-colors min-h-[180px] shadow-sm`}
                     >
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-bold">{label}</span>
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-sm font-semibold text-teal-600">
+                          {label}
+                        </span>
                         <button
-                          className="text-blue-500 hover:text-blue-700"
+                          className="text-teal-500 hover:text-teal-700 transition-colors"
                           onClick={() => {
                             setSelectedDate(key);
                             setOpenEventModal(true);
@@ -559,13 +262,13 @@ const CreateDoctorScheduleWeek = () => {
                         return (
                           <div
                             key={doctorId}
-                            className="flex items-center mb-1"
+                            className="flex items-center mb-2"
                           >
-                            <span className="bg-blue-500 text-white rounded-full px-2 py-1 text-xs flex-1">
+                            <span className="bg-teal-600 text-white rounded-lg px-3 py-1 text-xs flex-1 shadow-sm">
                               {doc?.userID?.name || doctorId}
                             </span>
                             <button
-                              className="ml-2 text-red-500 hover:text-red-700"
+                              className="ml-2 text-red-500 hover:text-red-700 transition-colors"
                               onClick={() => handleRemoveDoctor(key, doctorId)}
                             >
                               <svg
@@ -595,38 +298,25 @@ const CreateDoctorScheduleWeek = () => {
         </DragDropContext>
 
         <button
-          className={`w-full mt-6 py-2 text-white rounded-md font-bold ${
+          className={`w-full mt-8 py-3 text-white rounded-lg font-semibold ${
             Object.keys(scheduleData).length === 0 || isLoading
-              ? "bg-green-300 cursor-not-allowed"
-              : "bg-green-500 hover:bg-green-600"
-          }`}
+              ? "bg-teal-300 cursor-not-allowed"
+              : "bg-teal-600 hover:bg-teal-700 transition-colors"
+          } shadow-md`}
           onClick={() => setOpenConfirmDialog(true)}
           disabled={Object.keys(scheduleData).length === 0 || isLoading}
         >
           Gửi Lịch Khám
         </button>
 
-        {message && (
-          <div
-            className={`mt-4 p-4 rounded-md ${
-              message.startsWith("✅") ? "bg-green-100" : "bg-red-100"
-            }`}
-          >
-            <p>{message}</p>
-            {errorDetails && (
-              <p className="mt-2 text-sm">Chi tiết lỗi: {errorDetails}</p>
-            )}
-          </div>
-        )}
-
         {openEventModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-96">
-              <h2 className="text-lg font-bold mb-4">
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-8 w-[28rem] shadow-2xl">
+              <h2 className="text-xl font-semibold mb-5 text-teal-600">
                 Thêm Bác Sĩ Cho Ngày {selectedDate}
               </h2>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
+              <div className="mb-5">
+                <label className="block text-sm font-medium mb-2 text-gray-700">
                   Chọn bác sĩ (giữ Ctrl/Cmd để chọn nhiều)
                 </label>
                 <select
@@ -640,11 +330,11 @@ const CreateDoctorScheduleWeek = () => {
                       )
                     )
                   }
-                  className="w-full border rounded-md p-2 h-40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 rounded-lg p-3 h-48 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-teal-50"
                 >
                   {availableDoctors.length > 0 ? (
                     availableDoctors.map((doc) => (
-                      <option key={doc._id} value={doc._id}>
+                      <option key={doc._id} value={doc._id} className="py-1">
                         {doc.userID?.name || "Không rõ"}
                       </option>
                     ))
@@ -652,17 +342,17 @@ const CreateDoctorScheduleWeek = () => {
                     <option disabled>Không còn bác sĩ nào để chọn</option>
                   )}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 mt-2">
                   Sử dụng Ctrl/Cmd + click để chọn nhiều bác sĩ hoặc Shift để
                   chọn một dãy.
                 </p>
-                <div className="mt-2 flex flex-wrap gap-1">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {selectedDoctors.map((id) => {
                     const doc = doctors.find((d) => d._id === id);
                     return (
                       <span
                         key={id}
-                        className="bg-blue-500 text-white rounded-full px-2 py-1 text-xs"
+                        className="bg-teal-600 text-white rounded-lg px-3 py-1 text-xs shadow-sm"
                       >
                         {doc?.userID?.name || id}
                       </span>
@@ -670,9 +360,9 @@ const CreateDoctorScheduleWeek = () => {
                   })}
                 </div>
               </div>
-              <div className="flex justify-end space-x-2">
+              <div className="flex justify-end space-x-3">
                 <button
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+                  className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   onClick={() => {
                     setOpenEventModal(false);
                     setSelectedDoctors([]);
@@ -681,11 +371,11 @@ const CreateDoctorScheduleWeek = () => {
                   Hủy
                 </button>
                 <button
-                  className={`px-4 py-2 text-white rounded-md ${
+                  className={`px-5 py-2 text-white rounded-lg ${
                     selectedDoctors.length === 0
-                      ? "bg-green-300 cursor-not-allowed"
-                      : "bg-green-500 hover:bg-green-600"
-                  }`}
+                      ? "bg-teal-300 cursor-not-allowed"
+                      : "bg-teal-600 hover:bg-teal-700 transition-colors"
+                  } shadow-sm`}
                   onClick={handleAddEvent}
                   disabled={selectedDoctors.length === 0}
                 >
@@ -697,21 +387,25 @@ const CreateDoctorScheduleWeek = () => {
         )}
 
         {openConfirmDialog && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-96">
-              <h2 className="text-lg font-bold mb-4">Xác nhận lịch khám</h2>
-              <p className="mb-4">Bạn có chắc chắn muốn gửi lịch khám sau?</p>
-              <div className="mb-4">
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-8 w-[28rem] shadow-2xl">
+              <h2 className="text-xl font-semibold mb-5 text-teal-600">
+                Xác nhận lịch khám
+              </h2>
+              <p className="mb-5 text-gray-700">
+                Bạn có chắc chắn muốn gửi lịch khám sau?
+              </p>
+              <div className="mb-5 max-h-64 overflow-y-auto">
                 {Object.entries(scheduleData).map(([date, doctorIDs]) => (
-                  <div key={date} className="mb-2">
-                    <p className="text-sm font-bold">
+                  <div key={date} className="mb-3">
+                    <p className="text-sm font-semibold text-teal-600">
                       {new Date(date).toLocaleDateString("vi-VN", {
                         weekday: "long",
                         day: "2-digit",
                         month: "2-digit",
                       })}
                     </p>
-                    <p className="text-sm">
+                    <p className="text-sm text-gray-600">
                       {doctorIDs
                         .map(
                           (id) =>
@@ -723,19 +417,19 @@ const CreateDoctorScheduleWeek = () => {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-end space-x-2">
+              <div className="flex justify-end space-x-3">
                 <button
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+                  className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   onClick={() => setOpenConfirmDialog(false)}
                 >
                   Hủy
                 </button>
                 <button
-                  className={`px-4 py-2 text-white rounded-md ${
+                  className={`px-5 py-2 text-white rounded-lg ${
                     isLoading
-                      ? "bg-green-300 cursor-not-allowed"
-                      : "bg-green-500 hover:bg-green-600"
-                  }`}
+                      ? "bg-teal-300 cursor-not-allowed"
+                      : "bg-teal-600 hover:bg-teal-700 transition-colors"
+                  } shadow-sm`}
                   onClick={handleSubmit}
                   disabled={isLoading}
                 >

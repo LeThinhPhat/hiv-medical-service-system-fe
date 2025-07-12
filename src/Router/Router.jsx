@@ -60,6 +60,8 @@ import ContentManagement from "../Components/Staff/ContentManagement";
 import PendingAppointmentList from "../Components/Staff/PendingAppointmentList";
 import VerificationPage from "../Page/VerificationPage";
 import ResetPassword from "../Page/ResetPassword ";
+import ManagerSchedule from "../Components/Manager/ManagerSchedule";
+import DetailSchedule from "../Components/Manager/DetailSchedule";
 
 const Router = createBrowserRouter([
   {
@@ -85,8 +87,7 @@ const Router = createBrowserRouter([
       { path: "docs/:id", element: <DetailDoctor /> },
       { path: "book", element: <BookingApm /> },
       { path: "verification", element: <VerificationPage /> },
-      { path: "reset-password", element: <ResetPassword/> },
-
+      { path: "reset-password", element: <ResetPassword /> },
     ],
   },
   {
@@ -126,6 +127,8 @@ const Router = createBrowserRouter([
       { path: "user/:id", element: <UserDetail /> },
       { path: "drugs", element: <ManagerDrugs /> },
       { path: "drugs/:id", element: <DrugDetails /> },
+      { path: "schedule", element: <ManagerSchedule /> },
+      { path: "/manager/schedule/:id", element: <DetailSchedule /> },
       // Add manager child routes here if needed
     ],
   },

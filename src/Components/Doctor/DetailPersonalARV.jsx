@@ -1,15 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {
-  Typography,
-  CircularProgress,
-  Alert,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Box,
-  Paper,
-} from "@mui/material";
 import personalARVService from "../../Services/DoctorService/personalARVService";
 
 const DetailPersonalARV = ({ regimenId, token }) => {
@@ -43,16 +32,16 @@ const DetailPersonalARV = ({ regimenId, token }) => {
 
   if (loading) {
     return (
-      <div className="mt-8 flex justify-center">
-        <CircularProgress />
+      <div className="flex justify-center items-center h-40">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="mt-8">
-        <Alert severity="error">{error}</Alert>
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        {error}
       </div>
     );
   }
@@ -64,46 +53,58 @@ const DetailPersonalARV = ({ regimenId, token }) => {
   const { baseRegimentID, customDrugs, prescribedDate } = regimen;
 
   return (
-    <Box className="mt-8 space-y-6">
-      <Paper className="p-6 shadow-md rounded-lg border border-green-200">
-        <Typography variant="h6" className="text-green-700 font-semibold">
-          📋 Thông tin phác đồ cá nhân hóa
-        </Typography>
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 h-full">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-400 p-6">
+        <h2 className="text-2xl font-bold text-white flex items-center">
+          Thông tin phác đồ cá nhân hóa
+        </h2>
+      </div>
 
-        <Typography variant="body2" className="mt-2 text-gray-600">
-          Ngày kê đơn: {new Date(prescribedDate).toLocaleString()}
-        </Typography>
+      <div className="p-6 space-y-6">
+        <div className="text-gray-600 text-base">
+          <span className="font-semibold">Ngày kê đơn:</span>{" "}
+          {new Date(prescribedDate).toLocaleString()}
+        </div>
 
-        <Divider className="my-4" />
+        <div className="border-t border-gray-200 pt-4">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+            Phác đồ gốc: {baseRegimentID.name} ({baseRegimentID.regimenType})
+          </h3>
+          <p className="mt-2 text-gray-600 text-base">
+            <span className="font-medium">Tác dụng phụ:</span>{" "}
+            {baseRegimentID.sideEffects || "Không có"}
+          </p>
+        </div>
 
-        <Typography variant="subtitle1" className="text-green-800 font-bold">
-          🧠 Phác đồ gốc: {baseRegimentID.name} ({baseRegimentID.regimenType})
-        </Typography>
-
-        <Typography variant="body2" className="mt-1">
-          ⚠️ <strong>Tác dụng phụ:</strong> {baseRegimentID.sideEffects}
-        </Typography>
-
-        <Divider className="my-4" />
-
-        <Typography variant="subtitle1" className="font-semibold mb-2">
-          💊 Thuốc đã được điều chỉnh:
-        </Typography>
-
-        <List dense>
-          {customDrugs.map((drug, index) => (
-            <ListItem key={index} className="mb-2">
-              <ListItemText
-                primary={`• ${drug.drugId.genericName} (${drug.dosage})`}
-                secondary={`Nhóm: ${drug.drugId.group.join(
-                  ", "
-                )} | Uống: ${drug.frequency.join(", ")}`}
-              />
-            </ListItem>
-          ))}
-        </List>
-      </Paper>
-    </Box>
+        <div className="border-t border-gray-200 pt-4">
+          <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+            Thuốc đã được điều chỉnh
+          </h3>
+          <div className="space-y-3">
+            {customDrugs.map((drug, index) => (
+              <div
+                key={index}
+                className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+              >
+                <h4 className="font-medium text-gray-800 text-base">
+                  {drug.drugId.genericName} ({drug.dosage})
+                </h4>
+                <div className="mt-2 text-gray-600 text-base space-y-1">
+                  <p>
+                    <span className="font-medium">Nhóm:</span>{" "}
+                    {drug.drugId.group.join(", ")}
+                  </p>
+                  <p>
+                    <span className="font-medium">Uống:</span>{" "}
+                    {drug.frequency.join(", ")}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
