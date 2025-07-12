@@ -75,26 +75,32 @@ getAppointmentByPersonalID: async (personalID) => {
       throw error;
     }
   },
- cancelAppointment: async (appointmentId) => {
-    try {
-      const token = localStorage.getItem("token");
-      console.log("Canceling appointment with ID:", appointmentId);
-      const response = await axios.post(
-        `${API_URL}/cancle/appointment`,
-        { appointmentId }, // đúng với yêu cầu từ Swagger
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error canceling appointment:", error);
-      throw error;
-    }
-  },
+ 
+ cancelAppointment: async (appointmentId, reason) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    console.log("Canceling appointment with ID:", appointmentId, "Reason:", reason);
+    const response = await axios.post(
+      `${API_URL}/cancle/appointment`,
+      
+        appointmentId,{
+        reason, // thêm lý do như yêu cầu từ Swagger
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error canceling appointment:", error);
+    throw error;
+  }
+},
+  
 };
  
 export default appointmentListService;

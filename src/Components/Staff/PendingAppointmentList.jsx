@@ -129,7 +129,7 @@ const PendingAppointmentList = () => {
               {currentRecords.map((item, index) => {
                 const doctorName = item?.doctorSlotID[0]?.doctorID?.userID?.name || "----";
                 const patientName = item?.patientID?.userID?.name || "----";
-                const date = new Date(item.date).toLocaleDateString("vi-VN");
+                const date = new Date(item.startTime).toLocaleDateString("vi-VN");
                 const startTime = extractTimeFromUTC(item.startTime);
                 const service = item?.serviceID?.name || "N/A";
 

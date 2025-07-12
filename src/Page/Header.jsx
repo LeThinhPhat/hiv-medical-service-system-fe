@@ -44,7 +44,6 @@ const Header = () => {
           <Link to="/booking" className="hover:text-blue-700 transition">Đặt lịch khám</Link>
           <Link to="/docs" className="hover:text-blue-700 transition">Đội ngũ bác sĩ</Link>
           <Link to="/blogs" className="hover:text-blue-700 transition">Blogs</Link>
-          <Link to="/test" className="hover:text-blue-700 transition">Test</Link>
         </nav>
 
         {/* Mobile Menu Button */}

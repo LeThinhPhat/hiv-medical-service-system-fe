@@ -6,7 +6,7 @@ function Layout() {
   const location = useLocation();
   const pathname = location.pathname;
 
-  const paths = ["/signin", "/register", "/forgot-password","/verification",];
+  const paths = ["/signin", "/register", "/forgot-password","/verification","/reset-password",];
 
   const hideHeaderFooter = paths.some((path) => matchPath(path, pathname));
 
