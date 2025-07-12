@@ -95,7 +95,7 @@ const Profile = () => {
       }
     };
 
-    setWalletBalance(wallet.balance);
+    setWalletBalance(wallet);
     setTimeout(() => setLoading(false), 600);
 
     fetchAppointments();

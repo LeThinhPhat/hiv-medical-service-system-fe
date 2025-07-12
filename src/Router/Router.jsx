@@ -59,6 +59,7 @@ import BlogEdit from "../Components/Staff/ContentManagement";
 import ContentManagement from "../Components/Staff/ContentManagement";
 import PendingAppointmentList from "../Components/Staff/PendingAppointmentList";
 import VerificationPage from "../Page/VerificationPage";
+import ResetPassword from "../Page/ResetPassword ";
 
 const Router = createBrowserRouter([
   {
@@ -84,6 +85,8 @@ const Router = createBrowserRouter([
       { path: "docs/:id", element: <DetailDoctor /> },
       { path: "book", element: <BookingApm /> },
       { path: "verification", element: <VerificationPage /> },
+      { path: "reset-password", element: <ResetPassword/> },
+
     ],
   },
   {

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { FaEdit } from "react-icons/fa";
 import appointmentlistService from "../../Services/StaffService/appointmentlistService";
 
 const AppointmentList = () => {
@@ -84,7 +83,7 @@ const AppointmentList = () => {
     if (!cancelReason.trim()) return alert("Vui lòng nhập lý do hủy!");
 
     try {
-      await appointmentlistService.cancelAppointment(selectedAppointment._id, {
+      await appointmentlistService.cancelAppointment({appointmentId: selectedAppointment._id}, {
         reason: cancelReason,
       });
 
@@ -160,7 +159,7 @@ const AppointmentList = () => {
             </thead>
             <tbody>
               {currentRecords.map((item, index) => {
-                const doctorEmail = item?.doctorSlotID[0]?.doctorID?.userID?.name ;
+                const doctorEmail = item?.doctorSlotID[0]?.doctorID?.userID?.name;
                 const patientID = item?.patientID?.userID?.name || "----";
                 const date = new Date(item.date).toLocaleDateString("vi-VN");
                 const startTime = extractTimeFromUTC(item.startTime);
@@ -178,10 +177,10 @@ const AppointmentList = () => {
                     <td className="p-2 border capitalize">{status.replace(/_/g, " ")}</td>
                     <td className="p-2 border text-center">
                       <button
-                        className="text-blue-600 hover:text-blue-800 border border-blue-500 p-1 rounded"
+                        className="text-red-600 hover:text-red-800 border border-red-500 px-2 py-1 rounded"
                         onClick={() => openModal(item)}
                       >
-                        <FaEdit />
+                        Hủy hẹn
                       </button>
                     </td>
                   </tr>

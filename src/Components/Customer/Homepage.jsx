@@ -1,8 +1,12 @@
 import React, { useEffect } from "react";
 import BookingStepper from "../Customer/BookingStepper";
 import PatientService from "../../Services/patientService";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+const navigate = useNavigate();
+
+
   useEffect(() => {
     const fetchAndStorePatient = async () => {
       const token = localStorage.getItem("token");
@@ -41,7 +45,9 @@ const HomePage = () => {
           <p className="text-lg md:text-xl mb-6 drop-shadow-md">
             Hỗ trợ bảo mật – Chăm sóc toàn diện – Đồng hành cùng bạn vượt qua HIV
           </p>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105">
+          <button 
+           onClick={() => navigate("/booking")}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105">
             Đặt lịch tư vấn & khám HIV
           </button>
         </div>
@@ -91,7 +97,6 @@ const HomePage = () => {
           Đặt lịch tư vấn và khám HIV miễn phí, an toàn, thuận tiện, tận tâm.
         </p>
       </div>
-      <BookingStepper />
     </div>
   );
 };
