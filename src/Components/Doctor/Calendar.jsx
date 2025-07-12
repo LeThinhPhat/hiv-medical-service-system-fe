@@ -5,9 +5,12 @@ import doctorScheduleService from "../../Services/DoctorService/doctorScheduleSe
 
 const DoctorWeeklySchedule = () => {
   const [schedules, setSchedules] = useState([]);
+
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();
-    today.setDate(today.getDate() - today.getDay());
+    const day = today.getDay();
+    const diff = today.getDate() - (day === 0 ? 6 : day - 1); // Start from Monday
+    today.setDate(diff);
     return today;
   });
 
@@ -51,17 +54,23 @@ const DoctorWeeklySchedule = () => {
     return acc;
   }, {});
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Clear time for accurate comparison
+
   const days = Array.from({ length: 7 }).map((_, i) => {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
     const key = date.toISOString().slice(0, 10);
+    const isToday = date.toDateString() === today.toDateString();
+
     const label = date.toLocaleDateString("vi-VN", {
       weekday: "long",
       day: "2-digit",
       month: "2-digit",
       timeZone: "UTC",
     });
-    return { label, key };
+
+    return { label, key, isToday };
   });
 
   const handlePreviousWeek = () => {
@@ -78,7 +87,9 @@ const DoctorWeeklySchedule = () => {
 
   const handleDateChange = (date) => {
     const newStart = new Date(date);
-    newStart.setDate(date.getDate() - date.getDay());
+    const day = newStart.getDay();
+    const diff = newStart.getDate() - (day === 0 ? 6 : day - 1); // Always start from Monday
+    newStart.setDate(diff);
     setStartDate(newStart);
   };
 
@@ -118,7 +129,11 @@ const DoctorWeeklySchedule = () => {
               {days.map((day) => (
                 <th
                   key={day.key}
-                  className="border border-gray-200 px-6 py-3 text-center text-sm font-semibold text-gray-700"
+                  className={`border border-gray-200 px-6 py-3 text-center text-sm font-semibold ${
+                    day.isToday
+                      ? "bg-yellow-200 text-yellow-900 border-2 border-yellow-500"
+                      : "text-gray-700"
+                  }`}
                 >
                   {day.label}
                 </th>

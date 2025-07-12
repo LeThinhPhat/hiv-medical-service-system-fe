@@ -31,10 +31,9 @@ import Doctor from "../Components/Doctor/Doctor";
 import BookingPage from "../Components/Customer/BookingStep/BookingPage";
 import BookingConfirmPage from "../Components/Customer/BookingStep/BookingConfirmPage";
 
-import PatientsList from "../Components/Doctor/PatientsList";
+// import PatientsList from "../Components/Doctor/PatientsList";
 import DoctorSlot from "../Components/Staff/DoctorSlot";
 import DoctorProfile from "../Components/Doctor/DoctorProfile";
-import MedicalRecords from "../Components/Doctor/MedicalRecords";
 import DoctorSlotList from "../Components/Doctor/DoctorSlotList";
 import DoctorSchedule from "../Components/Doctor/DoctorSchedule";
 import DoctorAppointments from "../Components/Doctor/DoctorAppoinment";
@@ -107,8 +106,10 @@ const Router = createBrowserRouter([
       { path: "/staff/schedule", element: <DoctorSlot /> },
       { path: "/staff/checkin", element: <CheckIn /> },
       { path: "/staff/content", element: <ContentManagement /> },
-      { path: "/staff/pending-appointments", element: <PendingAppointmentList /> },
-
+      {
+        path: "/staff/pending-appointments",
+        element: <PendingAppointmentList />,
+      },
     ],
   },
   {
@@ -133,18 +134,10 @@ const Router = createBrowserRouter([
     element: <DoctorLayout />,
     children: [
       { path: "", element: <Doctor /> },
-      { path: "my-patients", element: <PatientsList /> },
-      // {
-      //   path: "profile-doctor",
-      //   element: <ProfileDoctor/>,
-      // },
+      // { path: "my-patients", element: <PatientsList /> },
       {
         path: "profile",
         element: <DoctorProfile />,
-      },
-      {
-        path: "medicallist",
-        element: <MedicalRecords />,
       },
       {
         path: "doctorslot",
