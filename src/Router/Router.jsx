@@ -60,9 +60,13 @@ import ContentManagement from "../Components/Staff/ContentManagement";
 import PendingAppointmentList from "../Components/Staff/PendingAppointmentList";
 import VerificationPage from "../Page/VerificationPage";
 import ResetPassword from "../Page/ResetPassword ";
+
+import UserList from "../Components/Admin/UserList";
+
 import ManagerSchedule from "../Components/Manager/ManagerSchedule";
 import DetailSchedule from "../Components/Manager/DetailSchedule";
 import DetailDrugs from "../Components/Manager/DetailDrugs";
+
 
 const Router = createBrowserRouter([
   {
@@ -96,7 +100,7 @@ const Router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { path: "", element: <Admin /> },
-      // Add admin child routes here if needed
+      { path: "/admin/users", element: <UserList /> },
     ],
   },
   {

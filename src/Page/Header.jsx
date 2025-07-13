@@ -21,6 +21,7 @@ const Header = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("patient");
+    localStorage.removeItem("treatmentIDs");
     setAnchorEl(null);
     navigate("/signin");
   };

@@ -2,30 +2,48 @@ import React, { useEffect } from "react";
 import BookingStepper from "../Customer/BookingStepper";
 import PatientService from "../../Services/patientService";
 import { useNavigate } from "react-router-dom";
+import MedicalRecordService from "../../Services/CusService/MedicalRecordService";
 
 const HomePage = () => {
 const navigate = useNavigate();
 
 
-  useEffect(() => {
-    const fetchAndStorePatient = async () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const patient = await PatientService.getPatientByToken();
-          if (patient) {
-           
-            localStorage.setItem("patient", JSON.stringify(patient));
+useEffect(() => {
+  const fetchAndStorePatientAndTreatment = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const patient = await PatientService.getPatientByToken();
+      if (patient) {
+        // Lưu patient ngay cả khi không có medical record
+        localStorage.setItem("patient", JSON.stringify(patient));
+
+        const personalId = patient.personalID;
+        if (personalId) {
+          try {
+            const res = await MedicalRecordService.getFullMedicalRecordByPersonalId(personalId);
+            // Lấy mảng treatmentID từ response
+            const treatmentIDs = res?.treatmentID;
+            if (treatmentIDs) {
+              localStorage.setItem("treatmentIDs", JSON.stringify(treatmentIDs));
+            }
+          } catch (medicalRecordErr) {
+            // Không xóa patient khi lỗi medical record
+            console.error("Lỗi khi lấy medical record:", medicalRecordErr);
+            localStorage.removeItem("treatmentIDs");
           }
-        } catch (err) {
-          // Xử lý nếu không lấy được (có thể xóa localStorage để tránh lỗi cũ)
-          localStorage.removeItem("patient");
-          throw new Error("Không thể lấy thông tin bệnh nhân",err);
         }
       }
-    };
-    fetchAndStorePatient();
-  }, []);
+    } catch (err) {
+      console.error("Lỗi khi lấy thông tin bệnh nhân:", err);
+      localStorage.removeItem("patient");
+      localStorage.removeItem("treatmentIDs");
+    }
+  };
+
+  fetchAndStorePatientAndTreatment();
+}, []);
 
   return (
     <div className="font-sans">

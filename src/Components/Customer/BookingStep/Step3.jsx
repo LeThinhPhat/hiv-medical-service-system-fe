@@ -1,24 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Box,
-  Typography,
-  Grid,
-  Avatar,
-  Button,
-  Card,
-  Chip,
-  Alert,
-  IconButton,
-  CircularProgress,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
-import PersonIcon from "@mui/icons-material/Person";
-import doctorSlotService from "../../../Services/doctorSlotService";
+import React, { useState, useEffect } from 'react';
+import doctorSlotService from '../../../Services/doctorSlotService';// Adjust the import path as needed
 
 const Step3 = ({ open, onClose, onNext, onBack, data }) => {
   const [loading, setLoading] = useState(false);
@@ -30,7 +11,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
   const [slotError, setSlotError] = useState(null);
 
   function combineDateAndTime(dateObj, timeStr) {
-    const [hours, minutes] = timeStr.split(":").map(Number);
+    const [hours, minutes] = timeStr.split(':').map(Number);
     const d = new Date(dateObj);
     d.setHours(hours, minutes, 0, 0);
     return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString();
@@ -51,7 +32,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
         const res = await doctorSlotService.getDoctorSlots({ startTime: Starttime });
         setDoctors(res?.filter(Boolean));
       } catch (err) {
-        setError("Không thể tải danh sách bác sĩ.");
+        setError('Không thể tải danh sách bác sĩ.');
       }
       setLoading(false);
     };
@@ -67,17 +48,17 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
       const slots = await doctorSlotService.getDoctorSlotByDoctor(doctor._id, Starttime);
       setDoctorSlots(slots);
       if (!slots || slots.length === 0) {
-        setSlotError("Bác sĩ này không có slot trống ở thời điểm này.");
+        setSlotError('Bác sĩ này không có slot trống ở thời điểm này.');
       }
     } catch (err) {
-      setSlotError("Bác sĩ này không có slot trống ở thời điểm này.");
+      setSlotError('Bác sĩ này không có slot trống ở thời điểm này.');
     }
     setLoadingDoctorSlot(false);
   };
 
   const handleNext = () => {
     if (!selectedDoctor || (doctorSlots && doctorSlots.length === 0)) {
-      setError("Vui lòng chọn bác sĩ có slot trống.");
+      setError('Vui lòng chọn bác sĩ có slot trống.');
       return;
     }
     setError(null);
@@ -86,247 +67,115 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
   };
 
   const getAvatar = (doctor) => {
-    const initials = doctor.userID?.name?.[0]?.toUpperCase() || "D";
+    const initials = doctor.userID?.name?.[0]?.toUpperCase() || 'D';
     return (
-      <Avatar
-        src={doctor.userID?.avatar || doctor.avatar}
-        sx={{
-          width: 72,
-          height: 72,
-          bgcolor: "#e0f2fe",
-          fontSize: "1.8rem",
-          fontWeight: "bold",
-          boxShadow: 2,
-          mr: 2,
-        }}
-      >
+      <div className="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center text-2xl font-bold text-sky-800 shadow-md mr-4">
         {initials}
-      </Avatar>
+      </div>
     );
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="lg"
-      fullWidth
-      sx={{
-        "& .MuiDialog-paper": {
-          borderRadius: 4,
-          boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
-          backgroundColor: "#f9fafb",
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          p: 3,
-          display: "flex",
-          alignItems: "center",
-          background: "linear-gradient(to right, #3b82f6, #60a5fa)",
-          color: "#fff",
-        }}
-      >
-        <Typography variant="h5" sx={{ flexGrow: 1, fontWeight: 700 }}>
-          Chọn bác sĩ khám
-        </Typography>
-        <IconButton onClick={onClose} sx={{ color: "#fff" }}>
-          <CloseIcon sx={{ fontSize: 28 }} />
-        </IconButton>
-      </DialogTitle>
+    <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <div className="bg-gray-50 rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden">
+        {/* Dialog Title */}
+        <div className="bg-gradient-to-r from-blue-500 to-blue-400 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-white">Chọn bác sĩ khám</h2>
+          <button onClick={onClose} className="text-white hover:text-gray-200">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
-      <DialogContent sx={{ p: 4, backgroundColor: "#fff" }}>
-        {loading && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              minHeight: 200,
-              flexDirection: "column",
-              gap: 2,
-            }}
-          >
-            <CircularProgress color="primary" size={50} />
-            <Typography variant="body1" sx={{ color: "#475569", fontWeight: 500 }}>
-              Đang tải danh sách bác sĩ...
-            </Typography>
-          </Box>
-        )}
+        {/* Dialog Content */}
+        <div className="p-6 bg-white">
+          {loading && (
+            <div className="flex flex-col items-center justify-center min-h-[200px] gap-4">
+              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-gray-600 font-medium">Đang tải danh sách bác sĩ...</p>
+            </div>
+          )}
 
-        {error && (
-          <Alert
-            severity="error"
-            sx={{
-              mt: 3,
-              mb: 2,
-              borderRadius: 2,
-              bgcolor: "#fee2e2",
-              color: "#b91c1c",
-              fontSize: "1rem",
-              fontWeight: 500,
-              p: 2,
-            }}
-          >
-            {error}
-          </Alert>
-        )}
+          {error && (
+            <div className="mt-6 mb-4 bg-red-50 text-red-700 p-4 rounded-lg text-lg font-medium">
+              {error}
+            </div>
+          )}
 
-        {!loading && doctors.length === 0 && !error && (
-          <Alert
-            severity="warning"
-            sx={{
-              mt: 3,
-              mb: 2,
-              borderRadius: 2,
-              bgcolor: "#fefce8",
-              color: "#a16207",
-              fontSize: "1rem",
-              fontWeight: 500,
-              p: 2,
-            }}
-          >
-            Không có bác sĩ nào khả dụng ở khung giờ này.
-          </Alert>
-        )}
+          {!loading && doctors.length === 0 && !error && (
+            <div className="mt-6 mb-4 bg-yellow-50 text-yellow-700 p-4 rounded-lg text-lg font-medium">
+              Không có bác sĩ nào khả dụng ở khung giờ này.
+            </div>
+          )}
 
-        <Grid container spacing={3}>
-          {doctors.map((doctor) => (
-            <Grid item xs={12} sm={6} md={4} key={doctor._id}>
-              <Card
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {doctors.map((doctor) => (
+              <div
+                key={doctor._id}
                 onClick={() => handleSelectDoctor(doctor)}
-                sx={{
-                  p: 3,
-                  borderRadius: 3,
-                  transition: "all 0.3s ease",
-                  border: selectedDoctor?._id === doctor._id ? "2px solid #2563eb" : "1px solid #e2e8f0",
-                  bgcolor: selectedDoctor?._id === doctor._id ? "#eff6ff" : "#ffffff",
-                  cursor: "pointer",
-                  "&:hover": {
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
-                    transform: "translateY(-4px)",
-                  },
-                  position: "relative",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                }}
+                className={`p-4 rounded-lg border transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-1 ${
+                  selectedDoctor?._id === doctor._id ? 'border-blue-500 border-2' : 'border-gray-200'
+                } bg-white relative flex flex-col justify-between h-full`}
               >
                 {selectedDoctor?._id === doctor._id && (
-                  <Chip
-                    icon={<HealthAndSafetyIcon sx={{ color: "#fff !important", fontSize: 20 }} />}
-                    label="Đã chọn"
-                    sx={{
-                      position: "absolute",
-                      top: 16,
-                      right: 16,
-                      bgcolor: "#3b82f6",
-                      color: "#fff",
-                      fontWeight: 600,
-                      fontSize: "0.9rem",
-                      px: 1,
-                    }}
-                  />
+                  <span className="absolute top-4 right-4 bg-blue-500 text-white text-sm font-semibold px-2 py-1 rounded flex items-center gap-1">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5-1H5a2 2 0 01-2 2v9a2 2 0 002 2h14a2 2 0 002-2v-9a2 2 0 01-2-2z" />
+                    </svg>
+                    Đã chọn
+                  </span>
                 )}
-                <Box display="flex" alignItems="center" mb={2}>
+                <div className="flex items-center mb-4">
                   {getAvatar(doctor)}
-                  <Box>
-                    <Typography variant="h6" fontWeight={700} color="primary.dark">
-                      {doctor.userID?.name || "Bác sĩ"}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {doctor.specializations || "Chuyên môn chưa cập nhật"}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" mt={0.5}>
-                      Số phòng: <strong>{doctor.room || "N/A"}</strong>
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box mt={1}>
+                  <div>
+                    <h3 className="text-lg font-bold text-blue-900">{doctor.userID?.name || 'Bác sĩ'}</h3>
+                    <p className="text-sm text-gray-500">{doctor.specializations || 'Chuyên môn chưa cập nhật'}</p>
+                    <p className="text-sm text-gray-500 mt-1">Số phòng: <span className="font-semibold">{doctor.room || 'N/A'}</span></p>
+                  </div>
+                </div>
+                <div className="mt-2">
                   {doctor.userID?.email && (
-                    <Typography variant="body2" color="text.secondary" mb={0.5}>
-                      📧 {doctor.userID.email}
-                    </Typography>
+                    <p className="text-sm text-gray-500 mb-1">📧 {doctor.userID.email}</p>
                   )}
                   {doctor.userID?.phone && (
-                    <Typography variant="body2" color="text.secondary">
-                      ☎️ {doctor.userID.phone}
-                    </Typography>
+                    <p className="text-sm text-gray-500">☎️ {doctor.userID.phone}</p>
                   )}
-                </Box>
-
+                </div>
                 {selectedDoctor?._id === doctor._id && (
-                  <Box mt={2}>
+                  <div className="mt-4">
                     {loadingDoctorSlot ? (
-                      <Typography color="primary" fontWeight={500}>
-                        Đang kiểm tra slot trống...
-                      </Typography>
+                      <p className="text-blue-600 font-medium">Đang kiểm tra slot trống...</p>
                     ) : slotError ? (
-                      <Typography color="error" fontWeight={500}>
-                        {slotError}
-                      </Typography>
+                      <p className="text-red-600 font-medium">{slotError}</p>
                     ) : doctorSlots?.length > 0 ? (
-                      <Typography color="success.main" fontWeight={500}>
-                        {doctorSlots.length} slot khả dụng
-                      </Typography>
+                      <p className="text-green-600 font-medium">{doctorSlots.length} slot khả dụng</p>
                     ) : null}
-                  </Box>
+                  </div>
                 )}
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </DialogContent>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <DialogActions
-        sx={{
-          p: 3,
-          borderTop: "1px solid #e5e7eb",
-          bgcolor: "#f8fafc",
-          justifyContent: "space-between",
-        }}
-      >
-        <Button
-          onClick={onBack}
-          sx={{
-            textTransform: "none",
-            color: "#475569",
-            fontSize: "1rem",
-            fontWeight: 600,
-            px: 4,
-            py: 1,
-            borderRadius: "8px",
-            "&:hover": { bgcolor: "#e5e7eb" },
-          }}
-        >
-          Quay lại
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleNext}
-          disabled={!selectedDoctor || loadingDoctorSlot || (doctorSlots && doctorSlots.length === 0)}
-          sx={{
-            px: 5,
-            py: 1.5,
-            borderRadius: 2,
-            fontWeight: 600,
-            fontSize: "1rem",
-            textTransform: "none",
-            bgcolor: "#3b82f6",
-            "&:hover": { bgcolor: "#1d4ed8" },
-            "&.Mui-disabled": {
-              bgcolor: "#d1d5db",
-              color: "#6b7280",
-            },
-          }}
-        >
-          Tiếp tục
-        </Button>
-      </DialogActions>
-    </Dialog>
+        {/* Dialog Actions */}
+        <div className="p-4 bg-gray-100 border-t border-gray-200 flex justify-between">
+          <button
+            onClick={onBack}
+            className="px-6 py-2 text-gray-600 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Quay lại
+          </button>
+          <button
+            onClick={handleNext}
+            disabled={!selectedDoctor || loadingDoctorSlot || (doctorSlots && doctorSlots.length === 0)}
+            className="px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed"
+          >
+            Tiếp tục
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
