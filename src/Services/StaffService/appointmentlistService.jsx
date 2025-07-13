@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const API_URL = "http://localhost:3000/appointments";
-
+  const token = localStorage.getItem("token"); 
 const appointmentListService = {
+  
   getAllAppointments: async () => {
     try {
-      const token = localStorage.getItem("token"); 
       const response = await axios.get(API_URL, {
         headers: {
             Accept: "application/json",
@@ -76,15 +76,13 @@ getAppointmentByPersonalID: async (personalID) => {
     }
   },
  
- cancelAppointment: async (appointmentId, reason) => {
+ cancelAppointment: async (appoinmentId, reason) => {
   try {
     const token = localStorage.getItem("token");
-
-    console.log("Canceling appointment with ID:", appointmentId, "Reason:", reason);
+    console.log("token", token);
     const response = await axios.post(
       `${API_URL}/cancle/appointment`,
-      
-        appointmentId,{
+      {appoinmentId,
         reason, // thêm lý do như yêu cầu từ Swagger
       },
       {

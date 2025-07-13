@@ -8,7 +8,8 @@ import {
 } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { FiLogOut } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
 
 const navItems = [
   {
@@ -41,20 +42,18 @@ const navItems = [
     icon: <FaComments className="text-xl" />,
     path: "/staff/content",
   },
-  {
-    label: "More Apps",
-    icon: <FaThLarge className="text-xl" />,
-    path: "/staff/apps",
-    hasDropdown: true,
-  },
-  {
-    label: "Healthcare Admin",
-    icon: <MdDashboard className="text-xl" />,
-    path: "/healthcare-admin",
-  },
+ 
 ];
 
 const StaffSidebar = () => {
+  const navigate = useNavigate(); // ✅ Sử dụng hook này
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/signin"); // ✅ Điều hướng nội bộ, không reload
+  };
+
   return (
     <aside className="w-64 min-h-screen bg-gradient-to-b from-gray-50 to-white shadow-xl flex flex-col transition-all duration-300">
       {/* Logo Section */}
@@ -78,6 +77,17 @@ const StaffSidebar = () => {
             hasDropdown={item.hasDropdown}
           />
         ))}
+
+        {/* Logout Button */}
+        <div
+          onClick={handleLogout}
+          className="flex items-center justify-between px-4 py-3 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200 ease-in-out cursor-pointer group"
+        >
+          <div className="flex items-center space-x-3">
+            <FiLogOut className="text-gray-500 group-hover:text-red-600" />
+            <span className="text-sm font-medium">Đăng xuất</span>
+          </div>
+        </div>
       </nav>
     </aside>
   );

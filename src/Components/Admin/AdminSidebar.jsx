@@ -10,54 +10,49 @@ import {
 } from "@heroicons/react/24/outline";
 
 const menuItems = [
-  { text: "Dashboard", icon: <HomeIcon className="w-5 h-5" />, path: "/admin" },
-  {
-    text: "Users",
-    icon: <UsersIcon className="w-5 h-5" />,
-    path: "/admin/users",
-  },
-  {
-    text: "Categories",
-    icon: <ClipboardDocumentListIcon className="w-5 h-5" />,
-    path: "/admin/categories",
-  },
-  {
-    text: "Inventory",
-    icon: <ArchiveBoxIcon className="w-5 h-5" />,
-    path: "/admin/inventory",
-  },
-  {
-    text: "Events",
-    icon: <CalendarDaysIcon className="w-5 h-5" />,
-    path: "/admin/events",
-  },
-  {
-    text: "Logout",
-    icon: <ArrowLeftOnRectangleIcon className="w-5 h-5" />,
-    path: "/signin",
-  },
+  { text: "Dashboard", icon: <HomeIcon className="w-6 h-6" />, path: "/admin" },
+  { text: "Users", icon: <UsersIcon className="w-6 h-6" />, path: "/admin/users" },
+  { text: "Categories", icon: <ClipboardDocumentListIcon className="w-6 h-6" />, path: "/admin/categories" },
+  { text: "Inventory", icon: <ArchiveBoxIcon className="w-6 h-6" />, path: "/admin/inventory" },
+  { text: "Events", icon: <CalendarDaysIcon className="w-6 h-6" />, path: "/admin/events" },
+  { text: "Logout", icon: <ArrowLeftOnRectangleIcon className="w-6 h-6" />, path: "/signin", isLogout: true },
 ];
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
 
+  const handleItemClick = (item) => {
+    if (item.isLogout) {
+      // ✅ Xử lý logout
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate(item.path); // Điều hướng về /signin
+    } else {
+      navigate(item.path);
+    }
+  };
+
   return (
-    <div className="w-64 h-screen bg-[#AD9700] text-white shadow-lg flex flex-col">
-      <div className="bg-[#00ABE1] p-4 text-center font-bold text-lg tracking-wide">
-        Admin Panel
+    <div className="w-64 h-screen bg-white border-r border-gray-200 shadow-md flex flex-col">
+      <div className="bg-[#00C2CB] p-5 text-center text-white font-semibold text-xl tracking-wide rounded-b-lg shadow">
+        🏥 Admin
       </div>
-      <ul className="flex-1 px-2 py-4 space-y-2">
+      <ul className="flex-1 px-4 py-6 space-y-2">
         {menuItems.map((item, index) => (
           <li
             key={index}
-            onClick={() => navigate(item.path)}
-            className="flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-yellow-300 hover:text-black transition-colors"
+            onClick={() => handleItemClick(item)}
+            className={`flex items-center space-x-4 p-3 rounded-lg cursor-pointer transition-all duration-200
+              ${item.isLogout ? "hover:bg-red-50 text-red-500" : "hover:bg-[#e0f7fa] text-gray-800"}`}
           >
-            <span className="text-[#00ABE1]">{item.icon}</span>
-            <span className="font-medium text-black">{item.text}</span>
+            <span className={`${item.isLogout ? "text-red-500" : "text-[#00C2CB]"}`}>{item.icon}</span>
+            <span className="font-medium text-[15px]">{item.text}</span>
           </li>
         ))}
       </ul>
+      <div className="p-4 text-xs text-gray-400 text-center">
+        &copy; 2025 Clinic Management
+      </div>
     </div>
   );
 };
