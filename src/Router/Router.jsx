@@ -37,7 +37,7 @@ import DoctorProfile from "../Components/Doctor/DoctorProfile";
 import DoctorSlotList from "../Components/Doctor/DoctorSlotList";
 import DoctorSchedule from "../Components/Doctor/DoctorSchedule";
 import DoctorAppointments from "../Components/Doctor/DoctorAppoinment";
-import CreateMedicalRecord from "../Components/Doctor/CreateMedicalRecord";
+// import CreateMedicalRecord from "../Components/Doctor/CreateMedicalRecord";
 import BookingPaymentPage from "../Components/Customer/BookingStep/BookingPayment";
 import SuccessPaymentPage from "../Components/Customer/BookingStep/SuccessPaymentPage";
 import CreateDoctorSchedule from "../Components/Manager/CreateDoctorSchedule";
@@ -70,8 +70,6 @@ import ARVManagement from "../Components/Manager/ARVManagement";
 import DashBoard from "../Components/Staff/Dashboard";
 import DetailDrugs from "../Components/Manager/DetailDrugs";
 import AnonymousAppointments from "../Components/Staff/AnonymousAppointments";
-
-
 
 const Router = createBrowserRouter([
   {
@@ -118,7 +116,10 @@ const Router = createBrowserRouter([
       { path: "/staff/checkin", element: <CheckIn /> },
       { path: "/staff/content", element: <ContentManagement /> },
       { path: "/staff/dashboard", element: <DashBoard /> },
-      { path: "/staff/anonymous-appointments", element: <AnonymousAppointments /> },
+      {
+        path: "/staff/anonymous-appointments",
+        element: <AnonymousAppointments />,
+      },
       {
         path: "/staff/pending-appointments",
         element: <PendingAppointmentList />,
@@ -169,10 +170,10 @@ const Router = createBrowserRouter([
         path: "doctorsappoinment",
         element: <DoctorAppointments />,
       },
-      {
-        path: "doctorsappoinment/medical-records/create/:patientID",
-        element: <CreateMedicalRecord />,
-      },
+      // {
+      //   path: "doctorsappoinment/medical-records/create/:patientID",
+      //   element: <CreateMedicalRecord />,
+      // },
       {
         path: "doctorsappoinment/medical-records/personal-id/:patientID",
         element: <ViewMedicalRecord />,

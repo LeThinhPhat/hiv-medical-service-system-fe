@@ -54,10 +54,10 @@ const ViewMedicalRecord = () => {
         token,
         serviceId
       );
-      toast.success("✅ Tạo hồ sơ bệnh án thành công");
+      toast.success("Tạo hồ sơ bệnh án thành công");
       setMedicalRecord(created.data);
     } catch (error) {
-      toast.error("❌ Lỗi khi tạo hồ sơ");
+      toast.error(" Lỗi khi tạo hồ sơ");
       console.error(error);
     } finally {
       setSubmitting(false);
