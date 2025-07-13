@@ -7,6 +7,18 @@ const ManagerDoctorList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [modalMode, setModalMode] = useState(null); // 'view' or 'update'
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    room: "",
+    specializations: "",
+    degrees: "",
+    experiences: [],
+  });
+  const [modalError, setModalError] = useState("");
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -41,6 +53,107 @@ const ManagerDoctorList = () => {
     setFilteredDoctors(results);
   }, [searchTerm, doctors]);
 
+  // Fetch doctor details
+  const handleViewDetails = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setModalError("Vui lòng đăng nhập để xem chi tiết.");
+        return;
+      }
+      const data = await doctorService.getDoctorById(id, token);
+      setSelectedDoctor(data);
+      setModalMode("view");
+      setModalError("");
+    } catch (error) {
+      setModalError("Không thể tải chi tiết bác sĩ.");
+    }
+  };
+
+  // Open update modal
+  const handleUpdate = (doctor) => {
+    setSelectedDoctor(doctor);
+    setFormData({
+      name: doctor.userID?.name || "",
+      email: doctor.userID?.email || "",
+      phone: doctor.userID?.phone || "",
+      room: doctor.room || "",
+      specializations: doctor.specializations || "",
+      degrees: doctor.degrees || "",
+      experiences: doctor.experiences || [],
+    });
+    setModalMode("update");
+    setModalError("");
+  };
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Handle experiences input (comma-separated)
+  const handleExperiencesChange = (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      experiences: value ? value.split(",").map((exp) => exp.trim()) : [],
+    }));
+  };
+
+  // Submit update
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setModalError("Vui lòng đăng nhập để cập nhật.");
+        return;
+      }
+      const updateData = {
+        userID: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+        },
+        room: formData.room,
+        specializations: formData.specializations,
+        degrees: formData.degrees,
+        experiences: formData.experiences,
+      };
+      await doctorService.updateDoctorById(
+        selectedDoctor._id,
+        updateData,
+        token
+      );
+      // Update local state
+      setDoctors((prev) =>
+        prev.map((doc) =>
+          doc._id === selectedDoctor._id ? { ...doc, ...updateData } : doc
+        )
+      );
+      setFilteredDoctors((prev) =>
+        prev.map((doc) =>
+          doc._id === selectedDoctor._id ? { ...doc, ...updateData } : doc
+        )
+      );
+      setModalMode(null);
+      setSelectedDoctor(null);
+    } catch (error) {
+      setModalError("Không thể cập nhật bác sĩ.");
+    }
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setModalMode(null);
+    setSelectedDoctor(null);
+    setModalError("");
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -58,8 +171,8 @@ const ManagerDoctorList = () => {
   }
 
   return (
-    <div className="min-h-screen  py-10 px-6">
-      <div className="container mx-auto ">
+    <div className="min-h-screen py-10 px-6">
+      <div className="container mx-auto">
         <div className="bg-white rounded-2xl shadow-xl">
           <div className="bg-gradient-to-r from-teal-700 to-teal-500 p-6 rounded-t-2xl">
             <h2 className="text-3xl font-bold text-white">Danh sách Bác sĩ</h2>
@@ -165,6 +278,21 @@ const ManagerDoctorList = () => {
                       <div className="mt-4 border-t pt-3 text-xs text-gray-500">
                         Tạo bởi: {doctor.createdBy?.email || "Không rõ"}
                       </div>
+
+                      <div className="mt-4 flex gap-2">
+                        <button
+                          onClick={() => handleViewDetails(doctor._id)}
+                          className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+                        >
+                          Xem chi tiết
+                        </button>
+                        <button
+                          onClick={() => handleUpdate(doctor)}
+                          className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors"
+                        >
+                          Cập nhật
+                        </button>
+                      </div>
                     </div>
                   ))}
               </div>
@@ -172,6 +300,172 @@ const ManagerDoctorList = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal for View Details and Update */}
+      {modalMode && selectedDoctor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto">
+            <h3 className="text-2xl font-bold text-teal-600 mb-4">
+              {modalMode === "view" ? "Chi tiết Bác sĩ" : "Cập nhật Bác sĩ"}
+            </h3>
+            {modalError && (
+              <div className="text-red-600 mb-4">{modalError}</div>
+            )}
+            {modalMode === "view" ? (
+              <div className="space-y-2 text-sm text-gray-700">
+                <p>
+                  <span className="font-medium text-gray-900">Tên:</span>{" "}
+                  {selectedDoctor.userID?.name || "Không rõ"}
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Email:</span>{" "}
+                  {selectedDoctor.userID?.email || "Không rõ"}
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Điện thoại:</span>{" "}
+                  {selectedDoctor.userID?.phone || "Không rõ"}
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Phòng:</span>{" "}
+                  {selectedDoctor.room || "Không rõ"}
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Chuyên môn:</span>{" "}
+                  {selectedDoctor.specializations || "Không rõ"}
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Bằng cấp:</span>{" "}
+                  {selectedDoctor.degrees || "Không rõ"}
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">
+                    Kinh nghiệm:
+                  </span>{" "}
+                  {Array.isArray(selectedDoctor.experiences) &&
+                  selectedDoctor.experiences.length > 0
+                    ? selectedDoctor.experiences.join(", ")
+                    : "Không có"}
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Tạo bởi:</span>{" "}
+                  {selectedDoctor.createdBy?.email || "Không rõ"}
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleUpdateSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Tên
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Điện thoại
+                  </label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Phòng
+                  </label>
+                  <input
+                    type="text"
+                    name="room"
+                    value={formData.room}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Chuyên môn
+                  </label>
+                  <input
+                    type="text"
+                    name="specializations"
+                    value={formData.specializations}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Bằng cấp
+                  </label>
+                  <input
+                    type="text"
+                    name="degrees"
+                    value={formData.degrees}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Kinh nghiệm (phân cách bằng dấu phẩy)
+                  </label>
+                  <textarea
+                    name="experiences"
+                    value={formData.experiences.join(", ")}
+                    onChange={handleExperiencesChange}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700"
+                  >
+                    Cập nhật
+                  </button>
+                </div>
+              </form>
+            )}
+            {modalMode === "view" && (
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={closeModal}
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
+                >
+                  Đóng
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

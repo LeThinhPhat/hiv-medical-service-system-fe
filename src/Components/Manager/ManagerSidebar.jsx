@@ -1,28 +1,33 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-  LocalHospital,
+  CalendarToday,
   FormatListBulleted,
-  Engineering,
+  Groups,
   EventNote,
-  AccountBox,
+  People,
   MiscellaneousServices,
   Person,
+  MedicalServices,
+  Medication,
+  CalendarMonth,
   Hotel,
   Newspaper,
-
   Widgets,
   Logout,
 } from "@mui/icons-material";
 
 const sidebarItems = [
   { text: "Doctors", icon: <LocalHospital />, path: "/manager/doctors" },
-  { text: "Doctor List", icon: <FormatListBulleted />, path: "/manager/doctorlist" },
-
+  {
+    text: "Doctor List",
+    icon: <FormatListBulleted />,
+    path: "/manager/doctorlist",
+  },
 
   {
     text: "Lịch làm việc bác sĩ",
-    icon: <LocalHospital />,
+    icon: <CalendarToday />,
     path: "/manager/doctors",
   },
   {
@@ -30,15 +35,17 @@ const sidebarItems = [
     icon: <FormatListBulleted />,
     path: "/manager/doctorlist",
   },
-
-  { text: "Staff", icon: <Engineering />, path: "/manager/staff" },
+  { text: "Staff", icon: <Groups />, path: "/manager/staff" },
   { text: "Appointments", icon: <EventNote />, path: "/manager/appointments" },
-  { text: "Patients", icon: <AccountBox />, path: "/manager/patient" },
-  { text: "Service", icon: <MiscellaneousServices />, path: "/manager/service" },
-  { text: "User", icon: <Person />, path: "/manager/user" },
-  { text: "Phát đồ ARV", icon: <Newspaper />, path: "/manager/arv" },
-  { text: "Thuốc", icon: <Hotel />, path: "/manager/drugs" },
-  { text: "Lịch làm việc", icon: <Hotel />, path: "/manager/schedule" },
+  { text: "Patients", icon: <People />, path: "/manager/patient" },
+  {
+    text: "Service",
+    icon: <MiscellaneousServices />,
+    path: "/manager/service",
+  },
+  { text: "Phát đồ ARV", icon: <MedicalServices />, path: "/manager/arv" },
+  { text: "Thuốc", icon: <Medication />, path: "/manager/drugs" },
+  { text: "Lịch làm việc", icon: <CalendarMonth />, path: "/manager/schedule" },
 ];
 
 const ManagerSidebar = () => {
@@ -61,7 +68,12 @@ const ManagerSidebar = () => {
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M4 6h16M4 12h16m-7 6h7"
+          />
         </svg>
         <h1 className="text-xl font-bold">Manager</h1>
       </div>
