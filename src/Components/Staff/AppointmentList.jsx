@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
+import {
+  FaSearch,
+  FaTimes,
+  FaCalendar,
+  FaUser,
+  FaFilter,
+} from "react-icons/fa";
+import dayjs from "dayjs";
 import appointmentlistService from "../../Services/StaffService/appointmentlistService";
 
 const AppointmentList = () => {
   const [appointments, setAppointments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage] = useState(10);
-  const [searchDate, setSearchDate] = useState("");
+  const [searchDate, setSearchDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [searchPatient, setSearchPatient] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -39,15 +47,19 @@ const AppointmentList = () => {
     const status = item.status?.toLowerCase() || "";
 
     const matchesDate = !searchDate || appointmentDate === searchDate;
-    const matchesPatient = !searchPatient || patientName.includes(searchPatient.toLowerCase());
-    const matchesStatus = !filterStatus || status === filterStatus.toLowerCase();
+    const matchesPatient =
+      !searchPatient || patientName.includes(searchPatient.toLowerCase());
+    const matchesStatus =
+      !filterStatus || status === filterStatus.toLowerCase();
 
     return matchesDate && matchesPatient && matchesStatus;
   });
 
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-const currentRecords = filteredAppointments.reverse().slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = filteredAppointments
+    .reverse()
+    .slice(indexOfFirstRecord, indexOfLastRecord);
   const totalPages = Math.ceil(filteredAppointments.length / recordsPerPage);
 
   const paginate = (pageNumber) => {
@@ -87,10 +99,10 @@ const currentRecords = filteredAppointments.reverse().slice(indexOfFirstRecord, 
     }
 
     try {
-      await appointmentlistService.cancelAppointment(selectedAppointment._id, 
-        cancelReason,
+      await appointmentlistService.cancelAppointment(
+        selectedAppointment._id,
+        cancelReason
       );
-
       await fetchAppointments();
       closeModal();
       showToast("Đã hủy thành công");
@@ -100,78 +112,116 @@ const currentRecords = filteredAppointments.reverse().slice(indexOfFirstRecord, 
     }
   };
 
+  const clearSearchPatient = () => {
+    setSearchPatient("");
+    setCurrentPage(1);
+  };
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className=" Container bg-gradient-to-b  px-4 py-8 sm:px-6 lg:px-8">
       {/* Toast Notification */}
       {toast.show && (
-        <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md z-50">
+        <div className="fixed top-6 right-6 z-50 bg-white/90 backdrop-blur-sm text-green-600 px-4 py-3 rounded-xl shadow-lg border border-green-200/50 transition-all duration-300 animate-in zoom-in-95 fade-in">
           {toast.message}
         </div>
       )}
 
-      <div className="bg-white p-4 rounded-md shadow-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-700">Lịch Hẹn</h2>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Book Appointment
-          </button>
+      <div className="bg-white rounded-3xl shadow-xl p-6 lg:p-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            Danh Sách Lịch Hẹn
+          </h2>
+          {/* <button className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-5 py-2.5 rounded-full hover:from-blue-700 hover:to-blue-600 transition-all duration-300 font-medium shadow-sm">
+            Đặt Lịch Hẹn
+          </button> */}
         </div>
 
-        {/* Bộ lọc */}
-        <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input
-            type="date"
-            className="border rounded px-3 py-2"
-            value={searchDate}
-            onChange={(e) => {
-              setSearchDate(e.target.value);
-              setCurrentPage(1);
-            }}
-          />
-          <input
-            type="text"
-            placeholder="Search by patient name"
-            className="border rounded px-3 py-2"
-            value={searchPatient}
-            onChange={(e) => {
-              setSearchPatient(e.target.value);
-              setCurrentPage(1);
-            }}
-          />
-          <select
-            className="border rounded px-3 py-2"
-            value={filterStatus}
-            onChange={(e) => {
-              setFilterStatus(e.target.value);
-              setCurrentPage(1);
-            }}
-          >
-            <option value="">Tất Cả</option>
-            <option value="Chờ thanh toán">Chờ thanh toán</option>
-            <option value="Đang xét duyệt">Đang xét duyệt</option>
-            <option value="Hoàn tất đặt lịch">Hoàn tất đặt lịch</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+        {/* Filter and Search Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="relative group">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Ngày Hẹn
+            </label>
+            <div className="relative">
+              <FaCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+              <input
+                type="date"
+                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-700 placeholder-gray-400"
+                value={searchDate}
+                onChange={(e) => {
+                  setSearchDate(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+            </div>
+          </div>
+          <div className="relative group">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Tên Bệnh Nhân
+            </label>
+            <div className="relative">
+              <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+              <input
+                type="text"
+                placeholder="Tìm theo tên bệnh nhân"
+                className="w-full pl-10 pr-10 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-700 placeholder-gray-400"
+                value={searchPatient}
+                onChange={(e) => {
+                  setSearchPatient(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+              {searchPatient && (
+                <FaTimes
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors duration-200"
+                  onClick={clearSearchPatient}
+                />
+              )}
+            </div>
+          </div>
+          <div className="relative group">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Trạng Thái
+            </label>
+            <div className="relative">
+              <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+              <select
+                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-700 appearance-none"
+                value={filterStatus}
+                onChange={(e) => {
+                  setFilterStatus(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="">Tất Cả</option>
+                <option value="Chờ thanh toán">Chờ thanh toán</option>
+                <option value="Đang xét duyệt">Đang xét duyệt</option>
+                <option value="Hoàn tất đặt lịch">Hoàn tất đặt lịch</option>
+                <option value="cancelled">Đã Hủy</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm text-left border border-gray-200">
-            <thead className="bg-gray-100 text-gray-600 font-semibold">
+        <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+          <table className="min-w-full text-sm text-left">
+            <thead className="bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 font-semibold">
               <tr>
-                <th className="p-2 border">#</th>
-                <th className="p-2 border">Patient</th>
-                <th className="p-2 border">Doctor</th>
-                <th className="p-2 border">Date</th>
-                <th className="p-2 border">Start</th>
-                <th className="p-2 border">Service</th>
-                <th className="p-2 border">Status</th>
-                <th className="p-2 border">Actions</th>
+                <th className="p-4 border-b">STT</th>
+                <th className="p-4 border-b">Bệnh Nhân</th>
+                <th className="p-4 border-b">Bác Sĩ</th>
+                <th className="p-4 border-b">Ngày</th>
+                <th className="p-4 border-b">Giờ Bắt Đầu</th>
+                <th className="p-4 border-b">Dịch Vụ</th>
+                <th className="p-4 border-b">Trạng Thái</th>
+                <th className="p-4 border-b">Hành Động</th>
               </tr>
             </thead>
             <tbody>
               {currentRecords.map((item, index) => {
-                const doctorEmail = item?.doctorSlotID[0]?.doctorID?.userID?.name;
+                const doctorEmail =
+                  item?.doctorSlotID[0]?.doctorID?.userID?.name || "----";
                 const patientID = item?.patientID?.userID?.name || "----";
                 const date = new Date(item.date).toLocaleDateString("vi-VN");
                 const startTime = extractTimeFromUTC(item.startTime);
@@ -179,20 +229,29 @@ const currentRecords = filteredAppointments.reverse().slice(indexOfFirstRecord, 
                 const service = item?.serviceID?.name || "N/A";
 
                 return (
-                  <tr key={item._id} className="hover:bg-gray-50">
-                    <td className="p-2 border">{indexOfFirstRecord + index + 1}</td>
-                    <td className="p-2 border">{patientID}</td>
-                    <td className="p-2 border">{doctorEmail}</td>
-                    <td className="p-2 border">{date}</td>
-                    <td className="p-2 border">{startTime}</td>
-                    <td className="p-2 border">{service}</td>
-                    <td className="p-2 border capitalize">{status.replace(/_/g, " ")}</td>
-                    <td className="p-2 border text-center">
+                  <tr
+                    key={item._id}
+                    className={`transition-colors duration-200 ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    } hover:bg-blue-50/50`}
+                  >
+                    <td className="p-4 border-b font-medium">
+                      {indexOfFirstRecord + index + 1}
+                    </td>
+                    <td className="p-4 border-b">{patientID}</td>
+                    <td className="p-4 border-b">{doctorEmail}</td>
+                    <td className="p-4 border-b">{date}</td>
+                    <td className="p-4 border-b">{startTime}</td>
+                    <td className="p-4 border-b">{service}</td>
+                    <td className="p-4 border-b capitalize">
+                      {status.replace(/_/g, " ")}
+                    </td>
+                    <td className="p-4 border-b text-center">
                       <button
-                        className="text-red-600 hover:text-red-800 border border-red-500 px-2 py-1 rounded"
+                        className="text-red-600 border border-red-400 px-3 py-1.5 rounded-full hover:bg-red-50 hover:text-red-700 hover:border-red-500 transition-all duration-200 font-medium"
                         onClick={() => openModal(item)}
                       >
-                        Hủy hẹn
+                        Hủy Hẹn
                       </button>
                     </td>
                   </tr>
@@ -203,76 +262,72 @@ const currentRecords = filteredAppointments.reverse().slice(indexOfFirstRecord, 
         </div>
 
         {/* Pagination */}
-        <div className="mt-4 flex justify-between items-center">
-          <div className="text-sm text-gray-600">
-            Showing {indexOfFirstRecord + 1} to{" "}
-            {Math.min(indexOfLastRecord, filteredAppointments.length)} of{" "}
-            {filteredAppointments.length} records
+        <div className="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="text-sm text-gray-600 font-medium">
+            Hiển thị {indexOfFirstRecord + 1} đến{" "}
+            {Math.min(indexOfLastRecord, filteredAppointments.length)} trong
+            tổng số {filteredAppointments.length} bản ghi
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={prevPage}
               disabled={currentPage === 1}
-              className={`px-3 py-1 rounded ${
-                currentPage === 1
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200"
             >
-              Previous
+              ←
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-              <button
-                key={number}
-                onClick={() => paginate(number)}
-                className={`px-3 py-1 rounded ${
-                  currentPage === number
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                {number}
-              </button>
-            ))}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+              (number) => (
+                <button
+                  key={number}
+                  onClick={() => paginate(number)}
+                  className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 ${
+                    currentPage === number
+                      ? "bg-blue-600 text-white shadow-md"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  {number}
+                </button>
+              )
+            )}
             <button
               onClick={nextPage}
               disabled={currentPage === totalPages}
-              className={`px-3 py-1 rounded ${
-                currentPage === totalPages
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200"
             >
-              Next
+              →
             </button>
           </div>
         </div>
       </div>
 
-      {/* Modal hủy lịch */}
+      {/* Cancel Appointment Modal */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-          <div className="bg-white p-6 rounded-md shadow-md w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4 text-gray-700">Nhập lý do hủy</h3>
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 transition-opacity duration-300 animate-in fade-in">
+          <div className="bg-white/95 backdrop-blur-md p-6 rounded-2xl shadow-2xl w-full max-w-md border border-gray-100/50">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              Nhập Lý Do Hủy
+            </h3>
             <textarea
-              className="w-full border px-3 py-2 rounded mb-4"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/80 text-gray-700 placeholder-gray-400 resize-none"
               rows={4}
               placeholder="Nhập lý do hủy..."
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
             />
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-3 mt-4">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all duration-200 font-medium"
               >
                 Hủy
               </button>
               <button
                 onClick={handleSubmitCancel}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
+                className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-200 font-medium"
               >
-                Xác nhận hủy
+                Xác Nhận Hủy
               </button>
             </div>
           </div>

@@ -6,6 +6,7 @@ const appointmentListService = {
   
   getAllAppointments: async () => {
     try {
+      console.log("token", token);
       const response = await axios.get(API_URL, {
         headers: {
             Accept: "application/json",

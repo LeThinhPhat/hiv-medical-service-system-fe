@@ -177,7 +177,7 @@ const DoctorSlot = () => {
   maxTime.setHours(20, 0, 0);
 
   return (
-    <div className="p-6 bg-gradient-to-br from-blue-50 to-gray-100 min-h-screen">
+    <div className="p-6 bg-gradient-to-br  min-h-screen">
       <h2 className="text-3xl font-extrabold text-gray-800 mb-6">
         Lịch Làm Việc Bác Sĩ
       </h2>
@@ -185,15 +185,13 @@ const DoctorSlot = () => {
       {/* Navigation Buttons */}
       <div className="flex flex-wrap gap-2 mb-6">
         {[
-          ["Năm Trước", "PREV_YEAR"],
           ["Tháng Trước", "PREV_MONTH"],
           ["Tuần Trước", "PREV_WEEK"],
-          ["Ngày Trước", "PREV_DAY"],
+
           ["Hôm Nay", "TODAY"],
-          ["Ngày Sau", "NEXT_DAY"],
+
           ["Tuần Sau", "NEXT_WEEK"],
           ["Tháng Sau", "NEXT_MONTH"],
-          ["Năm Sau", "NEXT_YEAR"],
         ].map(([label, action]) => (
           <button
             key={action}
