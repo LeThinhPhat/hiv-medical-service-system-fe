@@ -1,28 +1,22 @@
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
-  LocalHospital,
+  CalendarToday,
   FormatListBulleted,
-  Engineering,
+  Groups,
   EventNote,
-  AccountBox,
+  People,
   MiscellaneousServices,
   Person,
-  Hotel,
-  Newspaper,
-
-  Widgets,
-  Logout,
+  MedicalServices,
+  Medication,
+  CalendarMonth,
 } from "@mui/icons-material";
 
 const sidebarItems = [
-  { text: "Doctors", icon: <LocalHospital />, path: "/manager/doctors" },
-  { text: "Doctor List", icon: <FormatListBulleted />, path: "/manager/doctorlist" },
-
-
   {
     text: "Lịch làm việc bác sĩ",
-    icon: <LocalHospital />,
+    icon: <CalendarToday />,
     path: "/manager/doctors",
   },
   {
@@ -30,26 +24,20 @@ const sidebarItems = [
     icon: <FormatListBulleted />,
     path: "/manager/doctorlist",
   },
-
-  { text: "Staff", icon: <Engineering />, path: "/manager/staff" },
+  { text: "Staff", icon: <Groups />, path: "/manager/staff" },
   { text: "Appointments", icon: <EventNote />, path: "/manager/appointments" },
-  { text: "Patients", icon: <AccountBox />, path: "/manager/patient" },
-  { text: "Service", icon: <MiscellaneousServices />, path: "/manager/service" },
-  { text: "User", icon: <Person />, path: "/manager/user" },
-  { text: "Phát đồ ARV", icon: <Newspaper />, path: "/manager/arv" },
-  { text: "Thuốc", icon: <Hotel />, path: "/manager/drugs" },
-  { text: "Lịch làm việc", icon: <Hotel />, path: "/manager/schedule" },
+  { text: "Patients", icon: <People />, path: "/manager/patient" },
+  {
+    text: "Service",
+    icon: <MiscellaneousServices />,
+    path: "/manager/service",
+  },
+  { text: "Phát đồ ARV", icon: <MedicalServices />, path: "/manager/arv" },
+  { text: "Thuốc", icon: <Medication />, path: "/manager/drugs" },
+  { text: "Lịch làm việc", icon: <CalendarMonth />, path: "/manager/schedule" },
 ];
 
 const ManagerSidebar = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/signin");
-  };
-
   return (
     <div className="w-64 h-screen bg-white border-r shadow-sm flex flex-col">
       {/* Header */}
@@ -61,7 +49,12 @@ const ManagerSidebar = () => {
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M4 6h16M4 12h16m-7 6h7"
+          />
         </svg>
         <h1 className="text-xl font-bold">Manager</h1>
       </div>
@@ -98,17 +91,6 @@ const ManagerSidebar = () => {
           </NavLink>
         ))}
       </nav>
-
-      {/* Logout Button */}
-      <div className="p-4 border-t">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 text-red-500 hover:text-red-600 hover:bg-red-50 p-3 w-full rounded-lg transition-colors"
-        >
-          <Logout className="text-lg" />
-          <span className="text-sm font-medium">Đăng xuất</span>
-        </button>
-      </div>
     </div>
   );
 };
