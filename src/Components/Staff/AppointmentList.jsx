@@ -47,7 +47,7 @@ const AppointmentList = () => {
 
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = filteredAppointments.slice(indexOfFirstRecord, indexOfLastRecord);
+const currentRecords = filteredAppointments.reverse().slice(indexOfFirstRecord, indexOfLastRecord);
   const totalPages = Math.ceil(filteredAppointments.length / recordsPerPage);
 
   const paginate = (pageNumber) => {

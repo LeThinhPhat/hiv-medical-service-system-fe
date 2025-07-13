@@ -65,6 +65,8 @@ import UserList from "../Components/Admin/UserList";
 
 import ManagerSchedule from "../Components/Manager/ManagerSchedule";
 import DetailSchedule from "../Components/Manager/DetailSchedule";
+import ARVManagement from "../Components/Manager/ARVManagement";
+import DashBoard from "../Components/Staff/Dashboard";
 
 
 const Router = createBrowserRouter([
@@ -111,6 +113,8 @@ const Router = createBrowserRouter([
       { path: "/staff/schedule", element: <DoctorSlot /> },
       { path: "/staff/checkin", element: <CheckIn /> },
       { path: "/staff/content", element: <ContentManagement /> },
+      { path: "/staff/dashboard", element: <DashBoard /> },
+
       {
         path: "/staff/pending-appointments",
         element: <PendingAppointmentList />,
@@ -132,6 +136,7 @@ const Router = createBrowserRouter([
       { path: "drugs", element: <ManagerDrugs /> },
       { path: "drugs/:id", element: <DrugDetails /> },
       { path: "schedule", element: <ManagerSchedule /> },
+      { path: "arv", element: <ARVManagement /> },
       { path: "/manager/schedule/:id", element: <DetailSchedule /> },
       // Add manager child routes here if needed
     ],

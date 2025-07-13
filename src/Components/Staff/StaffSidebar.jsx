@@ -28,12 +28,12 @@ const navItems = [
     path: "/staff/checkin",
   },
   {
-    label: "Appointment List",
+    label: "Danh sách lịch hẹn",
     icon: <FaFileAlt className="text-xl" />,
     path: "/staff/appointmentlist",
   },
   {
-    label: "Schedule",
+    label: "Thời Khóa biểu",
     icon: <FaCalendarAlt className="text-xl" />,
     path: "/staff/schedule",
   },
