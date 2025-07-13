@@ -1,21 +1,22 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import {
-  LocalHospital,
+  CalendarToday,
   FormatListBulleted,
-  Engineering,
+  Groups,
   EventNote,
-  AccountBox,
+  People,
   MiscellaneousServices,
   Person,
-  Hotel,
-  Newspaper,
+  MedicalServices,
+  Medication,
+  CalendarMonth,
 } from "@mui/icons-material";
 
 const sidebarItems = [
   {
     text: "Lịch làm việc bác sĩ",
-    icon: <LocalHospital />,
+    icon: <CalendarToday />,
     path: "/manager/doctors",
   },
   {
@@ -23,18 +24,17 @@ const sidebarItems = [
     icon: <FormatListBulleted />,
     path: "/manager/doctorlist",
   },
-  { text: "Staff", icon: <Engineering />, path: "/manager/staff" },
+  { text: "Staff", icon: <Groups />, path: "/manager/staff" },
   { text: "Appointments", icon: <EventNote />, path: "/manager/appointments" },
-  { text: "Patients", icon: <AccountBox />, path: "/manager/patient" },
+  { text: "Patients", icon: <People />, path: "/manager/patient" },
   {
     text: "Service",
     icon: <MiscellaneousServices />,
     path: "/manager/service",
   },
-  { text: "User", icon: <Person />, path: "/manager/user" },
-  { text: "Phát đồ ARV", icon: <Newspaper />, path: "/manager/arv" },
-  { text: "Thuốc", icon: <Hotel />, path: "/manager/drugs" },
-  { text: "Lịch làm việc", icon: <Hotel />, path: "/manager/schedule" },
+  { text: "Phát đồ ARV", icon: <MedicalServices />, path: "/manager/arv" },
+  { text: "Thuốc", icon: <Medication />, path: "/manager/drugs" },
+  { text: "Lịch làm việc", icon: <CalendarMonth />, path: "/manager/schedule" },
 ];
 
 const ManagerSidebar = () => {

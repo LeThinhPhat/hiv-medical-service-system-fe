@@ -49,7 +49,7 @@ import ManagerService from "../Components/Manager/ManagerService";
 import ManagerUser from "../Components/Manager/ManagerUser";
 import UserDetail from "../Components/Manager/UserDetail";
 import ManagerDrugs from "../Components/Manager/ManagerDrugs";
-import DrugDetails from "../Components/Manager/DrugDetail";
+
 import SearchBooking from "../Components/Customer/SearchBooking";
 import TreatmentPlanPage from "../Components/Customer/TreatmentPlanPage ";
 import DetailTreatment from "../Components/Doctor/DetailTreatment";
@@ -62,6 +62,7 @@ import VerificationPage from "../Page/VerificationPage";
 import ResetPassword from "../Page/ResetPassword ";
 import ManagerSchedule from "../Components/Manager/ManagerSchedule";
 import DetailSchedule from "../Components/Manager/DetailSchedule";
+import DetailDrugs from "../Components/Manager/DetailDrugs";
 
 const Router = createBrowserRouter([
   {
@@ -123,10 +124,8 @@ const Router = createBrowserRouter([
       { path: "appointments", element: <ManagerAppointment /> },
       { path: "patient", element: <ManagerPatient /> },
       { path: "service", element: <ManagerService /> },
-      { path: "user", element: <ManagerUser /> },
-      { path: "user/:id", element: <UserDetail /> },
       { path: "drugs", element: <ManagerDrugs /> },
-      { path: "drugs/:id", element: <DrugDetails /> },
+      { path: "drugs/:id", element: <DetailDrugs /> },
       { path: "schedule", element: <ManagerSchedule /> },
       { path: "/manager/schedule/:id", element: <DetailSchedule /> },
       // Add manager child routes here if needed
