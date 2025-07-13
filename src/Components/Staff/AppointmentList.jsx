@@ -5,16 +5,13 @@ const AppointmentList = () => {
   const [appointments, setAppointments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage] = useState(10);
-
-  // Bộ lọc
   const [searchDate, setSearchDate] = useState("");
   const [searchPatient, setSearchPatient] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-
-  // Modal
   const [showModal, setShowModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
+  const [toast, setToast] = useState({ show: false, message: "" });
 
   useEffect(() => {
     fetchAppointments();
@@ -28,7 +25,6 @@ const AppointmentList = () => {
       console.error("Lỗi khi lấy dữ liệu lịch hẹn:", err);
     }
   };
-  console.log("Appointments:", appointments);
 
   const extractTimeFromUTC = (utcString) => {
     const date = new Date(utcString);
@@ -79,16 +75,25 @@ const AppointmentList = () => {
     setShowModal(false);
   };
 
+  const showToast = (message) => {
+    setToast({ show: true, message });
+    setTimeout(() => setToast({ show: false, message: "" }), 3000);
+  };
+
   const handleSubmitCancel = async () => {
-    if (!cancelReason.trim()) return alert("Vui lòng nhập lý do hủy!");
+    if (!cancelReason.trim()) {
+      alert("Vui lòng nhập lý do hủy!");
+      return;
+    }
 
     try {
-      await appointmentlistService.cancelAppointment({appointmentId: selectedAppointment._id}, {
-        reason: cancelReason,
-      });
+      await appointmentlistService.cancelAppointment(selectedAppointment._id, 
+        cancelReason,
+      );
 
-      await fetchAppointments(); // reload lại danh sách
+      await fetchAppointments();
       closeModal();
+      showToast("Đã hủy thành công");
     } catch (error) {
       console.error("Lỗi khi hủy lịch:", error);
       alert("Hủy lịch thất bại!");
@@ -97,6 +102,13 @@ const AppointmentList = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md z-50">
+          {toast.message}
+        </div>
+      )}
+
       <div className="bg-white p-4 rounded-md shadow-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-700">Lịch Hẹn</h2>

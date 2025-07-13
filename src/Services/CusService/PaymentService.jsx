@@ -51,6 +51,28 @@ const paymentService =  {
     throw error;
   }
 },
-};
+getPatientTransactions: async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${BASE_URL}/payments/patient-transactions`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
+      const result = await response.json();
+
+      if (!response.ok || result.statusCode !== 200) {
+        throw new Error(result.message || "Failed to fetch patient transactions");
+      }
+
+      return result.data;
+    } catch (error) {
+      console.error("Error fetching patient transactions:", error);
+      throw error;
+    }
+  },
+};
 export default paymentService;

@@ -33,7 +33,7 @@ const BookingStepper = () => {
     if (activeStep === 2) {
       const { doctor, slot, date, service } = { ...formData, ...stepData };
      
-      navigate("booking/confirm", {
+      navigate("/booking/confirm", {
         state: { doctor, slot, date, service }
       });
     } else {

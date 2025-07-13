@@ -12,12 +12,14 @@ import {
   FaUserCircle,
   FaBusinessTime,
   FaUser,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { MdOutlineDashboard, MdOutlineAnalytics } from "react-icons/md";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const DoctorSidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const menuItems = [
     {
@@ -58,7 +60,6 @@ const DoctorSidebar = () => {
           icon: <FaCalendarPlus />,
           path: "/doctor/appointments",
         },
-
         {
           label: "Doctor Appointment",
           icon: <FaStethoscope />,
@@ -113,6 +114,12 @@ const DoctorSidebar = () => {
     },
   ];
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/signin");
+  };
+
   return (
     <div className="w-64 h-screen bg-gradient-to-b from-teal-50 to-white border-r shadow-lg flex flex-col transition-all duration-300">
       {/* Logo */}
@@ -147,14 +154,22 @@ const DoctorSidebar = () => {
         ))}
       </nav>
 
-      {/* Footer Settings */}
-      <div className="p-4 border-t border-teal-100">
+      {/* Footer Settings + Logout */}
+      <div className="p-4 border-t border-teal-100 space-y-2">
         <Link to="/doctor/settings">
           <div className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition-colors">
             <FaUser className="mr-3" />
             Settings
           </div>
         </Link>
+
+        <div
+          onClick={handleLogout}
+          className="flex items-center px-4 py-2 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors cursor-pointer"
+        >
+          <FaSignOutAlt className="mr-3" />
+          Đăng xuất
+        </div>
       </div>
     </div>
   );
