@@ -1,15 +1,12 @@
 import React, { useState } from "react";
-import {
-  FaStethoscope,
-  FaClipboardList,
-} from "react-icons/fa";
+import { FaStethoscope, FaClipboardList } from "react-icons/fa";
 import BookingStepper from "../Customer/BookingStepper";
+import AnonymousConsultationForm from "./BookingStep/AnonymousConsultationForm";
 
 const Booking = () => {
   const [selectedService, setSelectedService] = useState("");
   const [showStepper, setShowStepper] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [email, setEmail] = useState("");
 
   const services = [
     { name: "Đặt lịch khám bác sĩ", icon: <FaStethoscope /> },
@@ -32,12 +29,6 @@ const Booking = () => {
     setShowEmailForm(serviceName === "Đặt lịch tư vấn ẩn danh");
   };
 
-  const handleEmailSubmit = (e) => {
-    e.preventDefault();
-    alert(`Gửi yêu cầu tư vấn đến email: ${email}`);
-    setEmail("");
-  };
-
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-12">
       <h2 className="text-4xl font-bold text-gray-800 text-center mb-6">
@@ -51,7 +42,7 @@ const Booking = () => {
         <small className="text-gray-500 text-sm">Cập nhật: {currentTime}</small>
       </p>
 
-<div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10 justify-center md:max-w-2xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10 justify-center md:max-w-2xl mx-auto">
         {services.map((service) => (
           <button
             key={service.name}
@@ -70,37 +61,13 @@ const Booking = () => {
         ))}
       </div>
 
-      {/* Booking Stepper */}
       {showStepper && (
         <div className="mt-12">
           <BookingStepper selectedService={selectedService} />
         </div>
       )}
 
-      {/* Gmail Form for anonymous consultation */}
-      {showEmailForm && (
-        <div className="mt-12 max-w-md mx-auto bg-white p-6 rounded-lg shadow">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">
-            Nhập Email để nhận tư vấn ẩn danh
-          </h3>
-          <form onSubmit={handleEmailSubmit}>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Nhập email của bạn"
-              className="w-full border border-gray-300 rounded px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-            >
-              Gửi yêu cầu tư vấn
-            </button>
-          </form>
-        </div>
-      )}
+      {showEmailForm && <AnonymousConsultationForm />} {/* 👉 Dùng component mới */}
     </div>
   );
 };

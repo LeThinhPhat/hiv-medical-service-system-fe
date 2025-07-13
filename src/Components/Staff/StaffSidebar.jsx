@@ -22,18 +22,23 @@ const navItems = [
     icon: <MdDashboard className="text-xl" />,
     path: "/staff/pending-appointments",
   },
+     {
+    label: "Cuộc hẹn ẩn danh",
+    icon: <FaComments className="text-xl" />,
+    path: "/staff/anonymous-appointments",
+  },
   {
     label: "Check-in",
     icon: <FaChartLine className="text-xl" />,
     path: "/staff/checkin",
   },
   {
-    label: "Appointment List",
+    label: "Danh sách lịch hẹn",
     icon: <FaFileAlt className="text-xl" />,
     path: "/staff/appointmentlist",
   },
   {
-    label: "Schedule",
+    label: "Thời Khóa biểu",
     icon: <FaCalendarAlt className="text-xl" />,
     path: "/staff/schedule",
   },

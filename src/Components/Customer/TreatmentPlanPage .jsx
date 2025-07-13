@@ -21,6 +21,7 @@ const TreatmentPlanPage = () => {
         const fetchAll = validItems.map(async (item) => {
           try {
             const regiment = await ARVService.getPrescribedRegimentById(item.prescribedRegimentID);
+            console.log("Fetched regiment:", regiment);
             if (!regiment || !regiment.customDrugs) {
               console.warn(`Invalid regiment data for ID ${item.prescribedRegimentID}`);
             }
@@ -71,7 +72,7 @@ const TreatmentPlanPage = () => {
         </p>
 
         {regimentDetails.map((regiment, index) => {
-          const { data, baseRegimentID, createdBy, note } = regiment;
+          const { data, note } = regiment;
           return (
             <div key={index} className="bg-white p-6 shadow rounded-xl mb-6">
               <div className="flex items-center mb-4 gap-2 text-blue-600">
@@ -83,9 +84,9 @@ const TreatmentPlanPage = () => {
 
               <p><strong>📝 Ghi chú:</strong> {note || "Không có ghi chú"}</p>
               <p><strong>📆 Ngày kê:</strong> {data.createdAt ? new Date(data.createdAt).toLocaleDateString() : "N/A"}</p>
-              <p><strong>📋 Tên phác đồ:</strong> {baseRegimentID?.name || "Không xác định"}</p>
-              <p><strong>💊 Loại:</strong> {baseRegimentID?.regimenType || "N/A"}</p>
-              <p><strong>⚠️ Tác dụng phụ:</strong> {baseRegimentID?.sideEffects || "N/A"}</p>
+              <p><strong>📋 Tên phác đồ:</strong> {data.baseRegimentID?.name || "Không xác định"}</p>
+              <p><strong>💊 Loại:</strong> {data.baseRegimentID?.regimenType || "N/A"}</p>
+              <p><strong>⚠️ Tác dụng phụ:</strong> {data.baseRegimentID?.sideEffects || "N/A"}</p>
 
               <hr className="my-4" />
 
@@ -109,7 +110,7 @@ const TreatmentPlanPage = () => {
               <hr className="my-4" />
 
               <p className="text-sm text-gray-500">
-                Được kê bởi: {createdBy?.email || "N/A"}
+                Được kê bởi: {data.createdBy?.name || "N/A"}
               </p>
             </div>
           );
