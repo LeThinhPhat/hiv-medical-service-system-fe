@@ -6,7 +6,7 @@ const ARVService = {
   // Hàm lấy thông tin phác đồ điều trị theo ID
   getPrescribedRegimentById: async (id) => {
     try {
-        console.log("Fetching regiment with ID:", id);
+      console.log("Using token:", token);
       const response = await fetch(`${BASE_URL}/prescribedRegiments/${id}`, {
         method: "GET",
         headers: {

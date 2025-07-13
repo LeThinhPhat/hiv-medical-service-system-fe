@@ -46,8 +46,8 @@ import Calendar from "../Components/Doctor/Calendar";
 import ViewMedicalRecord from "../Components/Doctor/ViewMedicalRecord";
 import ManagerPatient from "../Components/Manager/ManagerPatient";
 import ManagerService from "../Components/Manager/ManagerService";
-import ManagerUser from "../Components/Manager/ManagerUser";
-import UserDetail from "../Components/Manager/UserDetail";
+// import ManagerUser from "../Components/Manager/ManagerUser";
+// import UserDetail from "../Components/Manager/UserDetail";
 import ManagerDrugs from "../Components/Manager/ManagerDrugs";
 
 import SearchBooking from "../Components/Customer/SearchBooking";
@@ -69,6 +69,7 @@ import DetailSchedule from "../Components/Manager/DetailSchedule";
 import ARVManagement from "../Components/Manager/ARVManagement";
 import DashBoard from "../Components/Staff/Dashboard";
 import DetailDrugs from "../Components/Manager/DetailDrugs";
+import AnonymousAppointments from "../Components/Staff/AnonymousAppointments";
 
 
 
@@ -117,7 +118,7 @@ const Router = createBrowserRouter([
       { path: "/staff/checkin", element: <CheckIn /> },
       { path: "/staff/content", element: <ContentManagement /> },
       { path: "/staff/dashboard", element: <DashBoard /> },
-
+      { path: "/staff/anonymous-appointments", element: <AnonymousAppointments /> },
       {
         path: "/staff/pending-appointments",
         element: <PendingAppointmentList />,
