@@ -1,14 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  TextField,
-  Button,
-  CircularProgress,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-} from "@mui/material";
+import { toast } from "react-hot-toast";
 import treatmentService from "../../Services/DoctorService/treatmentService";
 import SuggestTreatment from "./SuggestTreatment";
 
@@ -27,7 +19,7 @@ const TestTypeLabels = {
   HIV_Antibody: "HIV Antibody",
   PregnancyTest: "Pregnancy Test",
   LiverFunction: "Liver Function",
-  AgeGroup: "Age Group",
+  AgeGroup: "Nhóm tuổi",
 };
 
 const CreateTreatment = () => {
@@ -50,6 +42,49 @@ const CreateTreatment = () => {
     e.preventDefault();
     setSubmitting(true);
 
+    // Validation
+    const hasInvalidInputs = testResults.some((result) => {
+      if (result.test_type === "CD4Count") {
+        const value = parseFloat(result.test_results);
+        return (
+          result.test_results === "" ||
+          isNaN(value) ||
+          value < 0 ||
+          value > 10000
+        );
+      }
+      if (result.test_type === "HIV_ViralLoad") {
+        const value = parseFloat(result.test_results);
+        return (
+          result.test_results === "" ||
+          isNaN(value) ||
+          value < 0 ||
+          value > 10000
+        );
+      }
+      if (result.test_type === "LiverFunction") {
+        const value = parseFloat(result.test_results);
+        return (
+          result.test_results === "" || isNaN(value) || value < 12 || value > 70
+        );
+      }
+      if (["HIV_Antibody", "PregnancyTest"].includes(result.test_type)) {
+        return !["Positive", "Negative"].includes(result.test_results);
+      }
+      if (result.test_type === "AgeGroup") {
+        return !["Adult", "Child"].includes(result.test_results);
+      }
+      return result.test_results === "";
+    });
+
+    if (hasInvalidInputs) {
+      toast.error(
+        "Vui lòng nhập kết quả hợp lệ: CD4 Count và HIV Viral Load từ 0 đến 10000, Liver Function từ 12 đến 70, và các trường khác phải được chọn hoặc điền."
+      );
+      setSubmitting(false);
+      return;
+    }
+
     const payload = {
       medicalRecordID: recordID,
       note,
@@ -66,73 +101,73 @@ const CreateTreatment = () => {
 
       setTreatmentID(createdID);
       setIsSubmitted(true);
-      alert("✅ Tạo treatment thành công");
+      toast.success("Đã tạo treatment thành công!");
     } catch (error) {
-      console.error("❌ Lỗi khi tạo treatment:", error);
-      alert("❌ Tạo treatment thất bại");
+      console.error("Lỗi khi tạo treatment:", error);
+      toast.error(`Tạo treatment thất bại: ${error.message}`);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Option dropdown
+  // Render result field
   const renderResultField = (type, value, index) => {
     const handleChange = (e) =>
       handleTestResultChange(index, "test_results", e.target.value);
 
     if (["HIV_Antibody", "PregnancyTest"].includes(type)) {
       return (
-        <FormControl fullWidth>
-          <InputLabel>Kết quả</InputLabel>
-          <Select
-            value={value}
-            onChange={handleChange}
-            label="Kết quả"
-            required
-          >
-            <MenuItem value="Positive">Positive</MenuItem>
-            <MenuItem value="Negative">Negative</MenuItem>
-          </Select>
-        </FormControl>
+        <select
+          value={value}
+          onChange={handleChange}
+          className="w-full bg-white border border-teal-100 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600"
+          disabled={isSubmitted}
+          required
+        >
+          <option value="" disabled>
+            Chọn kết quả
+          </option>
+          <option value="Positive">Positive</option>
+          <option value="Negative">Negative</option>
+        </select>
       );
     }
 
     if (type === "AgeGroup") {
       return (
-        <FormControl fullWidth>
-          <InputLabel>Nhóm tuổi</InputLabel>
-          <Select
-            value={value}
-            onChange={handleChange}
-            label="Nhóm tuổi"
-            required
-          >
-            <MenuItem value="Adult">Adult</MenuItem>
-            <MenuItem value="Child">Child</MenuItem>
-          </Select>
-        </FormControl>
+        <select
+          value={value}
+          onChange={handleChange}
+          className="w-full bg-white border border-teal-100 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600"
+          disabled={isSubmitted}
+          required
+        >
+          <option value="" disabled>
+            Chọn nhóm tuổi
+          </option>
+          <option value="Adult">Adult</option>
+          <option value="Child">Child</option>
+        </select>
       );
     }
 
     return (
-      <TextField
-        label="Kết quả"
+      <input
+        type="number"
         value={value}
-        onChange={(e) =>
-          handleTestResultChange(index, "test_results", e.target.value)
-        }
-        fullWidth
+        onChange={handleChange}
+        className="w-full bg-white border border-teal-100 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600"
+        disabled={isSubmitted}
         required
-        variant="outlined"
       />
     );
   };
 
   return (
-    <div className="container mx-auto mt-10 px-4">
+    <div className="Container mx-auto mt-10 px-4 mb-10">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1 bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-semibold text-blue-700 mb-4">
+        <div className="md:col-span-1 bg-white p-6 rounded-2xl shadow-lg">
+          <h2 className="text-xl font-semibold text-teal-600 mb-4">
             Tạo điều trị
           </h2>
 
@@ -140,20 +175,19 @@ const CreateTreatment = () => {
             {/* Ghi chú */}
             <div>
               <label className="font-medium text-gray-800 mb-1 block">
-                Ghi chú (Note)
+                Ghi chú
               </label>
               {isSubmitted ? (
-                <p className="text-gray-800 border p-2 rounded bg-gray-50">
+                <p className="text-gray-800 border p-2 rounded-lg bg-teal-50">
                   {note}
                 </p>
               ) : (
-                <TextField
+                <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  fullWidth
+                  className="w-full bg-white border border-teal-100 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600"
+                  rows="4"
                   required
-                  variant="outlined"
-                  margin="normal"
                 />
               )}
             </div>
@@ -178,7 +212,7 @@ const CreateTreatment = () => {
                 {/* Kết quả */}
                 <div className="col-span-4">
                   {isSubmitted ? (
-                    <p className="text-gray-800 border p-2 rounded bg-gray-50">
+                    <p className="text-gray-800 border p-2 rounded-lg bg-teal-50">
                       {result.test_results}
                     </p>
                   ) : (
@@ -193,12 +227,12 @@ const CreateTreatment = () => {
                 {/* Mô tả */}
                 <div className="col-span-5">
                   {isSubmitted ? (
-                    <p className="text-gray-800 border p-2 rounded bg-gray-50">
+                    <p className="text-gray-800 border p-2 rounded-lg bg-teal-50">
                       {result.description}
                     </p>
                   ) : (
-                    <TextField
-                      label="Mô tả"
+                    <input
+                      type="text"
                       value={result.description}
                       onChange={(e) =>
                         handleTestResultChange(
@@ -207,8 +241,7 @@ const CreateTreatment = () => {
                           e.target.value
                         )
                       }
-                      fullWidth
-                      variant="outlined"
+                      className="w-full bg-white border border-teal-100 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600"
                     />
                   )}
                 </div>
@@ -218,27 +251,47 @@ const CreateTreatment = () => {
             {/* Submit */}
             {!isSubmitted && (
               <div className="flex justify-end">
-                <Button
+                <button
                   type="submit"
-                  variant="contained"
-                  color="primary"
+                  className={`flex items-center gap-2 bg-teal-600 text-white rounded-lg px-4 py-2 hover:bg-teal-700 transition-colors ${
+                    submitting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                   disabled={submitting}
                 >
                   {submitting ? (
-                    <CircularProgress size={24} color="inherit" />
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
                   ) : (
-                    "✅ Tạo Treatment"
+                    "Tạo Treatment"
                   )}
-                </Button>
+                </button>
               </div>
             )}
           </form>
         </div>
 
         {/* Gợi ý điều trị */}
-        <div className="md:col-span-2 bg-gray-100 p-6 rounded shadow h-fit">
-          <h3 className="text-xl font-semibold text-green-600 mb-4">
-            💡 Gợi ý điều trị
+        <div className="md:col-span-2 bg-white p-6 rounded-2xl shadow-lg h-fit">
+          <h3 className="text-xl font-semibold text-teal-600 mb-4">
+            Gợi ý điều trị
           </h3>
           {treatmentID ? (
             <SuggestTreatment treatmentID={treatmentID} token={token} />

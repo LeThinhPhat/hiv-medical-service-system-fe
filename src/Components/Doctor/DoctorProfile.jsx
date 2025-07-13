@@ -157,11 +157,11 @@ const DoctorProfile = () => {
               const formatted = current.toISOString().slice(0, 10);
 
               const weekday = current.toLocaleDateString("vi-VN", {
-                weekday: "long",
-                day: "2-digit",
-                month: "2-digit",
+                timeZone: "Asia/Ho_Chi_Minh", // Giữ nguyên giờ UTC
+                hour12: false,
                 year: "numeric",
-                timeZone: "UTC",
+                month: "2-digit",
+                day: "2-digit",
               });
 
               const scheduleForDay = schedules.filter(

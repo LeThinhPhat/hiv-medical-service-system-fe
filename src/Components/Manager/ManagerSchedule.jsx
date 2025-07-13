@@ -12,7 +12,7 @@ const ManagerSchedule = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDate, setSelectedDate] = useState(
-    moment().format("YYYY-MM-DD")
+    moment().utcOffset("+07:00").format("YYYY-MM-DD")
   );
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedId, setSelectedId] = useState(null);
@@ -56,7 +56,9 @@ const ManagerSchedule = () => {
 
     if (selectedDate) {
       filtered = filtered.filter((item) =>
-        moment(item.date).isSame(moment(selectedDate), "day")
+        moment(item.date)
+          .utcOffset("+07:00")
+          .isSame(moment(selectedDate), "day")
       );
     }
 
@@ -65,7 +67,7 @@ const ManagerSchedule = () => {
     }
 
     setFilteredSchedules(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   }, [searchTerm, selectedDate, selectedStatus, schedules]);
 
   const handleDelete = async () => {
@@ -102,7 +104,6 @@ const ManagerSchedule = () => {
     }
   };
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentSchedules = filteredSchedules.slice(
@@ -129,6 +130,7 @@ const ManagerSchedule = () => {
 
   return (
     <div className="Container mx-auto mt-10 mb-10">
+      <Toaster />
       <div className="bg-white rounded-2xl shadow-lg p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-teal-600">
@@ -205,7 +207,9 @@ const ManagerSchedule = () => {
                       {item.doctorID?.userID?.name || "Không rõ"}
                     </td>
                     <td className="py-3 px-4 text-gray-700">
-                      {moment(item.date).format("DD/MM/YYYY")}
+                      {moment(item.date)
+                        .utcOffset("+07:00")
+                        .format("DD/MM/YYYY")}
                     </td>
                     <td className="py-3 px-4 text-gray-700">
                       {item.shiftName || "N/A"}
@@ -302,7 +306,7 @@ const ManagerSchedule = () => {
           </div>
         )}
 
-        {/* Dialog xác nhận xóa */}
+        {/* Confirm Delete Dialog */}
         {openConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
             <div className="bg-teal-50 rounded-xl p-6 w-full max-w-sm">

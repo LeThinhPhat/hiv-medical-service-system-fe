@@ -57,7 +57,7 @@ const DoctorSchedule = () => {
         )
       );
     } catch (err) {
-      console.error("❌ Lỗi xác nhận:", err);
+      console.error(" Lỗi xác nhận:", err);
       alert("Xác nhận thất bại.");
     }
   };
