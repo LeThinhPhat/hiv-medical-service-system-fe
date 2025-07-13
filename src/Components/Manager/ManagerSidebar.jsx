@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   CalendarToday,
   FormatListBulleted,
@@ -11,20 +11,9 @@ import {
   MedicalServices,
   Medication,
   CalendarMonth,
-  Hotel,
-  Newspaper,
-  Widgets,
-  Logout,
 } from "@mui/icons-material";
 
 const sidebarItems = [
-  { text: "Doctors", icon: <LocalHospital />, path: "/manager/doctors" },
-  {
-    text: "Doctor List",
-    icon: <FormatListBulleted />,
-    path: "/manager/doctorlist",
-  },
-
   {
     text: "Lịch làm việc bác sĩ",
     icon: <CalendarToday />,
@@ -49,14 +38,6 @@ const sidebarItems = [
 ];
 
 const ManagerSidebar = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/signin");
-  };
-
   return (
     <div className="w-64 h-screen bg-white border-r shadow-sm flex flex-col">
       {/* Header */}
@@ -110,17 +91,6 @@ const ManagerSidebar = () => {
           </NavLink>
         ))}
       </nav>
-
-      {/* Logout Button */}
-      <div className="p-4 border-t">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 text-red-500 hover:text-red-600 hover:bg-red-50 p-3 w-full rounded-lg transition-colors"
-        >
-          <Logout className="text-lg" />
-          <span className="text-sm font-medium">Đăng xuất</span>
-        </button>
-      </div>
     </div>
   );
 };
