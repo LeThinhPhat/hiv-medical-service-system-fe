@@ -41,19 +41,20 @@ const AppointmentList = () => {
     return `${hours}:${minutes}`;
   };
 
-  const filteredAppointments = appointments.filter((item) => {
-    const patientName = item?.patientID?.userID?.name?.toLowerCase() || "";
-    const appointmentDate = new Date(item.date).toISOString().split("T")[0];
-    const status = item.status?.toLowerCase() || "";
+const filteredAppointments = appointments.filter((item) => {
+  const patientName = item?.patientID?.userID?.name?.toLowerCase() || "";
+  const appointmentDate = item.rawDate || dayjs(item.date).format("YYYY-MM-DD");
+  const status = item.status?.toLowerCase() || "";
 
-    const matchesDate = !searchDate || appointmentDate === searchDate;
-    const matchesPatient =
-      !searchPatient || patientName.includes(searchPatient.toLowerCase());
-    const matchesStatus =
-      !filterStatus || status === filterStatus.toLowerCase();
+  const matchesDate = !searchDate || appointmentDate === searchDate;
+  const matchesPatient =
+    !searchPatient || patientName.includes(searchPatient.toLowerCase());
+  const matchesStatus =
+    !filterStatus || status === filterStatus.toLowerCase();
 
-    return matchesDate && matchesPatient && matchesStatus;
-  });
+  return matchesDate && matchesPatient && matchesStatus;
+});
+
 
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;

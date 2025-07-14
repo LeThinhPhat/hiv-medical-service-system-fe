@@ -47,51 +47,67 @@ const BookingConfirmPage = () => {
   };
 
   const handleSubmitBooking = async (e) => {
-    e.preventDefault();
-    if (!info.name || !info.cccd || !info.phone) {
-      toast.warning("Vui lòng nhập đầy đủ thông tin bệnh nhân!");
-      return;
-    }
+  e.preventDefault();
 
-    setLoading(true);
-    try {
-      const appointmentData = {
-        patientID: patient._id,
-        doctorSlotID: [slot._id],
-        serviceID: service?._id || null,
-        treatmentID: null,
-      };
+  const trimmedName = info.name.trim();
+  const trimmedPhone = info.phone.trim();
+  const trimmedCCCD = info.cccd.trim();
 
-      const appointment = await appointmentService.createAppointment(appointmentData);
-      toast.success(
-        <>
-          <b>Đặt lịch thành công!</b><br />
-          Bệnh nhân: {info.name} <br />
-          CCCD: {info.cccd} <br />
-          SĐT: {info.phone} <br />
-          Bác sĩ: {doctor.userID?.name} <br />
-          Ngày: {formatDate(date)}, {formatTime(slot.startTime)} - {formatTime(slot.endTime)}<br />
-          Dịch vụ: {serviceName}
-        </>
-      );
-      setTimeout(() => {
-        navigate("/booking-payment", {
-          state: {
-            appointment,
-            info,
-            doctor,
-            slot,
-            date,
-            service
-          }
-        });
-      }, 1800);
-    } catch (error) {
-      toast.error("Đặt lịch thất bại: " + (error.message || "Lỗi không xác định"));
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!trimmedName) {
+    toast.warning("Vui lòng nhập họ tên hợp lệ!");
+    return;
+  }
+
+  if (!/^\d{12}$/.test(trimmedCCCD)) {
+    toast.warning("CCCD phải gồm đúng 12 chữ số!");
+    return;
+  }
+
+  if (!/^0\d{9}$/.test(trimmedPhone)) {
+    toast.warning("Số điện thoại phải bắt đầu bằng số 0 và có đúng 10 chữ số!");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const appointmentData = {
+      patientID: patient._id,
+      doctorSlotID: [slot._id],
+      serviceID: service?._id || null,
+      treatmentID: null,
+    };
+
+    const appointment = await appointmentService.createAppointment(appointmentData);
+    toast.success(
+      <>
+        <b>Đặt lịch thành công!</b><br />
+        Bệnh nhân: {info.name} <br />
+        CCCD: {info.cccd} <br />
+        SĐT: {info.phone} <br />
+        Bác sĩ: {doctor.userID?.name} <br />
+        Ngày: {formatDate(date)}, {formatTime(slot.startTime)} - {formatTime(slot.endTime)}<br />
+        Dịch vụ: {serviceName}
+      </>
+    );
+    setTimeout(() => {
+      navigate("/booking-payment", {
+        state: {
+          appointment,
+          info,
+          doctor,
+          slot,
+          date,
+          service
+        }
+      });
+    }, 1800);
+  } catch (error) {
+    toast.error("Đặt lịch thất bại: " + (error.message || "Lỗi không xác định"));
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (!doctor || !slot || !token || !patient?._id) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
