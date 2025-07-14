@@ -67,7 +67,6 @@ import ManagerSchedule from "../Components/Manager/ManagerSchedule";
 import DetailSchedule from "../Components/Manager/DetailSchedule";
 
 import ARVManagement from "../Components/Manager/ARVManagement";
-import DashBoard from "../Components/Staff/Dashboard";
 import DetailDrugs from "../Components/Manager/DetailDrugs";
 import AnonymousAppointments from "../Components/Staff/AnonymousAppointments";
 
@@ -115,7 +114,7 @@ const Router = createBrowserRouter([
       { path: "/staff/schedule", element: <DoctorSlot /> },
       { path: "/staff/checkin", element: <CheckIn /> },
       { path: "/staff/content", element: <ContentManagement /> },
-      { path: "/staff/dashboard", element: <DashBoard /> },
+      { path: "/staff/dashboard", element: <Dashboard /> },
       {
         path: "/staff/anonymous-appointments",
         element: <AnonymousAppointments />,
