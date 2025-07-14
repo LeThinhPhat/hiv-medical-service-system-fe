@@ -7,11 +7,16 @@ const DoctorWeeklySchedule = () => {
   const [schedules, setSchedules] = useState([]);
 
   const [startDate, setStartDate] = useState(() => {
-    const today = new Date();
-    const day = today.getDay();
-    const diff = today.getDate() - (day === 0 ? 6 : day - 1); // Start from Monday
-    today.setDate(diff);
-    return today;
+    const vnNow = new Date(
+      new Date().toLocaleString("en-US", {
+        timeZone: "Asia/Ho_Chi_Minh",
+      })
+    );
+    const day = vnNow.getDay();
+    const diff = vnNow.getDate() - (day === 0 ? 6 : day - 1); // Start from Monday
+    vnNow.setDate(diff);
+    vnNow.setHours(0, 0, 0, 0);
+    return vnNow;
   });
 
   useEffect(() => {
@@ -54,20 +59,26 @@ const DoctorWeeklySchedule = () => {
     return acc;
   }, {});
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Clear time for accurate comparison
-
   const days = Array.from({ length: 7 }).map((_, i) => {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
+    date.setHours(0, 0, 0, 0);
+
     const key = date.toISOString().slice(0, 10);
-    const isToday = date.toDateString() === today.toDateString();
+
+    const isToday =
+      new Date().toLocaleDateString("vi-VN", {
+        timeZone: "Asia/Ho_Chi_Minh",
+      }) ===
+      date.toLocaleDateString("vi-VN", {
+        timeZone: "Asia/Ho_Chi_Minh",
+      });
 
     const label = date.toLocaleDateString("vi-VN", {
       weekday: "long",
       day: "2-digit",
       month: "2-digit",
-      timeZone: "UTC",
+      timeZone: "Asia/Ho_Chi_Minh",
     });
 
     return { label, key, isToday };
@@ -86,10 +97,15 @@ const DoctorWeeklySchedule = () => {
   };
 
   const handleDateChange = (date) => {
-    const newStart = new Date(date);
+    const newStart = new Date(
+      new Date(date).toLocaleString("en-US", {
+        timeZone: "Asia/Ho_Chi_Minh",
+      })
+    );
     const day = newStart.getDay();
-    const diff = newStart.getDate() - (day === 0 ? 6 : day - 1); // Always start from Monday
+    const diff = newStart.getDate() - (day === 0 ? 6 : day - 1);
     newStart.setDate(diff);
+    newStart.setHours(0, 0, 0, 0);
     setStartDate(newStart);
   };
 

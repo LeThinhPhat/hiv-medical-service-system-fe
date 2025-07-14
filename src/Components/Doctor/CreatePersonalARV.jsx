@@ -50,7 +50,7 @@ const CreatePersonalARV = ({
         {/* RIGHT: Chỉnh sửa thuốc */}
         <div className="space-y-4">
           <h4 className="font-semibold text-sm text-gray-700">
-            💊 Chỉnh sửa liều lượng & tần suất:
+            Chỉnh sửa liều lượng & tần suất:
           </h4>
           {editable?.customDrugs.map((drug, i) => (
             <div key={i} className="p-4 border rounded-lg bg-gray-50">

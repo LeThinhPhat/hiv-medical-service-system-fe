@@ -1,20 +1,15 @@
 import React from "react";
 import {
-  FaClipboardList,
-  FaFileMedical,
   FaCalendarPlus,
   FaCalendarCheck,
   FaStethoscope,
   FaUsers,
   FaIdCardAlt,
-  FaUserMd,
   FaCalendarAlt,
   FaUserCircle,
   FaBusinessTime,
-  FaUser,
   FaSignOutAlt,
 } from "react-icons/fa";
-import { MdOutlineDashboard, MdOutlineAnalytics } from "react-icons/md";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const DoctorSidebar = () => {
@@ -30,46 +25,11 @@ const DoctorSidebar = () => {
           icon: <FaCalendarPlus />,
           path: "/doctor/doctorsappoinment",
         },
-        {
-          label: "Doctor Appointment",
-          icon: <FaStethoscope />,
-          path: "/doctor/appointments",
-        },
-        {
-          label: "Doctors Grid",
-          icon: <FaUserMd />,
-          path: "/doctors-grid",
-        },
-      ],
-    },
-    {
-      section: "Dashboard",
-      items: [
-        {
-          label: "Medical Dashboard",
-          icon: <MdOutlineAnalytics />,
-          path: "/medical-dashboard",
-        },
-        {
-          label: "Doctors Dashboard",
-          icon: <MdOutlineDashboard />,
-          path: "/doctors-dashboard",
-        },
-      ],
-    },
-    {
-      section: "Medical Records",
-      items: [
-        {
-          label: "Medical List",
-          icon: <FaClipboardList />,
-          path: "/doctor/medicallist",
-        },
-        {
-          label: "Create Medical",
-          icon: <FaFileMedical />,
-          path: "/doctor/medical",
-        },
+        // {
+        //   label: "Doctor Appointment",
+        //   icon: <FaStethoscope />,
+        //   path: "/doctor/appointments",
+        // },
       ],
     },
     {
@@ -80,11 +40,11 @@ const DoctorSidebar = () => {
           icon: <FaUsers />,
           path: "/doctor/my-patients",
         },
-        {
-          label: "Patient Profile",
-          icon: <FaIdCardAlt />,
-          path: "/doctor/patient-profile",
-        },
+        // {
+        //   label: "Patient Profile",
+        //   icon: <FaIdCardAlt />,
+        //   path: "/doctor/patient-profile",
+        // },
       ],
     },
     {

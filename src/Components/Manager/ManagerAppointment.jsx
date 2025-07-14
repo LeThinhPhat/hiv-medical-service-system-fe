@@ -204,7 +204,15 @@ const ManagerAppointment = () => {
                         "Chưa có bệnh nhân"}
                     </td>
                     <td className="py-3 px-4 text-gray-700">
-                      {moment(appt.startTime).format("HH:mm DD/MM/YYYY")}
+                      {new Date(appt.startTime).toLocaleString("vi-VN", {
+                        timeZone: "UTC", // Giữ nguyên giờ UTC
+                        hour12: false,
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </td>
                     <td className="py-3 px-4">
                       <span

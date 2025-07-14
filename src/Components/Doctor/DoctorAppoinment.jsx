@@ -2,15 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import doctorAppointmentService from "../../Services/DoctorService/doctorAppointmentService";
+import checkoutService from "../../Services/DoctorService/checkoutService"; // ✅ import hàm checkout
+
 const DoctorAppointments = () => {
   const navigate = useNavigate();
-  const today = new Date().toISOString().split("T")[0];
+  const todayVN = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+  });
 
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchName, setSearchName] = useState("");
-  const [filterDate, setFilterDate] = useState(today);
+  const [filterDate, setFilterDate] = useState(todayVN);
   const [currentPage, setCurrentPage] = useState(1);
 
   const appointmentsPerPage = 10;
@@ -43,12 +47,12 @@ const DoctorAppointments = () => {
 
     if (filterDate) {
       filtered = filtered.filter((appt) => {
-        const apptDate = new Date(appt.createdAt).toISOString().split("T")[0];
+        const apptDate = new Date(appt.startTime).toISOString().split("T")[0];
         return apptDate === filterDate;
       });
     }
 
-    filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    filtered.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
     setFilteredAppointments(filtered.reverse());
     setCurrentPage(1);
   }, [searchName, filterDate, appointments]);
@@ -71,7 +75,7 @@ const DoctorAppointments = () => {
 
   const clearFilters = () => {
     setSearchName("");
-    setFilterDate(today);
+    setFilterDate(todayVN);
   };
 
   const getPaginationRange = () => {
@@ -82,6 +86,22 @@ const DoctorAppointments = () => {
       { length: endPage - startPage + 1 },
       (_, i) => startPage + i
     );
+  };
+
+  const handleCheckout = async (appointmentId) => {
+    try {
+      const token = localStorage.getItem("token"); // Hoặc dùng từ context
+      await checkoutService.checkoutAppointment(appointmentId, token);
+      toast.success("Checkout thành công!");
+
+      // Cập nhật local state
+      const updatedAppointments = appointments.map((appt) =>
+        appt._id === appointmentId ? { ...appt, status: "Đã checkout" } : appt
+      );
+      setAppointments(updatedAppointments);
+    } catch (error) {
+      toast.error("Lỗi khi checkout cuộc hẹn!");
+    }
   };
 
   if (loading) {
@@ -105,48 +125,20 @@ const DoctorAppointments = () => {
             {/* Search & Filter */}
             <div className="flex flex-col md:flex-row gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
               <div className="relative flex-1">
-                <svg
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1116.65 16.65l4.35 4.35z"
-                  />
-                </svg>
                 <input
                   type="text"
                   placeholder="Tìm theo tên bệnh nhân..."
                   className="pl-10 w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                   value={searchName}
                   onChange={(e) => setSearchName(e.target.value)}
-                  aria-label="Tìm kiếm bệnh nhân"
                 />
               </div>
               <div className="relative flex-1">
-                <svg
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
                 <input
                   type="date"
                   className="pl-10 w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                   value={filterDate}
                   onChange={(e) => setFilterDate(e.target.value)}
-                  aria-label="Lọc theo ngày tạo"
                 />
               </div>
               <button
@@ -211,7 +203,15 @@ const DoctorAppointments = () => {
                             {indexOfFirstAppointment + index + 1}
                           </td>
                           <td className="p-3 text-sm text-gray-700">
-                            {new Date(appt.createdAt).toLocaleString("vi-VN")}
+                            {new Date(appt.createdAt).toLocaleString("vi-VN", {
+                              timeZone: "UTC", // Giữ nguyên giờ UTC
+                              hour12: false,
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
                           </td>
                           <td className="p-3 text-sm text-gray-700">
                             {appt.patientID?.name || "Không có tên"}
@@ -223,14 +223,22 @@ const DoctorAppointments = () => {
                             {appt.serviceID?.name || "Không có dịch vụ"}
                           </td>
                           <td className="p-3 text-sm text-gray-700">
-                            {new Date(appt.startTime).toLocaleString("vi-VN")}
+                            {new Date(appt.startTime).toLocaleString("vi-VN", {
+                              timeZone: "UTC", // Giữ nguyên giờ UTC
+                              hour12: false,
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
                           </td>
                           <td className="p-3 text-sm text-gray-700">
                             {appt.status || "Không rõ"}
                           </td>
-                          <td className="p-3 flex space-x-2">
+                          <td className="p-3 flex flex-col gap-2 sm:flex-row sm:space-x-2">
                             <button
-                              className="bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition focus:ring-2 focus:ring-green-500"
+                              className="bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition"
                               onClick={() =>
                                 navigate(
                                   `medical-records/personal-id/${appt.patientID?.personalID}`,
@@ -245,16 +253,14 @@ const DoctorAppointments = () => {
                             >
                               Xem hồ sơ
                             </button>
-                            {/* <button
-                              className="bg-yellow-500 text-white px-3 py-1.5 rounded-lg hover:bg-yellow-600 transition focus:ring-2 focus:ring-yellow-500"
-                              onClick={() =>
-                                navigate(
-                                  `medical-records/create/${appt.patientID?._id}`
-                                )
-                              }
-                            >
-                              Tạo bệnh án
-                            </button> */}
+                            {appt.status !== "Đã checkout" && (
+                              <button
+                                className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition"
+                                onClick={() => handleCheckout(appt._id)}
+                              >
+                                Checkout
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -293,9 +299,6 @@ const DoctorAppointments = () => {
                         {page}
                       </button>
                     ))}
-                    {totalPages > 5 && currentPage < totalPages - 2 && (
-                      <span className="text-gray-500">...</span>
-                    )}
                     <button
                       className="px-4 py-2 border rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 transition"
                       onClick={() => handlePageChange(currentPage + 1)}
