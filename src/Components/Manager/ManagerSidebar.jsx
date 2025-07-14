@@ -16,11 +16,6 @@ import {
 
 const sidebarItems = [
   {
-    text: "Lịch làm việc bác sĩ",
-    icon: <CalendarToday />,
-    path: "/manager/doctors",
-  },
-  {
     text: "Doctor List",
     icon: <FormatListBulleted />,
     path: "/manager/doctorlist",
@@ -35,7 +30,16 @@ const sidebarItems = [
   },
   { text: "Phát đồ ARV", icon: <MedicalServices />, path: "/manager/arv" },
   { text: "Thuốc", icon: <Medication />, path: "/manager/drugs" },
-  { text: "Lịch làm việc", icon: <CalendarMonth />, path: "/manager/schedule" },
+  {
+    text: "Tạo làm việc bác sĩ",
+    icon: <CalendarToday />,
+    path: "/manager/doctors",
+  },
+  {
+    text: "Xác nhận lịch làm việc",
+    icon: <CalendarMonth />,
+    path: "/manager/schedule",
+  },
 ];
 
 const ManagerSidebar = () => {
