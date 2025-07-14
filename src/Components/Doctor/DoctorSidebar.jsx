@@ -32,21 +32,21 @@ const DoctorSidebar = () => {
         // },
       ],
     },
-    {
-      section: "Patients",
-      items: [
-        {
-          label: "My Patients",
-          icon: <FaUsers />,
-          path: "/doctor/my-patients",
-        },
-        // {
-        //   label: "Patient Profile",
-        //   icon: <FaIdCardAlt />,
-        //   path: "/doctor/patient-profile",
-        // },
-      ],
-    },
+    // {
+    //   section: "Patients",
+    //   items: [
+    //     {
+    //       label: "My Patients",
+    //       icon: <FaUsers />,
+    //       path: "/doctor/my-patients",
+    //     },
+    //     // {
+    //     //   label: "Patient Profile",
+    //     //   icon: <FaIdCardAlt />,
+    //     //   path: "/doctor/patient-profile",
+    //     // },
+    //   ],
+    // },
     {
       section: "Doctors",
       items: [
