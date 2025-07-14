@@ -28,30 +28,37 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
 
   // Fetch service list from API
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        setLoadingServices(true);
-        const result = await ServicesService.getAllService();
-        const patient = JSON.parse(localStorage.getItem("patient"));
-      
-        let filteredServices = result;
-        if (!patient || !patient.medicalRecordID || patient.medicalRecordID.length === 0) {
-          filteredServices = result.filter(
+  const fetchServices = async () => {
+    try {
+      setLoadingServices(true);
+      const result = await ServicesService.getAllService();
+      const patient = JSON.parse(localStorage.getItem("patient"));
+
+      let filteredServices = result.filter(
         (service) =>
           service.name &&
-          service.name.toLowerCase().includes("tổng quát")
-          );
-        }
-        setServices(filteredServices);
-      } catch (err) {
-        console.error("Error fetching services:", err);
-        setError("Failed to load services. Please try again.");
-      } finally {
-        setLoadingServices(false);
+          service.name.toLowerCase() !== "đăng kí khám ẩn danh" // Ẩn dịch vụ ẩn danh
+      );
+
+      if (!patient || !patient.medicalRecordID || patient.medicalRecordID.length === 0) {
+        filteredServices = filteredServices.filter(
+          (service) =>
+            service.name &&
+            service.name.toLowerCase().includes("tổng quát")
+        );
       }
-    };
-    if (open) fetchServices();
-  }, [open, getAllService]);
+
+      setServices(filteredServices);
+    } catch (err) {
+      console.error("Error fetching services:", err);
+      setError("Failed to load services. Please try again.");
+    } finally {
+      setLoadingServices(false);
+    }
+  };
+
+  if (open) fetchServices();
+}, [open, getAllService]);
 
   const handleNext = () => {
     if (selectedService === null) {
