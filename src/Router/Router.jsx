@@ -69,7 +69,7 @@ import DetailSchedule from "../Components/Manager/DetailSchedule";
 import ARVManagement from "../Components/Manager/ARVManagement";
 import DetailDrugs from "../Components/Manager/DetailDrugs";
 import AnonymousAppointments from "../Components/Staff/AnonymousAppointments";
-
+import Dashboard from "../Components/Staff/DashBoard";
 const Router = createBrowserRouter([
   {
     path: "/",
