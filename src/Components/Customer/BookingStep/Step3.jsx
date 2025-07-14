@@ -30,6 +30,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
       setDoctors([]);
       try {
         const res = await doctorSlotService.getDoctorSlots({ startTime: Starttime });
+        console.log("Fetched doctors:", res);
         setDoctors(res?.filter(Boolean));
       } catch (err) {
         setError('Không thể tải danh sách bác sĩ.');
@@ -65,7 +66,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
     onNext({ ...data, slot: doctorSlots, doctor: selectedDoctor });
     onClose();
   };
-
+  
   const getAvatar = (doctor) => {
     const initials = doctor.userID?.name?.[0]?.toUpperCase() || 'D';
     return (
@@ -127,7 +128,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
                   </span>
                 )}
                 <div className="flex items-center mb-4">
-                  {getAvatar(doctor)}
+                  {getAvatar(doctor.avatarURL)}
                   <div>
                     <h3 className="text-lg font-bold text-blue-900">{doctor.userID?.name || 'Bác sĩ'}</h3>
                     <p className="text-sm text-gray-500">{doctor.specializations || 'Chuyên môn chưa cập nhật'}</p>

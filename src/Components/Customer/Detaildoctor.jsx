@@ -30,11 +30,13 @@ const DetailDoctor = () => {
       try {
         setLoading(true);
         const data = await docService.getDoctorById(id);
+        console.log("Doctor data:", data);
         setDoctor({
           id: data._id,
           name: data.userID?.name || "Unknown",
           phone: data.userID?.phone || "N/A",
           room: data.room || "N/A",
+          avatarURL: data.avatarURL,
           experiences: data.experiences || [],
           degrees: data.degrees || "N/A",
           specializations: data.specializations || "Không có chuyên khoa",
@@ -49,7 +51,7 @@ const DetailDoctor = () => {
     };
     fetchDoctorDetails();
   }, [id]);
-
+  console.log("Doctor state:", doctor);
   if (loading) {
     return (
       <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fa", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -109,7 +111,7 @@ const DetailDoctor = () => {
               <Box sx={{ flex: { xs: "1 0 100%", md: "0 0 300px" }, display: "flex", justifyContent: "center" }}>
                 <CardMedia
                   component="img"
-                  image="https://nguoinoitieng.tv/images/nnt/107/0/bjur.jpg"
+                  image={doctor.avatarURL}
                   alt={doctor.name}
                   sx={{
                     width: { xs: "100%", md: 300 },
@@ -134,9 +136,6 @@ const DetailDoctor = () => {
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <Typography variant="body1" color="text.secondary">
                     <strong>Chuyên khoa:</strong> {doctor.specializations}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>Số điện thoại:</strong> {doctor.phone}
                   </Typography>
                   <Typography variant="body1" color="text.secondary">
                     <strong>Phòng:</strong> {doctor.room}

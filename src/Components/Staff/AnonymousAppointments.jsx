@@ -94,19 +94,19 @@ const AnonymousAppointments = () => {
     setCurrentPageOther(1);
   };
 
-  const filteredAppointments = appointments.filter((item) => {
-    const appointmentDate = new Date(item.date).toISOString().split("T")[0];
-    const email = item.createdBy?.email?.toLowerCase() || "";
-    const status = item.status?.toLowerCase() || "";
+const filteredAppointments = appointments.filter((item) => {
+  const appointmentDate = item.rawDate || dayjs(item.date).format("YYYY-MM-DD"); // Ưu tiên dùng rawDate
+  const email = item.createdBy?.email?.toLowerCase() || "";
+  const status = item.status?.toLowerCase() || "";
 
-    const matchesDate = !searchDate || appointmentDate === searchDate;
-    const matchesEmail =
-      !searchEmail || email.includes(searchEmail.toLowerCase());
-    const matchesStatus =
-      !filterStatus || status === filterStatus.toLowerCase();
+  const matchesDate = !searchDate || appointmentDate === searchDate;
+  const matchesEmail =
+    !searchEmail || email.includes(searchEmail.toLowerCase());
+  const matchesStatus =
+    !filterStatus || status === filterStatus.toLowerCase();
 
-    return matchesDate && matchesEmail && matchesStatus;
-  });
+  return matchesDate && matchesEmail && matchesStatus;
+});
 
   const pendingAppointments = filteredAppointments.filter(
     (item) => item.status === "Đang xét duyệt"

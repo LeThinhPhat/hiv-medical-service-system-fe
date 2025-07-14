@@ -49,7 +49,6 @@ import ManagerService from "../Components/Manager/ManagerService";
 // import ManagerUser from "../Components/Manager/ManagerUser";
 // import UserDetail from "../Components/Manager/UserDetail";
 import ManagerDrugs from "../Components/Manager/ManagerDrugs";
-
 import SearchBooking from "../Components/Customer/SearchBooking";
 import TreatmentPlanPage from "../Components/Customer/TreatmentPlanPage ";
 import DetailTreatment from "../Components/Doctor/DetailTreatment";
@@ -60,15 +59,13 @@ import ContentManagement from "../Components/Staff/ContentManagement";
 import PendingAppointmentList from "../Components/Staff/PendingAppointmentList";
 import VerificationPage from "../Page/VerificationPage";
 import ResetPassword from "../Page/ResetPassword ";
-
 import UserList from "../Components/Admin/UserList";
-
 import ManagerSchedule from "../Components/Manager/ManagerSchedule";
 import DetailSchedule from "../Components/Manager/DetailSchedule";
-
 import ARVManagement from "../Components/Manager/ARVManagement";
 import DetailDrugs from "../Components/Manager/DetailDrugs";
 import AnonymousAppointments from "../Components/Staff/AnonymousAppointments";
+import PaymentCancelled from "../Components/Customer/PaymentCancelled";
 import Dashboard from "../Components/Staff/DashBoard";
 const Router = createBrowserRouter([
   {
@@ -95,6 +92,7 @@ const Router = createBrowserRouter([
       { path: "book", element: <BookingApm /> },
       { path: "verification", element: <VerificationPage /> },
       { path: "reset-password", element: <ResetPassword /> },
+      { path: "payments/cancel", element: <PaymentCancelled /> },
     ],
   },
   {

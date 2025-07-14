@@ -41,11 +41,12 @@ const ListDoctor = () => {
         setLoading(true);
         const response = await docService.getAllDoctors();
         const data = Array.isArray(response.data) ? response.data : response;
+        console.log("Fetched doctors:", data);
         const mappedDoctors = data.map((doctor) => ({
           id: doctor._id,
           name: doctor.userID?.name || `Dr. ${doctor.userID?._id?.slice(-6) || "Unknown"}`,
           specialty: doctor.specializations || "Không có chuyên khoa",
-          avatar: doctor.avatar || "https://via.placeholder.com/120?text=Doctor",
+          avatar: doctor.avatarURL || "https://via.placeholder.com/120?text=Doctor",
         }));
         setDoctors(mappedDoctors);
       } catch (err) {
