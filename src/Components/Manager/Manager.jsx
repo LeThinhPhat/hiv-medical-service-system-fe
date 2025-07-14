@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
+import Dashboard from "../Staff/DashBoard";
 
 const Manager = () => {
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Chào mừng đến với Manager!</h1>
-      
+    <div style={{ padding: "20px" }}>
+      <Dashboard />
     </div>
   );
 };

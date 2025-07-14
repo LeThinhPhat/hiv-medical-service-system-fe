@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaUserMd, FaStar, FaLungs, FaStarHalfAlt } from "react-icons/fa";
 import doctorprofileService from "../../Services/DoctorService/doctorprofileService";
 import doctorScheduleService from "../../Services/DoctorService/doctorScheduleService";
+import { formatInTimeZone } from "date-fns-tz";
 
 const DoctorProfile = () => {
   const [doctor, setDoctor] = useState(null);
@@ -149,16 +150,22 @@ const DoctorProfile = () => {
             {Array.from({ length: 7 }).map((_, i) => {
               const today = new Date();
               const dayOfWeek = today.getDay(); // 0 = CN, 1 = T2, ...
-              const mondayOffset = dayOfWeek === 1 ? -6 : 1 - dayOfWeek;
+              const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
               const current = new Date();
               current.setDate(today.getDate() + mondayOffset + i);
               current.setHours(0, 0, 0, 0);
 
-              const formatted = current.toISOString().slice(0, 10);
+              // ✅ Lấy ngày theo giờ Việt Nam
+              const formatted = formatInTimeZone(
+                current,
+                "Asia/Ho_Chi_Minh",
+                "yyyy-MM-dd"
+              );
 
               const weekday = current.toLocaleDateString("vi-VN", {
-                timeZone: "Asia/Ho_Chi_Minh", // Giữ nguyên giờ UTC
-                hour12: false,
+                timeZone: "Asia/Ho_Chi_Minh",
+                weekday: "long",
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
@@ -183,9 +190,9 @@ const DoctorProfile = () => {
                       {scheduleForDay.map((shift, idx) => {
                         const shiftLabel =
                           shift.shiftName === "morning"
-                            ? "Ca sáng (8:00 - 11:30)"
+                            ? "Ca sáng (8:00)"
                             : shift.shiftName === "afternoon"
-                            ? "Ca chiều (13:00 - 17:00)"
+                            ? "Ca chiều (13:00)"
                             : "Cả ngày";
 
                         return (
