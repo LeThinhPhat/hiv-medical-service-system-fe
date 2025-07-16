@@ -33,7 +33,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
         console.log("Fetched doctors:", res);
         setDoctors(res?.filter(Boolean));
       } catch (err) {
-        setError('Không thể tải danh sách bác sĩ.');
+        setError('Không thể tải danh sách bác sĩ.',err);
       }
       setLoading(false);
     };
@@ -52,7 +52,7 @@ const Step3 = ({ open, onClose, onNext, onBack, data }) => {
         setSlotError('Bác sĩ này không có slot trống ở thời điểm này.');
       }
     } catch (err) {
-      setSlotError('Bác sĩ này không có slot trống ở thời điểm này.');
+      setSlotError('Bác sĩ này không có slot trống ở thời điểm này.',err);
     }
     setLoadingDoctorSlot(false);
   };

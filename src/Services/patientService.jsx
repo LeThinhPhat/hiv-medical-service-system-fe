@@ -1,50 +1,31 @@
-const BASE_URL = "http://localhost:3000";
+import axiosClient from "./api.config";
 
 const PatientService = {
+  // Gửi form không cần token (patient guest)
   createPatient: async (patientData) => {
     try {
-      const response = await fetch(`${BASE_URL}/patients/guest`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(patientData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      console.log("API response:", result);
-      return result.data;
+      const response = await axiosClient.post("/patients/guest", patientData);
+      console.log("API response:", response.data);
+      return response.data.data;
     } catch (error) {
-      console.error(`Error creating patient:`, error);
+      console.error("Error creating patient:", error);
       throw error;
     }
   },
 
+  // Gửi request có token để lấy thông tin bệnh nhân
   getPatientByToken: async () => {
     try {
       const token = localStorage.getItem("token");
-       if (!token) {
-      return { medicalRecordID: "" };
-    }
-      const response = await fetch(`${BASE_URL}/patients/by-token`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
-      const result = await response.json();
-      
-      console.log("API response:", result);
+      if (!token) {
+        return { medicalRecordID: "" };
+      }
 
-      return result.data;
+      const response = await axiosClient.post("/patients/by-token");
+      console.log("API response:", response.data);
+      return response.data.data;
     } catch (error) {
-      console.error(`Error fetching patient data:`, error);
+      console.error("Error fetching patient data:", error);
       throw error;
     }
   },

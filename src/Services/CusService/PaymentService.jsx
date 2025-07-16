@@ -26,6 +26,30 @@ const paymentService =  {
       throw error;
     }
   },
+  fundWallet: async (data) => { 
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${BASE_URL}/payments/fund-wallet`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ amount: data.amount }), // Sử dụng 'amount' theo yêu cầu API
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || result.statusCode !== 201) {
+        throw new Error(result.message || "Failed to fund wallet");
+      }
+
+      return result.data; // Trả về dữ liệu từ response
+    } catch (error) {
+      console.error("Error funding wallet:", error.message);
+      throw error;
+    }
+  },
     payWithWallet: async (data) => {
   try {
     const token = localStorage.getItem("token");

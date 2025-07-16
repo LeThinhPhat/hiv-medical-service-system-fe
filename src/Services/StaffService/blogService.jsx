@@ -1,28 +1,20 @@
-import axios from "axios";
-
-const API_URL = "http://localhost:3000/blogPosts";
-
+import axiosClient from "../api.config";
 const blogService = {
   // Lấy tất cả bài viết
   getAllBlogPosts: async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const res = await axios.get(API_URL, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return res.data.data; // hoặc res.data tùy theo API trả về
-  } catch (err) {
-    console.error("Lỗi khi lấy danh sách BlogPosts:", err);
-    throw err;
-  }
-}
-,
+    try {
+      const res = await axiosClient.get("/blogPosts");
+      return res.data.data;
+    } catch (err) {
+      console.error("Lỗi khi lấy danh sách BlogPosts:", err);
+      throw err;
+    }
+  },
+
   // Lấy chi tiết bài viết theo ID
   getBlogPostById: async (id) => {
     try {
-      const res = await axios.get(`${API_URL}/${id}`);
+      const res = await axiosClient.get(`/blogPosts/${id}`);
       return res.data.data;
     } catch (err) {
       console.error(`Lỗi khi lấy BlogPost ID ${id}:`, err);
@@ -31,13 +23,9 @@ const blogService = {
   },
 
   // Tạo bài viết mới
-  createBlogPost: async (data, token) => {
+  createBlogPost: async (data) => {
     try {
-      const res = await axios.post(API_URL, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axiosClient.post("/blogPosts", data);
       return res.data.data;
     } catch (err) {
       console.error("Lỗi khi tạo BlogPost:", err);
@@ -46,13 +34,9 @@ const blogService = {
   },
 
   // Cập nhật bài viết (PATCH)
-  updateBlogPost: async (id, data, token) => {
+  updateBlogPost: async (id, data) => {
     try {
-      const res = await axios.patch(`${API_URL}/${id}`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axiosClient.patch(`/blogPosts/${id}`, data);
       return res.data.data;
     } catch (err) {
       console.error(`Lỗi khi cập nhật BlogPost ID ${id}:`, err);
@@ -61,13 +45,9 @@ const blogService = {
   },
 
   // Xoá bài viết
-  deleteBlogPost: async (id, token) => {
+  deleteBlogPost: async (id) => {
     try {
-      const res = await axios.delete(`${API_URL}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axiosClient.delete(`/blogPosts/${id}`);
       return res.data.message || "Xóa thành công";
     } catch (err) {
       console.error(`Lỗi khi xoá BlogPost ID ${id}:`, err);

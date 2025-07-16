@@ -203,7 +203,7 @@ const DetailDoctor = () => {
 
                   <Button
                     component={Link}
-                    to="/docs"
+                    to="/booking"
                     variant="outlined"
                     color="primary"
                     sx={{

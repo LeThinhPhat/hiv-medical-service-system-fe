@@ -8,6 +8,8 @@ const authService = {
      forgotPassword: (email) => axiosClient.post("/auth/forgot-password", { email }),
        resetPassword: (token, newPassword) =>
     axiosClient.post("/auth/reset-password", { token, newPassword }),
+      changePassword: (oldPassword, newPassword) =>
+    axiosClient.post("/auth/change-password", { oldPassword, newPassword }),
 };
     
 

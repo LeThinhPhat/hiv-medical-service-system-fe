@@ -77,127 +77,118 @@ const ListDoctor = () => {
       <Container maxWidth="lg">
         {/* Header */}
         <Box sx={{ mb: 6, textAlign: "center" }}>
-          <Typography
-            variant="h3"
-            fontWeight={700}
-            sx={{
-              color: "#1976d2",
-              mb: 1,
-              fontSize: { xs: "2rem", md: "3rem" },
-              textShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            }}
-          >
-            Đội ngũ bác sĩ chuyên khoa
-          </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: "1rem", md: "1.2rem" } }}>
             Tìm kiếm bác sĩ phù hợp với nhu cầu của bạn
           </Typography>
         </Box>
 
-        {/* Search Filter */}
-        <Paper
-          elevation={4}
-          sx={{
-            p: 3,
-            borderRadius: 3,
-            mb: 4,
-            bgcolor: "white",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-          }}
-        >
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={2}
-            alignItems="center"
-            justifyContent="center"
+       
+       <Paper
+            elevation={4}
+            sx={{
+              p: 3,
+              borderRadius: 3,
+              mb: 4,
+              bgcolor: "white",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+            }}
           >
-            <TextField
-              label="Tìm kiếm bác sĩ"
-              variant="outlined"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: <SearchIcon color="action" sx={{ mr: 1 }} />,
-                endAdornment: searchTerm && (
-                  <IconButton onClick={() => setSearchTerm("")} size="small">
-                    <ClearIcon />
-                  </IconButton>
-                ),
-              }}
-              sx={{
-                flex: 1,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 3,
-                  bgcolor: "white",
-                  "&:hover fieldset": { borderColor: "#1976d2" },
-                },
-              }}
-            />
-            <TextField
-              select
-              label="Chuyên khoa"
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-              sx={{
-                flex: 1,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 3,
-                  bgcolor: "white",
-                  "&:hover fieldset": { borderColor: "#1976d2" },
-                },
-              }}
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              alignItems="center"
+              justifyContent="center"
+              flexWrap="wrap"
             >
-              {departments.map((dept, idx) => (
-                <MenuItem key={idx} value={dept}>
-                  {dept}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Stack direction="row" spacing={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<SearchIcon />}
-                sx={{
-                  height: 56,
-                  px: 4,
-                  borderRadius: 3,
-                  fontWeight: 600,
-                  textTransform: "none",
-                  bgcolor: "#1976d2",
-                  "&:hover": {
-                    bgcolor: "#1565c0",
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                  },
-                }}
-              >
-                Tìm kiếm
-              </Button>
-              <Button
+              <TextField
+                label="Tìm kiếm bác sĩ"
                 variant="outlined"
-                color="secondary"
-                startIcon={<ClearIcon />}
-                onClick={handleReset}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: <SearchIcon color="action" sx={{ mr: 1 }} />,
+                  endAdornment: searchTerm && (
+                    <IconButton onClick={() => setSearchTerm("")} size="small">
+                      <ClearIcon />
+                    </IconButton>
+                  ),
+                }}
                 sx={{
-                  height: 56,
-                  px: 4,
-                  borderRadius: 3,
-                  fontWeight: 600,
-                  textTransform: "none",
-                  "&:hover": {
-                    borderColor: "#d81b60",
-                    color: "#d81b60",
+                  width: { xs: "100%", sm: 250 },
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 3,
+                    bgcolor: "white",
+                    "&:hover fieldset": { borderColor: "#1976d2" },
+                  },
+                }}
+              />
+              <TextField
+                select
+                label="Chuyên khoa"
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
+                sx={{
+                  width: { xs: "100%", sm: 200 },
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 3,
+                    bgcolor: "white",
+                    "&:hover fieldset": { borderColor: "#1976d2" },
                   },
                 }}
               >
-                Xóa bộ lọc
-              </Button>
+                {departments.map((dept, idx) => (
+                  <MenuItem key={idx} value={dept}>
+                    {dept}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Stack direction="row" spacing={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<SearchIcon />}
+                  sx={{
+                    minWidth: 120,
+                    height: 56,
+                    px: 2,
+                    borderRadius: 3,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    bgcolor: "#1976d2",
+                    "&:hover": {
+                      bgcolor: "#1565c0",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    },
+                  }}
+                >
+                  Tìm kiếm
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  startIcon={<ClearIcon />}
+                  onClick={handleReset}
+                  sx={{
+                    minWidth: 120,
+                    height: 56,
+                    px: 2,
+                    borderRadius: 3,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    "&:hover": {
+                      borderColor: "#d81b60",
+                      color: "#d81b60",
+                    },
+                  }}
+                >
+                  Xóa bộ lọc
+                </Button>
+              </Stack>
             </Stack>
-          </Stack>
-        </Paper>
+          </Paper>
 
-        {/* Doctor List */}
+  
         <Paper elevation={0} sx={{ p: { xs: 2, md: 4 }, borderRadius: 3, bgcolor: "transparent" }}>
           {loading ? (
             <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>

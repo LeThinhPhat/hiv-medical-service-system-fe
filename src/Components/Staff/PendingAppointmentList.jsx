@@ -16,8 +16,9 @@ const PendingAppointmentList = () => {
   const [recordsPerPage] = useState(10);
   const [searchDate, setSearchDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [searchPatient, setSearchPatient] = useState("");
-  const [showModal, setShowModal] = useState(null);
+  const [showModal, setShowModal] = useState(null); // Handles both approve and cancel modals
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [cancelReason, setCancelReason] = useState(""); // For cancel reason input
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
   const [loading, setLoading] = useState(false);
 
@@ -79,14 +80,18 @@ const PendingAppointmentList = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
-  const openModal = (appointment) => {
+  const openModal = (appointment, modalType) => {
     setSelectedAppointment(appointment);
-    setShowModal("approve");
+    setShowModal(modalType); // "approve" or "cancel"
+    if (modalType === "cancel") {
+      setCancelReason(""); // Reset cancel reason for new cancellation
+    }
   };
 
   const closeModal = () => {
     setSelectedAppointment(null);
     setShowModal(null);
+    setCancelReason("");
     setLoading(false);
   };
 
@@ -100,6 +105,28 @@ const PendingAppointmentList = () => {
     } catch (error) {
       console.error("Lỗi khi duyệt lịch:", error);
       showToast("Duyệt lịch thất bại!", "error");
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitCancel = async () => {
+    if (!cancelReason.trim()) {
+      showToast("Vui lòng nhập lý do hủy!", "error");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await appointmentlistService.cancelAppointment(
+        selectedAppointment._id,
+        cancelReason
+      );
+      await fetchAppointments();
+      closeModal();
+      showToast("Đã hủy lịch hẹn thành công!", "success");
+    } catch (error) {
+      console.error("Lỗi khi hủy lịch:", error);
+      showToast("Hủy lịch thất bại!", "error");
       setLoading(false);
     }
   };
@@ -221,12 +248,18 @@ const PendingAppointmentList = () => {
                     <td className="p-4 border-b">{date}</td>
                     <td className="p-4 border-b">{startTime}</td>
                     <td className="p-4 border-b">{service}</td>
-                    <td className="p-4 border-b text-center">
+                    <td className="p-4 border-b text-center flex gap-2 justify-center">
                       <button
-                        className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-1.5 rounded-full hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium shadow-sm flex items-center gap-2 justify-center mx-auto"
-                        onClick={() => openModal(item)}
+                        className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-1.5 rounded-full hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium flex items-center gap-2"
+                        onClick={() => openModal(item, "approve")}
                       >
                         <FaCheck /> Duyệt
+                      </button>
+                      <button
+                        className="text-red-600 border border-red-400 px-3 py-1.5 rounded-full hover:bg-red-50 hover:text-red-700 hover:border-red-500 transition-all duration-200 font-medium"
+                        onClick={() => openModal(item, "cancel")}
+                      >
+                        Hủy Hẹn
                       </button>
                     </td>
                   </tr>
@@ -310,6 +343,48 @@ const PendingAppointmentList = () => {
                     <FaCheck />
                   )}
                   {loading ? "Đang xử lý..." : "Xác nhận"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Cancel Appointment Modal */}
+        {showModal === "cancel" && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 transition-opacity duration-300 animate-in fade-in">
+            <div className="bg-white/95 backdrop-blur-md p-6 rounded-2xl shadow-2xl w-full max-w-md border border-gray-100/50">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Nhập Lý Do Hủy
+              </h3>
+              <textarea
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/80 text-gray-700 placeholder-gray-400 resize-none"
+                rows={4}
+                placeholder="Nhập lý do hủy..."
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+              />
+              <div className="flex justify-end gap-3 mt-4">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all duration-200 font-medium"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={handleSubmitCancel}
+                  disabled={loading}
+                  className={`px-4 py-2 bg-red-600 text-white rounded-full transition-all duration-200 font-medium flex items-center gap-2 ${
+                    loading
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-red-700"
+                  }`}
+                >
+                  {loading ? (
+                    <FaSpinner className="animate-spin" />
+                  ) : (
+                    <FaTimes />
+                  )}
+                  {loading ? "Đang xử lý..." : "Xác Nhận Hủy"}
                 </button>
               </div>
             </div>

@@ -14,13 +14,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import PersonIcon from "@mui/icons-material/Person";
@@ -32,6 +27,9 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
+import LockIcon from "@mui/icons-material/Lock";
+import authService from "../Services/authService";
+import TransactionHistoryDialog from "./TransactionHistoryDialog";
 import paymentService from "../Services/CusService/PaymentService";
 
 export const PatientInfoField = ({ label, value, icon, editMode, fieldKey, handleChange, editable = true, onClick }) => (
@@ -112,34 +110,125 @@ export const PatientInfoField = ({ label, value, icon, editMode, fieldKey, handl
 
 const PatientInfo = ({ user, walletBalance, editMode, setEditMode, formValues, handleChange, handleSave }) => {
   const [openTransactionDialog, setOpenTransactionDialog] = useState(false);
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const handleOpenTransactionDialog = async () => {
+  const [openWalletOptionsDialog, setOpenWalletOptionsDialog] = useState(false);
+  const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
+  const [openAddFundsDialog, setOpenAddFundsDialog] = useState(false);
+  const [addFundsAmount, setAddFundsAmount] = useState("");
+  const [passwordValues, setPasswordValues] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordError, setPasswordError] = useState(null);
+  const [toast, setToast] = useState({ open: false, message: "", severity: "success" });
+  const [currentBalance, setCurrentBalance] = useState(walletBalance);
+
+  const handleOpenWalletOptionsDialog = () => {
+    setOpenWalletOptionsDialog(true);
+  };
+
+  const handleCloseWalletOptionsDialog = () => {
+    setOpenWalletOptionsDialog(false);
+  };
+
+  const handleOpenTransactionDialog = () => {
+    setOpenWalletOptionsDialog(false);
     setOpenTransactionDialog(true);
-    setLoading(true);
-    setError(null);
-    try {
-      const transactionData = await paymentService.getPatientTransactions();
-      setTransactions(transactionData);
-    } catch (err) {
-      setError("Không thể tải lịch sử giao dịch. Vui lòng thử lại.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleCloseTransactionDialog = () => {
     setOpenTransactionDialog(false);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
+  const handleOpenAddFundsDialog = () => {
+    setOpenWalletOptionsDialog(false);
+    setOpenAddFundsDialog(true);
+    setAddFundsAmount("");
+  };
+
+  const handleCloseAddFundsDialog = () => {
+    setOpenAddFundsDialog(false);
+  };
+
+  const handleAddFunds = async () => {
+    const amount = parseFloat(addFundsAmount);
+    if (isNaN(amount) || amount <= 0) {
+      setToast({
+        open: true,
+        message: "Vui lòng nhập số tiền hợp lệ.",
+        severity: "error",
+      });
+      return;
+    }
+    try {
+      const data = await paymentService.fundWallet({ amount });
+      const redirectUrl = data; 
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        setCurrentBalance((prev) => prev + amount); 
+        setToast({
+          open: true,
+          message: `Nạp ${amount.toLocaleString("vi-VN")} VNĐ thành công!`,
+          severity: "success",
+        });
+      }
+    } catch (error) {
+      setToast({
+        open: true,
+        message: error.message || "Nạp tiền thất bại. Vui lòng thử lại.",
+        severity: "error",
+      });
+    }
+    handleCloseAddFundsDialog();
+  };
+
+  const handleOpenPasswordDialog = () => {
+    setOpenPasswordDialog(true);
+    setPasswordError(null);
+    setPasswordValues({ oldPassword: "", newPassword: "", confirmPassword: "" });
+  };
+
+  const handleClosePasswordDialog = () => {
+    setOpenPasswordDialog(false);
+  };
+
+  const handlePasswordChange = (field) => (event) => {
+    setPasswordValues({ ...passwordValues, [field]: event.target.value });
+  };
+
+  const handleCloseToast = () => {
+    setToast({ ...toast, open: false });
+  };
+
+  const handlePasswordSave = async () => {
+    if (passwordValues.newPassword !== passwordValues.confirmPassword) {
+      setPasswordError("Mật khẩu mới và xác nhận mật khẩu không khớp.");
+      setToast({
+        open: true,
+        message: "Mật khẩu mới và xác nhận mật khẩu không khớp.",
+        severity: "error",
+      });
+      return;
+    }
+    try {
+      await authService.changePassword(passwordValues.oldPassword, passwordValues.newPassword);
+      setPasswordError(null);
+      setToast({
+        open: true,
+        message: "Đổi mật khẩu thành công!",
+        severity: "success",
+      });
+      handleClosePasswordDialog();
+    } catch (err) {
+      setPasswordError("Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu cũ.");
+      setToast({
+        open: true,
+        message: "Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu cũ.",
+        severity: "error",
+      });
+      console.error(err);
+    }
   };
 
   return (
@@ -223,53 +312,73 @@ const PatientInfo = ({ user, walletBalance, editMode, setEditMode, formValues, h
             )
           }
           action={
-            editMode ? (
-              <Box sx={{ display: "flex", gap: 1 }}>
-                <Button 
-                  variant="contained" 
-                  startIcon={<SaveIcon />}
-                  onClick={handleSave} 
-                  sx={{ 
-                    bgcolor: "#0277bd",
-                    "&:hover": { bgcolor: "#01579b" }
-                  }}
-                >
-                  Lưu
-                </Button>
-                <Button 
-                  variant="outlined" 
-                  startIcon={<CancelIcon />}
-                  onClick={() => setEditMode(false)}
-                  sx={{ 
-                    borderColor: "#616161",
-                    color: "#616161",
-                    "&:hover": { 
-                      borderColor: "#424242",
-                      color: "#424242"
-                    }
-                  }}
-                >
-                  Hủy
-                </Button>
-              </Box>
-            ) : (
-              <Button 
-                variant="outlined" 
-                startIcon={<EditIcon />} 
-                onClick={() => setEditMode(true)} 
-                sx={{ 
-                  borderColor: "#0277bd",
-                  color: "#0277bd",
-                  "&:hover": { 
-                    borderColor: "#01579b",
-                    color: "#01579b",
-                    bgcolor: "#f3f8ff"
-                  }
-                }}
-              >
-                Chỉnh sửa
-              </Button>
-            )
+            <Box sx={{ display: "flex", gap: 1 }}>
+              {editMode ? (
+                <>
+                  <Button 
+                    variant="contained" 
+                    startIcon={<SaveIcon />}
+                    onClick={handleSave} 
+                    sx={{ 
+                      bgcolor: "#0277bd",
+                      "&:hover": { bgcolor: "#01579b" }
+                    }}
+                  >
+                    Lưu
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    startIcon={<CancelIcon />}
+                    onClick={() => setEditMode(false)}
+                    sx={{ 
+                      borderColor: "#616161",
+                      color: "#616161",
+                      "&:hover": { 
+                        borderColor: "#424242",
+                        color: "#424242"
+                      }
+                    }}
+                  >
+                    Hủy
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="outlined" 
+                    startIcon={<EditIcon />} 
+                    onClick={() => setEditMode(true)} 
+                    sx={{ 
+                      borderColor: "#0277bd",
+                      color: "#0277bd",
+                      "&:hover": { 
+                        borderColor: "#01579b",
+                        color: "#01579b",
+                        bgcolor: "#f3f8ff"
+                      }
+                    }}
+                  >
+                    Chỉnh sửa
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    startIcon={<LockIcon />} 
+                    onClick={handleOpenPasswordDialog}
+                    sx={{ 
+                      borderColor: "#0277bd",
+                      color: "#0277bd",
+                      "&:hover": { 
+                        borderColor: "#01579b",
+                        color: "#01579b",
+                        bgcolor: "#f3f8ff"
+                      }
+                    }}
+                  >
+                    Đổi mật khẩu
+                  </Button>
+                </>
+              )}
+            </Box>
           }
         />
         
@@ -303,7 +412,7 @@ const PatientInfo = ({ user, walletBalance, editMode, setEditMode, formValues, h
             },
             { 
               label: "Số dư ví", 
-              value: walletBalance.toLocaleString("vi-VN") + " VNĐ", 
+              value: currentBalance.toLocaleString("vi-VN") + " VNĐ", 
               key: "walletBalance", 
               icon: <AccountBalanceWalletIcon sx={{ color: "#0277bd" }} />,
               editable: false
@@ -318,74 +427,163 @@ const PatientInfo = ({ user, walletBalance, editMode, setEditMode, formValues, h
               fieldKey={item.key}
               handleChange={handleChange}
               editable={item.editable}
-              onClick={item.key === "walletBalance" ? handleOpenTransactionDialog : undefined}
+              onClick={item.key === "walletBalance" ? handleOpenWalletOptionsDialog : undefined}
             />
           ))}
         </Grid>
 
         <Dialog
-          open={openTransactionDialog}
-          onClose={handleCloseTransactionDialog}
-          maxWidth="md"
+          open={openWalletOptionsDialog}
+          onClose={handleCloseWalletOptionsDialog}
+          maxWidth="sm"
           fullWidth
         >
           <DialogTitle sx={{ bgcolor: "#0277bd", color: "white" }}>
-            Lịch sử giao dịch
+            Quản lý ví
           </DialogTitle>
-          <DialogContent>
-            {loading ? (
-              <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
-                <CircularProgress sx={{ color: "#0277bd" }} />
-              </Box>
-            ) : error ? (
-              <Typography color="error" sx={{ p: 3 }}>
-                {error}
-              </Typography>
-            ) : transactions.length === 0 ? (
-              <Typography sx={{ p: 3 }}>
-                Không có giao dịch nào.
-              </Typography>
-            ) : (
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Ngày</TableCell>
-                      <TableCell>Loại giao dịch</TableCell>
-                      <TableCell>Số tiền</TableCell>
-                      <TableCell>Lý do</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {transactions.map((transaction) => (
-                      <TableRow key={transaction._id}>
-                        <TableCell>{formatDate(transaction.createdAt)}</TableCell>
-                        <TableCell>{transaction.type}</TableCell>
-                        <TableCell 
-                        sx={{ 
-                            color: transaction.type === "Giao dịch thanh toán" ? "red" : 
-                                transaction.type === "Giao dịch hoàn trả" ? "green" : "inherit"
-                        }}
-                        >
-                        {transaction.amount.toLocaleString("vi-VN")} VNĐ
-                        </TableCell>
-                        <TableCell>{transaction.reason}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
+          <DialogContent sx={{ mt: 2 }}>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              Vui lòng chọn một tùy chọn:
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Button 
+                variant="contained"
+                onClick={handleOpenTransactionDialog}
+                sx={{ bgcolor: "#0277bd", "&:hover": { bgcolor: "#01579b" } }}
+              >
+                Xem lịch sử ví
+              </Button>
+              <Button 
+                variant="contained"
+                onClick={handleOpenAddFundsDialog}
+                sx={{ bgcolor: "#0277bd", "&:hover": { bgcolor: "#01579b" } }}
+              >
+                Nạp tiền vào ví
+              </Button>
+            </Box>
           </DialogContent>
           <DialogActions>
             <Button 
-              onClick={handleCloseTransactionDialog} 
+              onClick={handleCloseWalletOptionsDialog} 
               sx={{ color: "#0277bd" }}
             >
-              Đóng
+              Hủy
             </Button>
           </DialogActions>
         </Dialog>
+
+        <Dialog
+          open={openAddFundsDialog}
+          onClose={handleCloseAddFundsDialog}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle sx={{ bgcolor: "#0277bd", color: "white" }}>
+            Nạp tiền vào ví
+          </DialogTitle>
+          <DialogContent sx={{ mt: 2 }}>
+            <TextField
+              label="Số tiền (VNĐ)"
+              type="number"
+              fullWidth
+              value={addFundsAmount}
+              onChange={(e) => setAddFundsAmount(e.target.value)}
+              sx={{ mb: 2, "& .MuiOutlinedInput-root": { "&.Mui-focused fieldset": { borderColor: "#0277bd" } } }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button 
+              onClick={handleCloseAddFundsDialog} 
+              sx={{ color: "#0277bd" }}
+            >
+              Hủy
+            </Button>
+            <Button 
+              variant="contained"
+              onClick={handleAddFunds}
+              sx={{ bgcolor: "#0277bd", "&:hover": { bgcolor: "#01579b" } }}
+            >
+              Nạp tiền
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <TransactionHistoryDialog
+          open={openTransactionDialog}
+          onClose={handleCloseTransactionDialog}
+        />
+
+        <Dialog
+          open={openPasswordDialog}
+          onClose={handleClosePasswordDialog}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle sx={{ bgcolor: "#0277bd", color: "white" }}>
+            Đổi mật khẩu
+          </DialogTitle>
+          <DialogContent sx={{ mt: 2 }}>
+            {passwordError && (
+              <Typography color="error" sx={{ mb: 2 }}>
+                {passwordError}
+              </Typography>
+            )}
+            <TextField
+              label="Mật khẩu cũ"
+              type="password"
+              fullWidth
+              value={passwordValues.oldPassword}
+              onChange={handlePasswordChange("oldPassword")}
+              sx={{ mb: 2, "& .MuiOutlinedInput-root": { "&.Mui-focused fieldset": { borderColor: "#0277bd" } } }}
+            />
+            <TextField
+              label="Mật khẩu mới"
+              type="password"
+              fullWidth
+              value={passwordValues.newPassword}
+              onChange={handlePasswordChange("newPassword")}
+              sx={{ mb: 2, "& .MuiOutlinedInput-root": { "&.Mui-focused fieldset": { borderColor: "#0277bd" } } }}
+            />
+            <TextField
+              label="Xác nhận mật khẩu mới"
+              type="password"
+              fullWidth
+              value={passwordValues.confirmPassword}
+              onChange={handlePasswordChange("confirmPassword")}
+              sx={{ "& .MuiOutlinedInput-root": { "&.Mui-focused fieldset": { borderColor: "#0277bd" } } }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button 
+              onClick={handleClosePasswordDialog} 
+              sx={{ color: "#0277bd" }}
+            >
+              Hủy
+            </Button>
+            <Button 
+              variant="contained"
+              onClick={handlePasswordSave}
+              sx={{ bgcolor: "#0277bd", "&:hover": { bgcolor: "#01579b" } }}
+            >
+              Lưu
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Snackbar
+          open={toast.open}
+          autoHideDuration={6000}
+          onClose={handleCloseToast}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleCloseToast}
+            severity={toast.severity}
+            sx={{ width: "100%" }}
+          >
+            {toast.message}
+          </Alert>
+        </Snackbar>
       </Paper>
     </Fade>
   );

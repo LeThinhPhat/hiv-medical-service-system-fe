@@ -65,14 +65,19 @@ const BookingPage = () => {
         const result = await ServicesService.getAllService();
         const patient = JSON.parse(localStorage.getItem("patient"));
 
-        let filteredServices = result;
-        if (!patient || !patient.medicalRecordID || patient.medicalRecordID.length === 0) {
-          filteredServices = result.filter(
-            (service) =>
-              service.name && service.name.toLowerCase().includes("tổng quát")
-          );
-        }
+          let filteredServices = result.filter(
+        (service) =>
+          service.name &&
+          service.name.toLowerCase() !== "đăng kí khám ẩn danh" // Ẩn dịch vụ ẩn danh
+      );
 
+      if (!patient || !patient.medicalRecordID || patient.medicalRecordID.length === 0) {
+        filteredServices = filteredServices.filter(
+          (service) =>
+            service.name &&
+            service.name.toLowerCase().includes("khám và")
+        );
+      }
         setServices(filteredServices);
       } catch (err) {
         console.error("Error fetching services:", err);

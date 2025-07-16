@@ -18,7 +18,7 @@ import { LocalizationProvider, DateCalendar } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import doctorSlotService from "../../../Services/doctorSlotService";
 
-// Chỉ định dạng giờ từ chuỗi ISO mà không điều chỉnh múi giờ
+// Định dạng giờ từ chuỗi ISO mà không điều chỉnh múi giờ
 function formatTime(iso) {
   const dateObj = new Date(iso);
   const hour = dateObj.getUTCHours().toString().padStart(2, "0");
@@ -26,16 +26,26 @@ function formatTime(iso) {
   return `${hour}:${minute}`;
 }
 
-// Chia slot thành ca sáng/chiều, trả về dạng { Sáng: [giờ], Chiều: [giờ] }
-function splitSlotsByPeriod(slots) {
+// Chia slot thành ca sáng/chiều, và ẩn những slot đã qua nếu là hôm nay
+function splitSlotsByPeriod(slots, selectedDate) {
   const morning = [];
   const afternoon = [];
+  const now = new Date();
+
+  const isToday = selectedDate.toDateString() === now.toDateString();
+
   slots.forEach((iso) => {
-    const hour = new Date(iso).getUTCHours();
+    const dateObj = new Date(iso);
+
+    // Nếu là hôm nay và slot < thời gian hiện tại thì bỏ qua
+    if (isToday && dateObj <= now) return;
+
+    const hour = dateObj.getUTCHours();
     const time = formatTime(iso);
     if (hour >= 7 && hour <= 11) morning.push(time);
     else if (hour >= 13 && hour <= 17) afternoon.push(time);
   });
+
   return { Sáng: morning, Chiều: afternoon };
 }
 
@@ -48,6 +58,7 @@ const Step2 = ({ open, onClose, onNext, onBack, data }) => {
 
   useEffect(() => {
     if (!selectedDate || !data.service._id) return;
+
     const fetchSlots = async () => {
       setLoading(true);
       setError(null);
@@ -57,8 +68,7 @@ const Step2 = ({ open, onClose, onNext, onBack, data }) => {
           data.service._id,
           dateStr
         );
-        console.log("Fetched slots:", apiSlots.data);
-        setSlots(splitSlotsByPeriod(apiSlots.data || []));
+        setSlots(splitSlotsByPeriod(apiSlots.data || [], selectedDate));
       } catch (err) {
         setError("Không thể tải khung giờ. Vui lòng thử lại.",err);
         setSlots({ Sáng: [], Chiều: [] });
@@ -66,6 +76,7 @@ const Step2 = ({ open, onClose, onNext, onBack, data }) => {
         setLoading(false);
       }
     };
+
     fetchSlots();
   }, [selectedDate, data.service._id]);
 
@@ -117,6 +128,7 @@ const Step2 = ({ open, onClose, onNext, onBack, data }) => {
           <CloseIcon sx={{ fontSize: 32 }} />
         </IconButton>
       </DialogTitle>
+
       <DialogContent dividers sx={{ p: 5, backgroundColor: "#fff" }}>
         <Grid container spacing={4}>
           {/* Calendar */}
@@ -157,6 +169,7 @@ const Step2 = ({ open, onClose, onNext, onBack, data }) => {
               </LocalizationProvider>
             </Card>
           </Grid>
+
           {/* Time Slots */}
           <Grid item xs={12} md={8}>
             <Card
@@ -205,7 +218,8 @@ const Step2 = ({ open, onClose, onNext, onBack, data }) => {
                                 minHeight: 48,
                                 borderRadius: 2,
                                 borderColor: "#e0e0e0",
-                                backgroundColor: selectedTime === time ? "#1976d2" : "#fff",
+                                backgroundColor:
+                                  selectedTime === time ? "#1976d2" : "#fff",
                                 color: selectedTime === time ? "#fff" : "#374151",
                                 fontSize: "1.1rem",
                                 "&:hover": {
@@ -244,6 +258,7 @@ const Step2 = ({ open, onClose, onNext, onBack, data }) => {
           </Alert>
         )}
       </DialogContent>
+
       <DialogActions
         sx={{
           p: 4,
