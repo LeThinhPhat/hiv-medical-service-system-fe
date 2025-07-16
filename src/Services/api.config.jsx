@@ -9,8 +9,9 @@ const axiosClient = axios.create({
   },
 });
 
-const handleRequestSuccess = async (config) => {
-  const token = Cookies.get("token");
+// Thêm token vào header nếu có
+const handleRequestSuccess = (config) => {
+  const token = localStorage.getItem('token');  // Sử dụng localStorage thay cho Cookies
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -19,69 +20,30 @@ const handleRequestSuccess = async (config) => {
   return config;
 };
 
-const handleRequestErr = (err) => {
-  console.error("Request Error:", err);
-  return Promise.reject(err);
+const handleRequestError = (error) => {
+  console.error("Request Error:", error);
+  return Promise.reject(error);
 };
 
-const handleResponseSuccess = (res) => res;
+// Xử lý phản hồi thành công
+const handleResponseSuccess = (response) => response;
 
-const handleResponseErr = async (err) => {
-  if (!err.response || !err.response.status) {
-    console.error("Unknown error:", err);
-    return Promise.reject(err);
+// Xử lý phản hồi lỗi
+const handleResponseError = (error) => {
+  console.error("Response Error:", error);
+
+  // Nếu muốn, bạn có thể kiểm tra 401 và chuyển người dùng về trang đăng nhập:
+  if (error.response && error.response.status === 401) {
+    Cookies.remove("token");
+    Cookies.remove("refreshToken");
+    // window.location.href = "/login"; // Bỏ comment nếu muốn chuyển hướng khi token hết hạn
   }
 
-  const originalRequest = err.config;
-
-  if (err.response.status === 401 && !originalRequest._retry) {
-    originalRequest._retry = true;
-    const refreshToken = Cookies.get("refreshToken");
-
-    if (!refreshToken) {
-      console.warn("No refresh token available");
-      Cookies.remove("token");
-      Cookies.remove("refreshToken");
-      return Promise.reject(err);
-    }
-
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/refresh-token`,
-        {
-          token: refreshToken,
-        },
-      );
-
-      const newAccessToken = res.data.accessToken;
-      Cookies.set("token", newAccessToken); // Lưu token mới vào Cookies
-      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
-      return axiosClient(originalRequest); // Gửi lại request ban đầu
-    } catch (error) {
-      console.error("Failed to refresh token:", error);
-      Cookies.remove("token");
-      Cookies.remove("refreshToken");
-
-      return Promise.reject(error);
-    }
-  }
-
-  return Promise.reject(err);
+  return Promise.reject(error);
 };
 
-axiosClient.interceptors.request.use(
-  (config) => {
-    const token = Cookies.get("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
-
-axiosClient.interceptors.request.use(handleRequestSuccess, handleRequestErr);
-axiosClient.interceptors.response.use(handleResponseSuccess, handleResponseErr);
+// Cấu hình interceptors
+axiosClient.interceptors.request.use(handleRequestSuccess, handleRequestError);
+axiosClient.interceptors.response.use(handleResponseSuccess, handleResponseError);
 
 export default axiosClient;

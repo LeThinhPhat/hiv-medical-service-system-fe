@@ -1,17 +1,11 @@
-import axios from "axios";
-
-const API_URL = "http://localhost:3000/doctorSlots";
+import axiosClient from "../api.config"; 
 
 const doctorslotService = {
   // Lấy tất cả slot khám
   getAllDoctorSlots: async () => {
     try {
-      const response = await axios.get(API_URL, {
-        headers: {
-          Accept: "*/*",
-        },
-      });
-      return response.data.data; // hoặc response.data nếu cần toàn bộ
+      const response = await axiosClient.get("/doctorSlots");
+      return response.data.data;
     } catch (error) {
       console.error("Lỗi khi lấy danh sách doctor slots:", error);
       throw error;
@@ -19,14 +13,9 @@ const doctorslotService = {
   },
 
   // Lấy chi tiết 1 slot theo ID
-  getDoctorSlotById: async (id, token) => {
+  getDoctorSlotById: async (id) => {
     try {
-      const response = await axios.get(`${API_URL}/${id}`, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`, // Truyền token để xác thực nếu cần
-        },
-      });
+      const response = await axiosClient.get(`/doctorSlots/${id}`);
       return response.data.data;
     } catch (error) {
       console.error("Lỗi khi lấy thông tin slot:", error);

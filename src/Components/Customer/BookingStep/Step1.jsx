@@ -44,7 +44,7 @@ const Step1Dialog = ({ open, onClose, onNext, data, getAllService }) => {
         filteredServices = filteredServices.filter(
           (service) =>
             service.name &&
-            service.name.toLowerCase().includes("tổng quát")
+            service.name.toLowerCase().includes("khám và")
         );
       }
 

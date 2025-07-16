@@ -43,7 +43,7 @@ const Header = () => {
           <Link to="/" className="hover:text-blue-700 transition">Trang chủ</Link>
           <Link to="/about" className="hover:text-blue-700 transition">Giới thiệu</Link>
           <Link to="/booking" className="hover:text-blue-700 transition">Đặt lịch khám</Link>
-          <Link to="/docs" className="hover:text-blue-700 transition">Đội ngũ bác sĩ</Link>
+          <Link to="/services" className="hover:text-blue-700 transition">Các dịch vụ</Link>
           <Link to="/blogs" className="hover:text-blue-700 transition">Blogs</Link>
         </nav>
 
