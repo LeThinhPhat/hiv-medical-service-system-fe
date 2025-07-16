@@ -194,7 +194,7 @@ const CreateTreatment = () => {
 
             {/* Xét nghiệm */}
             <h3 className="text-lg font-medium text-gray-800">
-              🧪 Kết quả xét nghiệm
+              Kết quả xét nghiệm
             </h3>
 
             {testResults.map((result, index) => (
