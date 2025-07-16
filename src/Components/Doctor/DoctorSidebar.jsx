@@ -25,11 +25,11 @@ const DoctorSidebar = () => {
           icon: <FaCalendarPlus />,
           path: "/doctor/doctorsappoinment",
         },
-        // {
-        //   label: "Doctor Appointment",
-        //   icon: <FaStethoscope />,
-        //   path: "/doctor/appointments",
-        // },
+        {
+          label: "Appointment List",
+          icon: <FaStethoscope />,
+          path: "/doctor/appointments",
+        },
       ],
     },
     // {
