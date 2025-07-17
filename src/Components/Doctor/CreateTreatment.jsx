@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom"; // 👈 Đã thêm useLocation
 import { toast } from "react-hot-toast";
 import treatmentService from "../../Services/DoctorService/treatmentService";
 import SuggestTreatment from "./SuggestTreatment";
@@ -24,7 +24,11 @@ const TestTypeLabels = {
 
 const CreateTreatment = () => {
   const { recordID } = useParams();
+  const location = useLocation(); // 👈 Lấy thông tin location
+  const appointmentId = location.state?.appointmentId || null; // 👈 Lấy appointmentId từ state
   const token = localStorage.getItem("token");
+
+  console.log("Appointment ID nhận được:", appointmentId); // ✅ Kiểm tra
 
   const [note, setNote] = useState("");
   const [testResults, setTestResults] = useState(defaultTestResults);
@@ -89,6 +93,7 @@ const CreateTreatment = () => {
       medicalRecordID: recordID,
       note,
       testResults,
+      appointmentId, // ✅ Gửi thêm appointmentId nếu cần ở backend
     };
 
     try {
@@ -110,7 +115,6 @@ const CreateTreatment = () => {
     }
   };
 
-  // Render result field
   const renderResultField = (type, value, index) => {
     const handleChange = (e) =>
       handleTestResultChange(index, "test_results", e.target.value);
@@ -170,9 +174,16 @@ const CreateTreatment = () => {
           <h2 className="text-xl font-semibold text-teal-600 mb-4">
             Tạo điều trị
           </h2>
+          {/* {appointmentId && (
+            <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-300 mb-4">
+              <p className="text-gray-700">
+                <strong className="text-yellow-800">Mã cuộc hẹn:</strong>{" "}
+                {appointmentId}
+              </p>
+            </div>
+          )} */}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Ghi chú */}
             <div>
               <label className="font-medium text-gray-800 mb-1 block">
                 Ghi chú
@@ -192,9 +203,8 @@ const CreateTreatment = () => {
               )}
             </div>
 
-            {/* Xét nghiệm */}
             <h3 className="text-lg font-medium text-gray-800">
-              🧪 Kết quả xét nghiệm
+              Kết quả xét nghiệm
             </h3>
 
             {testResults.map((result, index) => (
@@ -202,14 +212,11 @@ const CreateTreatment = () => {
                 key={index}
                 className="grid grid-cols-12 gap-4 items-center mb-2"
               >
-                {/* Loại xét nghiệm */}
                 <div className="col-span-3">
                   <p className="text-gray-700 font-medium">
                     {TestTypeLabels[result.test_type] || result.test_type}
                   </p>
                 </div>
-
-                {/* Kết quả */}
                 <div className="col-span-4">
                   {isSubmitted ? (
                     <p className="text-gray-800 border p-2 rounded-lg bg-teal-50">
@@ -223,8 +230,6 @@ const CreateTreatment = () => {
                     )
                   )}
                 </div>
-
-                {/* Mô tả */}
                 <div className="col-span-5">
                   {isSubmitted ? (
                     <p className="text-gray-800 border p-2 rounded-lg bg-teal-50">
@@ -248,7 +253,6 @@ const CreateTreatment = () => {
               </div>
             ))}
 
-            {/* Submit */}
             {!isSubmitted && (
               <div className="flex justify-end">
                 <button
@@ -288,13 +292,16 @@ const CreateTreatment = () => {
           </form>
         </div>
 
-        {/* Gợi ý điều trị */}
         <div className="md:col-span-2 bg-white p-6 rounded-2xl shadow-lg h-fit">
           <h3 className="text-xl font-semibold text-teal-600 mb-4">
             Gợi ý điều trị
           </h3>
           {treatmentID ? (
-            <SuggestTreatment treatmentID={treatmentID} token={token} />
+            <SuggestTreatment
+              treatmentID={treatmentID}
+              token={token}
+              appointmentId={appointmentId} // 👈 Truyền nếu cần dùng
+            />
           ) : (
             <p className="text-gray-500 italic">
               Vui lòng tạo điều trị để xem gợi ý...

@@ -246,6 +246,7 @@ const DoctorAppointments = () => {
                                     state: {
                                       serviceId: appt.serviceID._id,
                                       serviceName: appt.serviceID.name,
+                                      appointmentId: appt._id,
                                     },
                                   }
                                 )
@@ -253,14 +254,14 @@ const DoctorAppointments = () => {
                             >
                               Xem hồ sơ
                             </button>
-                            {appt.status !== "Đã checkout" && (
+                            {/* {appt.status !== "Đã checkout" && (
                               <button
                                 className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition"
                                 onClick={() => handleCheckout(appt._id)}
                               >
                                 Checkout
                               </button>
-                            )}
+                            )} */}
                           </td>
                         </tr>
                       ))}

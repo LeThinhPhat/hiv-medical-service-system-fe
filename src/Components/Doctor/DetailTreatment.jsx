@@ -67,9 +67,9 @@ const DetailTreatment = () => {
                         Ngày điều trị:
                       </span>
                       <span className="text-gray-600">
-                        {moment(treatment.treatmentDate).format(
-                          "DD/MM/YYYY HH:mm"
-                        )}
+                        {treatment.treatmentDate
+                          ? moment(treatment.treatmentDate).format("DD/MM/YYYY")
+                          : "N/A"}
                       </span>
                     </div>
                     <div className="flex items-center">
@@ -112,6 +112,16 @@ const DetailTreatment = () => {
                       </span>
                       <span className="text-gray-600">
                         {treatment.createdBy?.email || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="font-semibold text-gray-700 w-32">
+                        Ngày tái khám:
+                      </span>
+                      <span className="bg-yellow-200 text-gray-800 px-2 py-1 rounded">
+                        {treatment.followUpDate
+                          ? moment(treatment.followUpDate).format("DD/MM/YYYY")
+                          : "N/A"}
                       </span>
                     </div>
                   </div>

@@ -69,6 +69,7 @@ import PaymentCancelled from "../Components/Customer/PaymentCancelled";
 import Dashboard from "../Components/Staff/DashBoard";
 import ServicesPage from "../Page/ServicesPage";
 import SuccessWalletPage from "../Components/Customer/SuccessWalletPage";
+import FinishAppointment from "../Components/Doctor/FinishAppointment";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -89,7 +90,7 @@ const Router = createBrowserRouter([
       { path: "/book/:doctorId", element: <BookingPage /> },
       { path: "/booking/confirm", element: <BookingConfirmPage /> },
       { path: "/payments/vnpay-return", element: <SuccessPaymentPage /> },
-      { path: "/up-wallet-success", element: < SuccessWalletPage /> },
+      { path: "/up-wallet-success", element: <SuccessWalletPage /> },
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "docs", element: <ListDoctor /> },
       { path: "docs/:id", element: <DetailDoctor /> },
@@ -170,6 +171,10 @@ const Router = createBrowserRouter([
       {
         path: "doctorsappoinment",
         element: <DoctorAppointments />,
+      },
+      {
+        path: "appointments",
+        element: <FinishAppointment />,
       },
       // {
       //   path: "doctorsappoinment/medical-records/create/:patientID",
