@@ -47,7 +47,8 @@ const Profile = () => {
     const fetchAppointments = async () => {
       try {
         const data = await appointmentService.getAppointmentByToken();
-        setAppointments(data?.data || []);
+        console.log("Appointments:", data);
+        setAppointments(data || []);
       } catch (error) {
         console.error("Lỗi lấy lịch hẹn:", error);
       } finally {

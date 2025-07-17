@@ -6,7 +6,6 @@ const appointmentListService = {
   getAllAppointments: async () => {
     try {
       const token = localStorage.getItem("token"); 
-      console.log("token", token);
       const response = await axios.get(API_URL, {
         headers: {
             Accept: "application/json",

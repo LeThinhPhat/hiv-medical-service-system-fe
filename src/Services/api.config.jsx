@@ -11,7 +11,8 @@ const axiosClient = axios.create({
 
 // Thêm token vào header nếu có
 const handleRequestSuccess = (config) => {
-  const token = localStorage.getItem('token');  // Sử dụng localStorage thay cho Cookies
+  const token = localStorage.getItem('token');
+  console.log("Token được đính vào header:", token);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
