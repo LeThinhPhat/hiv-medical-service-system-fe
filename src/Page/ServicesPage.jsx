@@ -4,14 +4,23 @@ import ServicesService from '../Services/ServicesService';
 const ServiceCard = ({ service }) => (
   <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
     <h3 className="text-lg font-semibold text-gray-800 mb-2">{service.name}</h3>
-    <p className="text-gray-600 text-sm">
-      Giá: {service.price?.toLocaleString('vi-VN')} VND
+
+    <p className="text-gray-600 text-sm mb-1">
+      <span className="font-semibold">Giá:</span> {service.price?.toLocaleString('vi-VN')} VND
     </p>
-    <p className="text-gray-600 text-sm">
-      Thời gian: {service.durationMinutes} phút
+
+    <p className="text-gray-600 text-sm mb-1">
+      <span className="font-semibold">Thời gian:</span> {service.durationMinutes} phút
     </p>
+
+    {service.description && (
+      <p className="text-gray-600 text-sm mt-2">
+        <span className="font-semibold">Chi tiết dịch vụ:</span> {service.description}
+      </p>
+    )}
   </div>
 );
+
 
 const ServicesPage = () => {
   const [services, setServices] = useState([]);

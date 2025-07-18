@@ -33,9 +33,9 @@ const ManagerService = () => {
     setLoading(true);
     try {
       const res = await servicesManagerService.getAllServices(token);
-      if (Array.isArray(res.data.data)) {
-        setServices(res.data.data);
-        setFilteredServices(res.data.data);
+      if (Array.isArray(res.data)) {
+        setServices(res.data);
+        setFilteredServices(res.data);
       } else {
         console.error("Dữ liệu dịch vụ không hợp lệ.");
         toast.error("Dữ liệu dịch vụ không hợp lệ.");

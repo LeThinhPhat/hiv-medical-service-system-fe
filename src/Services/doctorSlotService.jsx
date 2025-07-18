@@ -41,6 +41,7 @@ const doctorSlotService = {
       );
 
       const result = response.data;
+      console.log("Fetched doctor slots:", result.data);
       if (result.statusCode !== 200) {
         throw new Error(result.message || "Failed to fetch doctor slots");
       }

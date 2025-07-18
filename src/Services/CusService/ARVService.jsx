@@ -6,7 +6,7 @@ const ARVService = {
   // Hàm lấy thông tin phác đồ điều trị theo ID
   getPrescribedRegimentById: async (id) => {
     try {
-      console.log("Using token:", token);
+      
       const response = await fetch(`${BASE_URL}/prescribedRegiments/${id}`, {
         method: "GET",
         headers: {
@@ -14,13 +14,14 @@ const ARVService = {
           "Authorization": `Bearer ${token}`,
         },
       });
-
+      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to fetch prescribed regiment");
       }
 
       const data = await response.json();
+      console.log("Fetching prescribed regiment with ID:", data);
       return data;
     } catch (error) {
       console.error("Error fetching prescribed regiment:", error.message);

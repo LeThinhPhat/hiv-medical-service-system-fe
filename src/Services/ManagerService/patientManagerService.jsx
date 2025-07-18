@@ -1,25 +1,28 @@
 // Services/ManagerService/patientManagerService.js
-import axios from "axios";
+import axiosClient from "../api.config"; // Cập nhật đường dẫn nếu cần
 
-const getAllPatients = (token) => {
-  return axios.get("http://localhost:3000/patients", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+const patientManagerService = {
+  // ✅ Lấy tất cả bệnh nhân
+  getAllPatients: async () => {
+    try {
+      const response = await axiosClient.get("/patients");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching all patients:", error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  // ✅ Lấy chi tiết bệnh nhân theo ID
+  getPatientById: async (id) => {
+    try {
+      const response = await axiosClient.get(`/patients/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching patient by ID:", error.response?.data || error.message);
+      throw error;
+    }
+  },
 };
 
-// Thêm hàm lấy chi tiết bệnh nhân theo ID
-const getPatientById = (id, token) => {
-  return axios.get(`http://localhost:3000/patients/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-  });
-};
-
-export default {
-  getAllPatients,
-  getPatientById,
-};
+export default patientManagerService;

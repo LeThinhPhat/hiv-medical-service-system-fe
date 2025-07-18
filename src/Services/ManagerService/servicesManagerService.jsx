@@ -1,64 +1,60 @@
 // src/Services/serviceAPI.js
-import axios from "axios";
+import axiosClient from "../api.config"; 
+const serviceAPI = {
+  // ✅ Lấy tất cả dịch vụ
+  getAllServices: async () => {
+    try {
+      const response = await axiosClient.get("/services");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching services:", error.response?.data || error.message);
+      throw error;
+    }
+  },
 
-const API_BASE_URL = "http://localhost:3000";
+  // ✅ Lấy dịch vụ theo ID
+  getServiceById: async (id) => {
+    try {
+      const response = await axiosClient.get(`/services/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching service by ID:", error.response?.data || error.message);
+      throw error;
+    }
+  },
 
-// Lấy tất cả dịch vụ
-const getAllServices = (token) => {
-  return axios.get(`${API_BASE_URL}/services`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "*/*",
-    },
-  });
+  // ✅ Cập nhật dịch vụ theo ID
+  updateServiceById: async (id, data) => {
+    try {
+      const response = await axiosClient.patch(`/services/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating service:", error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  // ✅ Tạo mới dịch vụ
+  createService: async (data) => {
+    try {
+      const response = await axiosClient.post("/services", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating service:", error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  // ✅ Xoá dịch vụ theo ID
+  deleteServiceById: async (id) => {
+    try {
+      const response = await axiosClient.delete(`/services/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting service:", error.response?.data || error.message);
+      throw error;
+    }
+  },
 };
 
-// Lấy dịch vụ theo ID
-const getServiceById = (id, token) => {
-  return axios.get(`${API_BASE_URL}/services/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-  });
-};
-
-// Cập nhật dịch vụ theo ID
-const updateServiceById = (id, data, token) => {
-  return axios.patch(`${API_BASE_URL}/services/${id}`, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  });
-};
-
-// Tạo mới dịch vụ
-const createService = (data, token) => {
-  return axios.post(`${API_BASE_URL}/services`, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  });
-};
-
-// (Tuỳ chọn) Xoá dịch vụ theo ID
-const deleteServiceById = (id, token) => {
-  return axios.delete(`${API_BASE_URL}/services/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-  });
-};
-
-export default {
-  getAllServices,
-  getServiceById,
-  updateServiceById,
-  createService,
-  deleteServiceById, // ← thêm nếu bạn cần gọi API xoá
-};
+export default serviceAPI;

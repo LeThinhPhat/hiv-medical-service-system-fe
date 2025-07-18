@@ -1,55 +1,50 @@
-import axios from "axios";
 
-const API_URL = "http://localhost:3000/appointments";
-
-// Lấy tất cả cuộc hẹn
-const getAllAppointments = async (token) => {
-  const response = await axios.get(API_URL, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-  });
-  return response.data.data;
-};
-
-// Lấy chi tiết một cuộc hẹn theo ID
-const getAppointmentById = async (token, id) => {
-  const response = await axios.get(`${API_URL}/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-  });
-  return response.data.data;
-};
-
-// Cập nhật cuộc hẹn
-const updateAppointment = async (token, id, data) => {
-  const response = await axios.patch(`${API_URL}/${id}`, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-  return response.data;
-};
-
-// Xoá cuộc hẹn
-const deleteAppointment = async (token, id) => {
-  const response = await axios.delete(`${API_URL}/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return response.data;
-};
+import axiosClient from "../api.config"; // Đảm bảo đúng đường dẫn
 
 const appointmentManagerService = {
-  getAllAppointments,
-  getAppointmentById,
-  updateAppointment,
-  deleteAppointment,
+  // Lấy tất cả cuộc hẹn
+  getAllAppointments: async () => {
+    try {
+      const response = await axiosClient.get("/appointments");
+      return response.data.data;
+    } catch (error) {
+      console.error("❌ Error fetching all appointments:", error);
+      throw error;
+    }
+  },
+
+  // Lấy chi tiết cuộc hẹn theo ID
+  getAppointmentById: async (id) => {
+    try {
+      const response = await axiosClient.get(`/appointments/${id}`);
+      return response.data.data;
+    } catch (error) {
+      console.error("❌ Error fetching appointment by ID:", error);
+      throw error;
+    }
+  },
+
+  // Cập nhật cuộc hẹn
+  updateAppointment: async (id, data) => {
+    try {
+      const response = await axiosClient.patch(`/appointments/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error updating appointment:", error);
+      throw error;
+    }
+  },
+
+  // Xoá cuộc hẹn
+  deleteAppointment: async (id) => {
+    try {
+      const response = await axiosClient.delete(`/appointments/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error deleting appointment:", error);
+      throw error;
+    }
+  },
 };
 
 export default appointmentManagerService;
