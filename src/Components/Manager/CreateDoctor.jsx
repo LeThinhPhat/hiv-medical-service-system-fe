@@ -94,7 +94,7 @@ const CreateDoctor = () => {
         phone: "",
       });
     } catch (err) {
-      console.error("❌ API Error:", err.response?.data || err.message);
+      console.error(" API Error:", err.response?.data || err.message);
       toast.error(
         `Tạo bác sĩ thất bại: ${err.response?.data?.message || err.message}`
       );
