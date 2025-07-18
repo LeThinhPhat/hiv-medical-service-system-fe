@@ -37,7 +37,11 @@ const AppointmentList = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
-  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -84,11 +88,13 @@ const AppointmentList = () => {
   const filteredAppointments = useMemo(() => {
     return appointments.filter((item) => {
       const patientName = item?.patientID?.userID?.name?.toLowerCase() || "";
-      const appointmentDate = dayjs(item.date).format("YYYY-MM-DD");
+      const appointmentDate = dayjs(item.startTime).format("YYYY-MM-DD");
       const status = item.status?.toLowerCase() || "";
       const matchesDate = !searchDate || appointmentDate === searchDate;
-      const matchesPatient = !searchPatient || patientName.includes(searchPatient.toLowerCase());
-      const matchesStatus = !filterStatus || status === filterStatus.toLowerCase();
+      const matchesPatient =
+        !searchPatient || patientName.includes(searchPatient.toLowerCase());
+      const matchesStatus =
+        !filterStatus || status === filterStatus.toLowerCase();
       const isNotPending = status !== PENDING_STATUS;
       return matchesDate && matchesPatient && matchesStatus && isNotPending;
     });
@@ -96,8 +102,10 @@ const AppointmentList = () => {
 
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = [...filteredAppointments]
-    .slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = [...filteredAppointments].slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
   const totalPages = Math.ceil(filteredAppointments.length / recordsPerPage);
 
   const paginate = (pageNumber) => {
@@ -128,7 +136,10 @@ const AppointmentList = () => {
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
+    setTimeout(
+      () => setToast({ show: false, message: "", type: "success" }),
+      3000
+    );
   };
 
   const handleSubmitCancel = async () => {
@@ -174,7 +185,9 @@ const AppointmentList = () => {
         >
           {toast.message}
           <button
-            onClick={() => setToast({ show: false, message: "", type: "success" })}
+            onClick={() =>
+              setToast({ show: false, message: "", type: "success" })
+            }
             className="ml-2 text-sm font-semibold"
           >
             ×
@@ -262,7 +275,9 @@ const AppointmentList = () => {
 
         {/* Loading and No Data State */}
         {isLoading ? (
-          <div className="text-center py-8 text-gray-600">Đang tải dữ liệu...</div>
+          <div className="text-center py-8 text-gray-600">
+            Đang tải dữ liệu...
+          </div>
         ) : currentRecords.length === 0 ? (
           <div className="text-center py-8 text-gray-600">
             Không tìm thấy lịch hẹn nào.
@@ -292,7 +307,7 @@ const AppointmentList = () => {
                     const doctorEmail =
                       item?.doctorSlotID[0]?.doctorID?.userID?.name || "----";
                     const patientID = item?.patientID?.userID?.name || "----";
-                    const date = dayjs(item.date).format("DD/MM/YYYY");
+                    const date = dayjs(item.startTime).format("DD/MM/YYYY");
                     const startTime = extractTimeFromUTC(item.startTime);
                     const status = item.status || "N/A";
                     const service = item?.serviceID?.name || "N/A";

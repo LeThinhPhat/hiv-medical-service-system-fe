@@ -214,7 +214,7 @@ const DoctorAppointments = () => {
                             })}
                           </td>
                           <td className="p-3 text-sm text-gray-700">
-                            {appt.patientID?.name || "Không có tên"}
+                            {appt.patientID?.userID?.name || "Không có tên"}
                           </td>
                           <td className="p-3 text-sm text-gray-700">
                             {appt.patientID?.personalID || "Không có"}
