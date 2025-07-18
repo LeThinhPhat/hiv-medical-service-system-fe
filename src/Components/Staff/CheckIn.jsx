@@ -38,7 +38,7 @@ const CheckIn = () => {
       const transformed = res.data.map((appt) => ({
         id: appt._id,
         personalId: appt.patientID?.personalID,
-        patientName: appt.patientID?.name || "Không rõ tên",
+        patientName: appt.patientID?.userID?.name || "Không rõ tên",
         appointmentDate: appt.date,
         serviceName: appt.serviceID?.name || "Không rõ dịch vụ",
         startTime: appt.startTime,

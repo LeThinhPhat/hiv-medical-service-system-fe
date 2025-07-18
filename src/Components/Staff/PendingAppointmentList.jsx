@@ -50,7 +50,9 @@ const PendingAppointmentList = () => {
 
   const filteredAppointments = appointments.filter((item) => {
     const patientName = item?.patientID?.userID?.name?.toLowerCase() || "";
-    const appointmentDate = new Date(item.date).toISOString().split("T")[0];
+    const appointmentDate = new Date(item.startTime)
+      .toISOString()
+      .split("T")[0];
     const status = item.status?.toLowerCase() || "";
     const matchesDate = !searchDate || appointmentDate === searchDate;
     const matchesPatient =
