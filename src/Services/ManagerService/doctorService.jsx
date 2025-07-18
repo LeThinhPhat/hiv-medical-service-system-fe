@@ -8,7 +8,10 @@ const doctorService = {
       const data = response.data?.data;
       return Array.isArray(data) ? data : [];
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách bác sĩ:", error.response?.data || error.message);
+      console.error(
+        "Lỗi khi lấy danh sách bác sĩ:",
+        error.response?.data || error.message
+      );
       return [];
     }
   },
@@ -19,7 +22,10 @@ const doctorService = {
       const response = await axiosClient.get(`/doctors/${id}`);
       return response.data;
     } catch (error) {
-      console.error("Lỗi khi lấy chi tiết bác sĩ:", error.response?.data || error.message);
+      console.error(
+        "Lỗi khi lấy chi tiết bác sĩ:",
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -30,7 +36,24 @@ const doctorService = {
       const response = await axiosClient.patch(`/doctors/${id}`, data);
       return response.data;
     } catch (error) {
-      console.error("Lỗi khi cập nhật bác sĩ:", error.response?.data || error.message);
+      console.error(
+        "Lỗi khi cập nhật bác sĩ:",
+        error.response?.data || error.message
+      );
+      throw error;
+    }
+  },
+
+  // ✅ Tạo mới bác sĩ
+  createDoctor: async (doctorData) => {
+    try {
+      const response = await axiosClient.post("/doctors", doctorData);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Lỗi khi tạo bác sĩ mới:",
+        error.response?.data || error.message
+      );
       throw error;
     }
   },

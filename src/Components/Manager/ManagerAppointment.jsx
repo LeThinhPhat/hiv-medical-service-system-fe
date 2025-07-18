@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import moment from "moment";
 import appointmentManagerService from "../../Services/ManagerService/appointmentManagerService";
 import EditIcon from "@mui/icons-material/Edit";

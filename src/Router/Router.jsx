@@ -70,6 +70,7 @@ import Dashboard from "../Components/Staff/DashBoard";
 import ServicesPage from "../Page/ServicesPage";
 import SuccessWalletPage from "../Components/Customer/SuccessWalletPage";
 import FinishAppointment from "../Components/Doctor/FinishAppointment";
+import CreateDoctor from "../Components/Manager/CreateDoctor";
 const Router = createBrowserRouter([
   {
     path: "/",
@@ -143,6 +144,7 @@ const Router = createBrowserRouter([
       { path: "schedule", element: <ManagerSchedule /> },
       { path: "arv", element: <ARVManagement /> },
       { path: "/manager/schedule/:id", element: <DetailSchedule /> },
+      { path: "/manager/createdoctor", element: <CreateDoctor /> },
       // Add manager child routes here if needed
     ],
   },
