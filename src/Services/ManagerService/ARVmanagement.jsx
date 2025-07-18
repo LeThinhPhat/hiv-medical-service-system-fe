@@ -1,28 +1,14 @@
-const BASE_URL = "http://localhost:3000";
-const token = localStorage.getItem("token");
+import axiosClient from "../api.config"; // cập nhật đúng đường dẫn nếu khác
 
 const ARVmanagementService = {
   getRegiments: async () => {
     try {
-      const response = await fetch(`${BASE_URL}/regiments`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error fetching regiments: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
+      const response = await axiosClient.get("/regiments");
+      return response.data; // hoặc response.data.data nếu API có dạng { data: [...] }
     } catch (error) {
-      console.error("Failed to get ARV regiments:", error);
+      console.error("❌ Failed to get ARV regiments:", error.response?.data || error.message);
       throw error;
     }
-  }
+  },
 };
-
 export default ARVmanagementService;

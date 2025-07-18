@@ -14,7 +14,7 @@ const AnonymousConsultationForm = () => {
 
     const selectedDate = new Date(dateString);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // reset về 00:00 để so sánh chính xác
+    today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
       toast.error("Vui lòng chọn ngày trong tương lai.");
@@ -40,7 +40,6 @@ const AnonymousConsultationForm = () => {
     }
   };
 
-  // Chỉ tạo khung giờ phút là 00 từ 07:00–11:00 và 13:00–17:00
   const generateTimeOptions = () => {
     const times = [];
     const allowedHours = [
@@ -48,7 +47,18 @@ const AnonymousConsultationForm = () => {
       ...Array.from({ length: 5 }, (_, i) => 13 + i), // 13 → 17
     ];
 
+    const now = new Date();
+    const currentHour = now.getHours();
+
+    const selectedDate = new Date(dateString);
+    const isToday =
+      selectedDate.toDateString() === now.toDateString();
+
     for (let hour of allowedHours) {
+      if (isToday && hour <= currentHour) {
+        continue; // Bỏ qua các giờ đã qua trong hôm nay
+      }
+
       const h = hour.toString().padStart(2, "0");
       times.push(`${h}:00`);
     }
@@ -70,9 +80,12 @@ const AnonymousConsultationForm = () => {
           <input
             type="date"
             required
-            min={new Date().toISOString().split("T")[0]} // 👈 giới hạn chỉ chọn từ hôm nay trở đi
+            min={new Date().toISOString().split("T")[0]}
             value={dateString}
-            onChange={(e) => setDateString(e.target.value)}
+            onChange={(e) => {
+              setDateString(e.target.value);
+              setTimeString(""); // Reset giờ khi đổi ngày
+            }}
             className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>

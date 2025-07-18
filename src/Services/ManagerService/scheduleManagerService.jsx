@@ -1,56 +1,37 @@
-// src/Services/DoctorService/scheduleManagerService.jsx
-import axios from "axios";
 
-const BASE_URL = "http://localhost:3000"; // hoặc dùng process.env nếu deploy
+import axiosClient from "../api.config"; // Điều chỉnh đường dẫn nếu khác
 
 const scheduleManagerService = {
-  // GET all doctor schedules
-  // ✅ ĐÚNG: Truy cập .data.data nếu API trả về { data: [...] }
-  getAllSchedules: async (token) => {
+  // ✅ Lấy tất cả lịch khám của bác sĩ
+  getAllSchedules: async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/doctor-schedules`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const response = await axiosClient.get("/doctor-schedules");
       console.log("Raw response:", response);
       return Array.isArray(response.data?.data) ? response.data.data : [];
     } catch (error) {
-      console.error("Error fetching doctor schedules:", error);
+      console.error("Error fetching doctor schedules:", error.response?.data || error.message);
       return [];
     }
   },
-  getScheduleById: async (id, token) => {
-    try {
-      const response = await axios.get(`${BASE_URL}/doctor-schedules/${id}`, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      // ✅ Lấy đúng object chi tiết trong data
+  // ✅ Lấy lịch theo ID
+  getScheduleById: async (id) => {
+    try {
+      const response = await axiosClient.get(`/doctor-schedules/${id}`);
       return response.data?.data;
     } catch (error) {
-      console.error("Error fetching schedule detail:", error);
+      console.error("Error fetching schedule detail:", error.response?.data || error.message);
       throw error;
     }
   },
-  deleteScheduleById: async (id, token) => {
+
+  // ✅ Xoá lịch khám theo ID
+  deleteScheduleById: async (id) => {
     try {
-      const response = await axios.delete(
-        `${BASE_URL}/doctor-schedules/${id}`,
-        {
-          headers: {
-            Accept: "*/*",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axiosClient.delete(`/doctor-schedules/${id}`);
       return response.data;
     } catch (error) {
-      console.error("Error deleting schedule:", error);
+      console.error("Error deleting schedule:", error.response?.data || error.message);
       throw error;
     }
   },

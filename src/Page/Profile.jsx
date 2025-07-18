@@ -31,7 +31,7 @@ const Profile = () => {
 
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const patient = JSON.parse(localStorage.getItem("patient")) || {};
-  const wallet = patient.wallet || { balance: 0 };
+  const wallet = patient.wallet ||  0 ;
 
   const [editMode, setEditMode] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -47,7 +47,8 @@ const Profile = () => {
     const fetchAppointments = async () => {
       try {
         const data = await appointmentService.getAppointmentByToken();
-        setAppointments(data?.data || []);
+        console.log("Appointments:", data);
+        setAppointments(data || []);
       } catch (error) {
         console.error("Lỗi lấy lịch hẹn:", error);
       } finally {
@@ -58,7 +59,6 @@ const Profile = () => {
     const fetchMedicalRecords = async () => {
       try {
         const data = await medicalRecordService.getMedicalRecordByPersonalID(patient.personalID);
-        console.log("Medical Records:", data);
         setMedicalRecords(data ? [data] : []);
       } catch (error) {
         console.error("Lỗi lấy hồ sơ bệnh án:", error);

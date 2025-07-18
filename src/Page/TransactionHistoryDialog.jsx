@@ -29,6 +29,7 @@ const TransactionHistoryDialog = ({ open, onClose }) => {
         setError(null);
         try {
           const transactionData = await paymentService.getPatientTransactions();
+          console.log("Fetched transactions:", transactionData);
           setTransactions(transactionData);
         } catch (err) {
           setError("Không thể tải lịch sử giao dịch. Vui lòng thử lại.");
@@ -41,21 +42,19 @@ const TransactionHistoryDialog = ({ open, onClose }) => {
     }
   }, [open]);
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-    >
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ bgcolor: "#0277bd", color: "white" }}>
         Lịch sử giao dịch
       </DialogTitle>
@@ -77,7 +76,7 @@ const TransactionHistoryDialog = ({ open, onClose }) => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Ngày</TableCell>
+                  <TableCell>Ngày giờ</TableCell>
                   <TableCell>Loại giao dịch</TableCell>
                   <TableCell>Số tiền</TableCell>
                   <TableCell>Lý do</TableCell>
@@ -86,15 +85,24 @@ const TransactionHistoryDialog = ({ open, onClose }) => {
               <TableBody>
                 {transactions.map((transaction) => (
                   <TableRow key={transaction._id}>
-                    <TableCell>{formatDate(transaction.createdAt)}</TableCell>
+                    <TableCell>{formatDateTime(transaction.createdAt)}</TableCell>
                     <TableCell>{transaction.type}</TableCell>
-                    <TableCell 
-                      sx={{ 
-                        color: transaction.type === "Giao dịch thanh toán" ? "red" : 
-                              transaction.type === "Giao dịch hoàn trả" ? "green" : "inherit"
+                    <TableCell
+                      sx={{
+                        color:
+                          transaction.type === "Giao dịch thanh toán"
+                            ? "red"
+                            : transaction.type === "Nạp tiền vào ví" ||
+                              transaction.type === "Giao dịch hoàn trả"
+                            ? "green"
+                            : "inherit",
                       }}
                     >
-                      {transaction.amount.toLocaleString("vi-VN")} VNĐ
+                      {transaction.type === "Nạp tiền vào ví" ||
+                      transaction.type === "Giao dịch hoàn trả"
+                        ? `+${transaction.amount.toLocaleString("vi-VN")}`
+                        : `-${transaction.amount.toLocaleString("vi-VN")}`}{" "}
+                      VNĐ
                     </TableCell>
                     <TableCell>{transaction.reason}</TableCell>
                   </TableRow>
@@ -105,10 +113,7 @@ const TransactionHistoryDialog = ({ open, onClose }) => {
         )}
       </DialogContent>
       <DialogActions>
-        <Button 
-          onClick={onClose} 
-          sx={{ color: "#0277bd" }}
-        >
+        <Button onClick={onClose} sx={{ color: "#0277bd" }}>
           Đóng
         </Button>
       </DialogActions>

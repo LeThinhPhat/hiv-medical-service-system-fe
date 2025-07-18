@@ -14,7 +14,6 @@ const ServicesService = {
       });
 
       const result = await response.json();
-      console.log("Fetched services:", result.data);
       return result.data;
     } catch (error) {
       console.error("Error fetching doctors:", error);
@@ -33,7 +32,6 @@ const ServicesService = {
       });
 
       const result = await response.json();
-      console.log("Fetched services:", result.data);
       return result.data;
     } catch (error) {
       console.error("Error fetching doctors:", error);

@@ -43,6 +43,7 @@ const FinishAppointment = () => {
             customStartDate,
             customEndDate
           );
+          console.log("check finish : ", res.data);
           const initialExpanded = res.data.reduce((acc, appt) => {
             acc[appt._id] = false;
             return acc;
@@ -309,7 +310,7 @@ const FinishAppointment = () => {
           <div className="p-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-blue-600">
-                {appointment.patientID.name} - {appointment.serviceID.name}
+                {appointment.patientID.name} - {appointment.serviceID.name} 
               </h2>
               <button
                 onClick={() => handleToggleExpand(appointment._id)}

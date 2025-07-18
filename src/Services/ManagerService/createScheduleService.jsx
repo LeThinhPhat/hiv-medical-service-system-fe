@@ -1,22 +1,11 @@
-// Services/ManagerService/createScheduleService.jsx
-import axios from "axios";
-
-const API_URL = "http://localhost:3000/doctor-schedules";
+import axiosClient from "../api.config"; // cập nhật đúng đường dẫn nếu khác
 
 const createSchedule = async ({ doctorID, dates }) => {
-  const token = localStorage.getItem("token");
-
   try {
-    const response = await axios.post(
-      API_URL,
-      { doctorID, dates },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axiosClient.post("/doctor-schedules", {
+      doctorID,
+      dates,
+    });
 
     return response.data;
   } catch (err) {

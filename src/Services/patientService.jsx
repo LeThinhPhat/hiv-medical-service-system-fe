@@ -5,7 +5,7 @@ const PatientService = {
   createPatient: async (patientData) => {
     try {
       const response = await axiosClient.post("/patients/guest", patientData);
-      console.log("API response:", response.data);
+   
       return response.data.data;
     } catch (error) {
       console.error("Error creating patient:", error);
@@ -22,7 +22,7 @@ const PatientService = {
       }
 
       const response = await axiosClient.post("/patients/by-token");
-      console.log("API response:", response.data);
+   
       return response.data.data;
     } catch (error) {
       console.error("Error fetching patient data:", error);

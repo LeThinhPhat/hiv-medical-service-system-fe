@@ -8,7 +8,8 @@ import {
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
-import AssignmentIcon from "@mui/icons-material/Assignment"; // 👉 Icon lộ trình điều trị
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -16,6 +17,8 @@ const Header = () => {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
+  const patient = JSON.parse(localStorage.getItem("patient")) || {};
+  const walletBalance = patient.wallet || 0;
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -33,12 +36,10 @@ const Header = () => {
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-        {/* Logo */}
         <div className="text-2xl font-bold text-blue-700">
           <Link to="/">GoldenAge</Link>
         </div>
 
-        {/* Desktop Menu */}
         <nav className="hidden md:flex space-x-6 text-gray-700 text-sm font-medium">
           <Link to="/" className="hover:text-blue-700 transition">Trang chủ</Link>
           <Link to="/about" className="hover:text-blue-700 transition">Giới thiệu</Link>
@@ -47,35 +48,36 @@ const Header = () => {
           <Link to="/blogs" className="hover:text-blue-700 transition">Blogs</Link>
         </nav>
 
-        {/* Mobile Menu Button */}
         <div className="md:hidden">
           <button onClick={toggleMenu} className="text-blue-700">
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
-        {/* Profile Icons */}
-        <div className="hidden md:flex space-x-2">
-       
+        <div className="hidden md:flex items-center space-x-3">
+          {token && (
+            <div className="flex items-center space-x-1 text-sm font-medium text-blue-600">
+              <AccountBalanceWalletIcon fontSize="small" sx={{ color: "#3B82F6" }} />
+              <span>{walletBalance.toLocaleString("vi-VN")} ₫</span>
+            </div>
+          )}
+
           {token && (
             <IconButton component={Link} to="/treatment-plan">
               <AssignmentIcon fontSize="large" sx={{ color: "#3B82F6" }} />
             </IconButton>
           )}
-      
-         {token && (
-  <IconButton component={Link} to="/profile">
-    <PersonSearchIcon fontSize="large" sx={{ color: "#3B82F6" }} />
-  </IconButton>
-)}
-          
 
-          {/* Menu tài khoản */}
+          {token && (
+            <IconButton component={Link} to="/profile">
+              <PersonSearchIcon fontSize="large" sx={{ color: "#3B82F6" }} />
+            </IconButton>
+          )}
+
           <IconButton onClick={handleProfileMenuOpen}>
             <AccountCircleIcon fontSize="large" sx={{ color: "#3B82F6" }} />
           </IconButton>
 
-          {/* Dropdown Menu */}
           <MuiMenu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
@@ -97,7 +99,6 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden px-4 pb-4">
           <nav className="flex flex-col space-y-2 text-gray-700 text-sm font-medium">
@@ -114,6 +115,13 @@ const Header = () => {
                   Xem lộ trình điều trị
                 </button>
               </Link>
+            )}
+
+            {token && (
+              <div className="flex items-center space-x-1 mt-2 text-sm font-medium text-blue-600">
+                <AccountBalanceWalletIcon fontSize="small" sx={{ color: "#3B82F6" }} />
+                <span>{walletBalance.toLocaleString("vi-VN")} ₫</span>
+              </div>
             )}
 
             {token ? (

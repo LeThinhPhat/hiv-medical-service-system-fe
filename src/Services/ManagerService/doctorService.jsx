@@ -1,63 +1,36 @@
-// Services/ManagerService/doctorService.jsx
-import axios from "axios";
-
-const API_BASE_URL = "http://localhost:3000";
+import axiosClient from "../api.config"; // Đảm bảo đúng đường dẫn đến api.config.js
 
 const doctorService = {
-  // Lấy tất cả bác sĩ
+  // ✅ Lấy tất cả bác sĩ
   getAllDoctors: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/doctors`, {
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      if (Array.isArray(response.data.data)) {
-        return response.data.data;
-      } else {
-        console.warn("API không trả về mảng:", response.data);
-        return [];
-      }
+      const response = await axiosClient.get("/doctors");
+      const data = response.data?.data;
+      return Array.isArray(data) ? data : [];
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách bác sĩ:", error);
+      console.error("Lỗi khi lấy danh sách bác sĩ:", error.response?.data || error.message);
       return [];
     }
   },
 
   // ✅ Lấy thông tin chi tiết bác sĩ theo ID
-  getDoctorById: async (id, token) => {
+  getDoctorById: async (id) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/doctors/${id}`, {
-        headers: {
-          Accept: "*/*",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axiosClient.get(`/doctors/${id}`);
       return response.data;
     } catch (error) {
-      console.error("Lỗi khi lấy chi tiết bác sĩ:", error);
+      console.error("Lỗi khi lấy chi tiết bác sĩ:", error.response?.data || error.message);
       throw error;
     }
   },
 
   // ✅ Cập nhật thông tin bác sĩ theo ID
-  updateDoctorById: async (id, data, token) => {
+  updateDoctorById: async (id, data) => {
     try {
-      const response = await axios.patch(
-        `${API_BASE_URL}/doctors/${id}`,
-        data,
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axiosClient.patch(`/doctors/${id}`, data);
       return response.data;
     } catch (error) {
-      console.error("Lỗi khi cập nhật bác sĩ:", error);
+      console.error("Lỗi khi cập nhật bác sĩ:", error.response?.data || error.message);
       throw error;
     }
   },

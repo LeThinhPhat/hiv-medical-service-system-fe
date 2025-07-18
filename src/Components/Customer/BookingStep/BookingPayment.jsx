@@ -13,6 +13,11 @@ import {
   ToggleButton,
   Stack,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from "@mui/material";
 import {
   Event as EventIcon,
@@ -45,17 +50,29 @@ const BookingPaymentPage = () => {
   const location = useLocation();
   const { info, appointment } = location.state || {};
   const [paymentMethod, setPaymentMethod] = useState("bank");
+  const [openAddFundsDialog, setOpenAddFundsDialog] = useState(false);
+  const [topUpAmount, setTopUpAmount] = useState("");
+
+  const patient = JSON.parse(localStorage.getItem("patient")) || {};
+  const walletBalance = patient?.wallet || 0;
+  const servicePrice = appointment.serviceID?.price || 0;
 
   const handlePayment = async () => {
     try {
       if (paymentMethod === "wallet") {
-        // Gọi API cho thanh toán ví
+        if (walletBalance < servicePrice) {
+          toast.info(
+            `Số dư ví không đủ (${walletBalance.toLocaleString("vi-VN")} VNĐ) để thanh toán dịch vụ giá ${servicePrice.toLocaleString("vi-VN")} VNĐ.`
+          );
+          setOpenAddFundsDialog(true);
+          return;
+        }
+
         await paymentService.payWithWallet({
           appointmentID: appointment._id,
         });
         toast.success("Thanh toán bằng ví thành công!");
       } else {
-        // Gọi API cho thanh toán chuyển khoản
         const { paymentUrl } = await paymentService.createPayment({
           appointmentID: appointment._id,
           method: paymentMethod,
@@ -65,6 +82,23 @@ const BookingPaymentPage = () => {
     } catch (err) {
       toast.error(`Tạo thanh toán thất bại vì ${err.message}`);
     }
+  };
+
+  const handleTopUp = async () => {
+    const amount = parseFloat(topUpAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error("Vui lòng nhập số tiền hợp lệ.");
+      return;
+    }
+
+    try {
+      const data = await paymentService.fundWallet({ amount });
+      toast.success("Đang chuyển đến cổng nạp tiền...");
+      window.location.href = data; // Redirect đến cổng nạp tiền
+    } catch (error) {
+      toast.error(error.message || "Nạp tiền thất bại.");
+    }
+    setOpenAddFundsDialog(false);
   };
 
   const InfoRow = ({ icon: Icon, label, value, bold }) => (
@@ -83,16 +117,7 @@ const BookingPaymentPage = () => {
   );
 
   return (
-    <Box
-      sx={{
-        maxWidth: 700,
-        mx: "auto",
-        mt: 6,
-        mb: 6,
-        p: 3,
-        bgcolor: "#f9fafb",
-      }}
-    >
+    <Box sx={{ maxWidth: 700, mx: "auto", mt: 6, mb: 6, p: 3, bgcolor: "#f9fafb" }}>
       <Paper
         elevation={4}
         sx={{
@@ -110,14 +135,7 @@ const BookingPaymentPage = () => {
         </Typography>
       </Paper>
 
-      <Card
-        sx={{
-          borderRadius: 3,
-          bgcolor: "#ffffff",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
-          mb: 4,
-        }}
-      >
+      <Card sx={{ borderRadius: 3, bgcolor: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.1)", mb: 4 }}>
         <CardContent sx={{ p: 4 }}>
           <Stack spacing={1.5}>
             <InfoRow
@@ -127,33 +145,11 @@ const BookingPaymentPage = () => {
               bold
             />
             <Divider />
-            <InfoRow
-              icon={PersonIcon}
-              label="Bệnh nhân:"
-              value={
-                appointment.patientID?.userID?.name || appointment.patientID?.name
-              }
-            />
-            <InfoRow
-              icon={PersonIcon}
-              label="CCCD:"
-              value={appointment.patientID.personalID}
-            />
-            <InfoRow
-              icon={PersonIcon}
-              label="SĐT:"
-              value={info?.phone || "Không có"}
-            />
-            <InfoRow
-              icon={MedicalServicesIcon}
-              label="Bác sĩ:"
-              value={appointment.doctorID.userID?.name}
-            />
-            <InfoRow
-              icon={EventIcon}
-              label="Ngày:"
-              value={formatDate(appointment.date)}
-            />
+            <InfoRow icon={PersonIcon} label="Bệnh nhân:" value={appointment.patientID?.userID?.name || appointment.patientID?.name} />
+            <InfoRow icon={PersonIcon} label="CCCD:" value={appointment.patientID.personalID} />
+            <InfoRow icon={PersonIcon} label="SĐT:" value={info?.phone || "Không có"} />
+            <InfoRow icon={MedicalServicesIcon} label="Bác sĩ:" value={appointment.doctorID.userID?.name} />
+            <InfoRow icon={EventIcon} label="Ngày:" value={formatDate(appointment.date)} />
             <InfoRow
               icon={EventIcon}
               label="Giờ:"
@@ -165,22 +161,18 @@ const BookingPaymentPage = () => {
                 )
               }`}
             />
-            <InfoRow
-              icon={MedicalServicesIcon}
-              label="Dịch vụ:"
-              value={appointment.serviceID.name}
-            />
+            <InfoRow icon={MedicalServicesIcon} label="Dịch vụ:" value={appointment.serviceID.name} />
             <InfoRow
               icon={PaymentIcon}
               label="Giá tiền:"
-              value={`${appointment.serviceID?.price?.toLocaleString("vi-VN")} ₫`}
+              value={`${servicePrice.toLocaleString("vi-VN")} ₫`}
               bold
             />
+           
           </Stack>
         </CardContent>
       </Card>
 
-      {/* Chọn phương thức thanh toán */}
       <Box sx={{ mb: 4, textAlign: "center" }}>
         <Typography variant="h6" fontWeight={600} mb={2} color="#1e293b">
           Chọn phương thức thanh toán
@@ -193,16 +185,10 @@ const BookingPaymentPage = () => {
           }}
           aria-label="Phương thức thanh toán"
         >
-          <ToggleButton
-            value="bank"
-            sx={{ px: 4, py: 1.5, fontWeight: 600 }}
-          >
+          <ToggleButton value="bank" sx={{ px: 4, py: 1.5, fontWeight: 600 }}>
             Chuyển khoản
           </ToggleButton>
-          <ToggleButton
-            value="wallet"
-            sx={{ px: 4, py: 1.5, fontWeight: 600 }}
-          >
+          <ToggleButton value="wallet" sx={{ px: 4, py: 1.5, fontWeight: 600 }}>
             Ví Tài Khoản
           </ToggleButton>
         </ToggleButtonGroup>
@@ -224,6 +210,27 @@ const BookingPaymentPage = () => {
       >
         Thanh toán ngay
       </Button>
+
+      {/* Dialog Nạp Tiền */}
+      <Dialog open={openAddFundsDialog} onClose={() => setOpenAddFundsDialog(false)}>
+        <DialogTitle sx={{ bgcolor: "#3b82f6", color: "white" }}>Nạp tiền vào ví</DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          <Typography>Nhập số tiền bạn muốn nạp (VNĐ):</Typography>
+          <TextField
+            type="number"
+            fullWidth
+            value={topUpAmount}
+            onChange={(e) => setTopUpAmount(e.target.value)}
+            sx={{ mt: 2 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAddFundsDialog(false)}>Hủy</Button>
+          <Button variant="contained" onClick={handleTopUp}>
+            Nạp tiền
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <ToastContainer position="top-center" autoClose={2000} />
     </Box>
