@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import viLocale from "date-fns/locale/vi";
 import { toast } from "react-hot-toast";
 import doctorService from "../../Services/ManagerService/doctorService";
 import doctorScheduleService from "../../Services/ManagerService/createScheduleService";
@@ -36,14 +37,22 @@ const CreateDoctorScheduleWeek = () => {
     fetchDoctors();
   }, []);
 
+  const formatDateToLocal = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const daysOfWeek = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
-    const key = date.toISOString().slice(0, 10);
+    const key = formatDateToLocal(date); // Use local date (e.g., 2025-12-30)
     const label = date.toLocaleDateString("vi-VN", {
       weekday: "short",
       day: "2-digit",
       month: "2-digit",
+      year: "numeric",
     });
     return { key, label, date };
   });
@@ -52,11 +61,25 @@ const CreateDoctorScheduleWeek = () => {
     if (!result.destination) return;
     const doctorId = result.draggableId;
     const date = result.destination.droppableId;
-    if (scheduleData[date]?.includes(doctorId)) return;
+    if (scheduleData[date]?.includes(doctorId)) {
+      toast.error("Bác sĩ đã được phân lịch cho ngày này!");
+      return;
+    }
     setScheduleData((prev) => ({
       ...prev,
       [date]: [...(prev[date] || []), doctorId],
     }));
+    const doctor = doctors.find((d) => d._id === doctorId);
+    const formattedDate = new Date(date).toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+    toast.success(
+      `Đã thêm ${
+        doctor?.userID?.name || doctorId
+      } vào lịch ngày ${formattedDate}`
+    );
   };
 
   const handleRemoveDoctor = (date, doctorId) => {
@@ -64,14 +87,44 @@ const CreateDoctorScheduleWeek = () => {
       ...prev,
       [date]: (prev[date] || []).filter((id) => id !== doctorId),
     }));
+    const doctor = doctors.find((d) => d._id === doctorId);
+    const formattedDate = new Date(date).toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+    toast.success(
+      `Đã xóa ${
+        doctor?.userID?.name || doctorId
+      } khỏi lịch ngày ${formattedDate}`
+    );
   };
 
   const handleAddEvent = () => {
-    if (selectedDate && selectedDoctors.length > 0) {
+    if (selectedDate) {
+      if (selectedDoctors.length === 0) {
+        toast.error("Vui lòng chọn ít nhất một bác sĩ!");
+        return;
+      }
       setScheduleData((prev) => {
         const currentDoctors = prev[selectedDate] || [];
         const newDoctors = selectedDoctors.filter(
           (id) => !currentDoctors.includes(id)
+        );
+        if (newDoctors.length === 0) {
+          toast.error("Tất cả bác sĩ đã được chọn cho ngày này!");
+          return prev;
+        }
+        const formattedDate = new Date(selectedDate).toLocaleDateString(
+          "vi-VN",
+          {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }
+        );
+        toast.success(
+          `Đã thêm ${newDoctors.length} bác sĩ vào lịch ngày ${formattedDate}`
         );
         return {
           ...prev,
@@ -84,6 +137,13 @@ const CreateDoctorScheduleWeek = () => {
     }
   };
 
+  const handleClearAll = () => {
+    setScheduleData({});
+    setSelectedDoctors([]);
+    setSelectedDate(null);
+    toast.success("Đã xóa tất cả lịch và lựa chọn bác sĩ");
+  };
+
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
@@ -91,8 +151,13 @@ const CreateDoctorScheduleWeek = () => {
       const selectedDates = [];
 
       Object.entries(scheduleData).forEach(([date, doctorIDs]) => {
-        doctorIDs.forEach((id) => selectedDoctorIDs.add(id));
-        selectedDates.push(date);
+        if (doctorIDs.length > 0) {
+          doctorIDs.forEach((id) => selectedDoctorIDs.add(id));
+          // Convert local date (YYYY-MM-DD) to UTC ISO string
+          const [year, month, day] = date.split("-");
+          const utcDate = new Date(Date.UTC(year, month - 1, day));
+          selectedDates.push(utcDate.toISOString().slice(0, 10));
+        }
       });
 
       if (selectedDoctorIDs.size === 0 || selectedDates.length === 0) {
@@ -123,6 +188,7 @@ const CreateDoctorScheduleWeek = () => {
     newStart.setDate(startDate.getDate() - 7);
     setStartDate(newStart);
     setScheduleData({});
+    toast.success("Đã chuyển sang tuần trước");
   };
 
   const handleNextWeek = () => {
@@ -130,6 +196,14 @@ const CreateDoctorScheduleWeek = () => {
     newStart.setDate(startDate.getDate() + 7);
     setStartDate(newStart);
     setScheduleData({});
+    toast.success("Đã chuyển sang tuần sau");
+  };
+
+  const handleCloseEventModal = () => {
+    setOpenEventModal(false);
+    setSelectedDoctors([]);
+    setSelectedDate(null);
+    toast.success("Đã hủy thêm bác sĩ");
   };
 
   const availableDoctors = selectedDate
@@ -137,7 +211,7 @@ const CreateDoctorScheduleWeek = () => {
     : doctors;
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={viLocale}>
       <div className="container mx-auto mt-10 p-8 bg-white shadow-xl rounded-xl relative">
         <h1 className="text-3xl font-bold mb-8 text-teal-600">
           Lịch Khám Bác Sĩ
@@ -152,11 +226,13 @@ const CreateDoctorScheduleWeek = () => {
                 adjustedDate.setDate(newDate.getDate() - newDate.getDay());
                 setStartDate(adjustedDate);
                 setScheduleData({});
+                toast.success("Đã chọn tuần mới");
               }
             }}
             slotProps={{
               textField: { className: "w-48 bg-teal-50 rounded-md" },
             }}
+            format="dd/MM/yyyy"
           />
           <button
             className="px-5 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
@@ -169,6 +245,12 @@ const CreateDoctorScheduleWeek = () => {
             onClick={handleNextWeek}
           >
             Tuần sau →
+          </button>
+          <button
+            className="px-5 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            onClick={handleClearAll}
+          >
+            Xóa Tất Cả
           </button>
         </div>
 
@@ -239,6 +321,14 @@ const CreateDoctorScheduleWeek = () => {
                           onClick={() => {
                             setSelectedDate(key);
                             setOpenEventModal(true);
+                            const formattedDate = new Date(
+                              key
+                            ).toLocaleDateString("vi-VN", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            });
+                            toast.success(`Đã mở lịch ngày ${formattedDate}`);
                           }}
                           title="Thêm bác sĩ"
                         >
@@ -303,7 +393,10 @@ const CreateDoctorScheduleWeek = () => {
               ? "bg-teal-300 cursor-not-allowed"
               : "bg-teal-600 hover:bg-teal-700 transition-colors"
           } shadow-md`}
-          onClick={() => setOpenConfirmDialog(true)}
+          onClick={() => {
+            setOpenConfirmDialog(true);
+            toast.success("Đã mở xác nhận lịch khám");
+          }}
           disabled={Object.keys(scheduleData).length === 0 || isLoading}
         >
           Gửi Lịch Khám
@@ -313,7 +406,12 @@ const CreateDoctorScheduleWeek = () => {
           <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl p-8 w-[28rem] shadow-2xl">
               <h2 className="text-xl font-semibold mb-5 text-teal-600">
-                Thêm Bác Sĩ Cho Ngày {selectedDate}
+                Thêm Bác Sĩ Cho Ngày{" "}
+                {new Date(selectedDate).toLocaleDateString("vi-VN", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
               </h2>
               <div className="mb-5">
                 <label className="block text-sm font-medium mb-2 text-gray-700">
@@ -363,10 +461,7 @@ const CreateDoctorScheduleWeek = () => {
               <div className="flex justify-end space-x-3">
                 <button
                   className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  onClick={() => {
-                    setOpenEventModal(false);
-                    setSelectedDoctors([]);
-                  }}
+                  onClick={handleCloseEventModal}
                 >
                   Hủy
                 </button>
@@ -377,7 +472,7 @@ const CreateDoctorScheduleWeek = () => {
                       : "bg-teal-600 hover:bg-teal-700 transition-colors"
                   } shadow-sm`}
                   onClick={handleAddEvent}
-                  disabled={selectedDoctors.length === 0}
+                  disabled={isLoading}
                 >
                   Thêm
                 </button>
@@ -395,7 +490,7 @@ const CreateDoctorScheduleWeek = () => {
               <p className="mb-5 text-gray-700">
                 Bạn có chắc chắn muốn gửi lịch khám sau?
               </p>
-              <div className="mb-5 max-h-64 overflow-y-auto">
+              {/* <div className="mb-5 max-h-64 overflow-y-auto">
                 {Object.entries(scheduleData).map(([date, doctorIDs]) => (
                   <div key={date} className="mb-3">
                     <p className="text-sm font-semibold text-teal-600">
@@ -403,6 +498,7 @@ const CreateDoctorScheduleWeek = () => {
                         weekday: "long",
                         day: "2-digit",
                         month: "2-digit",
+                        year: "numeric",
                       })}
                     </p>
                     <p className="text-sm text-gray-600">
@@ -416,11 +512,14 @@ const CreateDoctorScheduleWeek = () => {
                     </p>
                   </div>
                 ))}
-              </div>
+              </div> */}
               <div className="flex justify-end space-x-3">
                 <button
                   className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  onClick={() => setOpenConfirmDialog(false)}
+                  onClick={() => {
+                    setOpenConfirmDialog(false);
+                    toast.success("Đã hủy xác nhận lịch khám");
+                  }}
                 >
                   Hủy
                 </button>

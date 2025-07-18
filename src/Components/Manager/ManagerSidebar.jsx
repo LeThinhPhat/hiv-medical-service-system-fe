@@ -40,6 +40,11 @@ const sidebarItems = [
     icon: <CalendarMonth />,
     path: "/manager/schedule",
   },
+  {
+    text: "Thêm bác sĩ",
+    icon: <Groups />,
+    path: "/manager/createdoctor",
+  },
 ];
 
 const ManagerSidebar = () => {

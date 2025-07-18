@@ -370,7 +370,7 @@ const SuggestTreatment = ({ treatmentID, token, appointmentId }) => {
         } else {
           throw new Error("Invalid response format");
         }
-      } catch (err) {
+      } catch {
         setError("Không thể lấy gợi ý phác đồ.");
         toast.error("Không thể lấy gợi ý phác đồ.");
       } finally {
@@ -446,7 +446,7 @@ const SuggestTreatment = ({ treatmentID, token, appointmentId }) => {
       setIsLocked(true);
       setShowFollowUpField(true);
       handleCloseConfirmDialog();
-    } catch (err) {
+    } catch {
       toast.error("Lỗi khi lưu phác đồ.");
     } finally {
       setSaving(false);

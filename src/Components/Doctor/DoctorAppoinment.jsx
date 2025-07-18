@@ -24,7 +24,7 @@ const DoctorAppointments = () => {
       try {
         const data = await doctorAppointmentService.getAppointmentsByToken();
         setAppointments(data);
-      } catch (err) {
+      } catch {
         toast.error("Không thể tải danh sách cuộc hẹn");
       } finally {
         setLoading(false);
@@ -99,7 +99,7 @@ const DoctorAppointments = () => {
         appt._id === appointmentId ? { ...appt, status: "Đã checkout" } : appt
       );
       setAppointments(updatedAppointments);
-    } catch (error) {
+    } catch {
       toast.error("Lỗi khi checkout cuộc hẹn!");
     }
   };
