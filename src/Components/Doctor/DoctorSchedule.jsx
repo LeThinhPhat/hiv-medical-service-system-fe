@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import doctorScheduleService from "../../Services/DoctorService/doctorScheduleService";
 import moment from "moment";
+import toast, { Toaster } from "react-hot-toast";
 
 const DoctorSchedule = () => {
   const [schedule, setSchedule] = useState([]);
   const [selectedShifts, setSelectedShifts] = useState({});
+  const [selectedIds, setSelectedIds] = useState([]);
   const [currentMonday, setCurrentMonday] = useState(getMonday(new Date()));
   const token = localStorage.getItem("token");
 
@@ -18,7 +20,10 @@ const DoctorSchedule = () => {
   useEffect(() => {
     const fetchSchedule = async () => {
       try {
-        if (!token) return;
+        if (!token) {
+          toast.error("Vui lòng đăng nhập để xem lịch làm việc");
+          return;
+        }
 
         const monday = new Date(currentMonday);
         const sunday = new Date(monday);
@@ -35,30 +40,35 @@ const DoctorSchedule = () => {
         setSchedule(res.data);
       } catch (err) {
         console.error("Không thể tải lịch làm việc", err);
+        toast.error("Không thể tải lịch làm việc");
       }
     };
 
     fetchSchedule();
   }, [token, currentMonday]);
 
-  const handleConfirmSchedule = async (scheduleId) => {
-    const shiftName = selectedShifts[scheduleId] || "morning";
+  const handleConfirmSchedules = async () => {
     try {
-      const response = await doctorScheduleService.confirmSchedule(
-        scheduleId,
-        shiftName,
-        token
-      );
-      setSchedule((prev) =>
-        prev.map((item) =>
-          item._id === scheduleId
-            ? { ...item, status: "Đã xác nhận", isConfirmed: true }
-            : item
-        )
-      );
+      for (const scheduleId of selectedIds) {
+        const shiftName = selectedShifts[scheduleId] || "morning";
+        await doctorScheduleService.confirmSchedule(
+          scheduleId,
+          shiftName,
+          token
+        );
+        setSchedule((prev) =>
+          prev.map((item) =>
+            item._id === scheduleId
+              ? { ...item, status: "Đã xác nhận", isConfirmed: true }
+              : item
+          )
+        );
+      }
+      setSelectedIds([]);
+      toast.success(`Đã xác nhận thành công ${selectedIds.length} ca`);
     } catch (err) {
-      console.error(" Lỗi xác nhận:", err);
-      alert("Xác nhận thất bại.");
+      console.error("Lỗi xác nhận:", err);
+      toast.error("Xác nhận thất bại");
     }
   };
 
@@ -67,6 +77,14 @@ const DoctorSchedule = () => {
       ...prev,
       [scheduleId]: value,
     }));
+  };
+
+  const toggleSelectSchedule = (scheduleId) => {
+    setSelectedIds((prev) =>
+      prev.includes(scheduleId)
+        ? prev.filter((id) => id !== scheduleId)
+        : [...prev, scheduleId]
+    );
   };
 
   const goToPreviousWeek = () => {
@@ -90,116 +108,151 @@ const DoctorSchedule = () => {
     )}`;
   };
 
+  const generateWeekDays = () => {
+    const days = [];
+    const monday = new Date(currentMonday);
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(monday);
+      day.setDate(monday.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  };
+
+  const getStatusStyles = (status) => {
+    switch (status) {
+      case "Đã xác nhận":
+        return "bg-green-200 text-green-800";
+      case "Chưa xác nhận":
+        return "bg-yellow-100 text-yellow-700";
+      case "Đã hủy":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
   return (
-    <div className="p-4">
+    <div className="p-6 Container mx-auto  min-h-screen">
+      {/* Toaster for notifications */}
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-lg shadow">
-        <h1 className="text-xl font-bold text-gray-800 mb-2 sm:mb-0">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-lg">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">
           📅 Lịch làm việc: {formatRange()}
         </h1>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <button
             onClick={goToPreviousWeek}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-sm rounded-md"
+            className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition duration-200"
           >
             ⬅️ Tuần trước
           </button>
           <button
             onClick={goToNextWeek}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-sm rounded-md"
+            className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition duration-200"
           >
             ➡️ Tuần sau
           </button>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white text-sm border border-gray-200 rounded-lg shadow-sm">
-          <thead>
-            <tr className="bg-blue-50 text-blue-800 uppercase text-xs">
-              <th className="p-3 border text-left">Ngày</th>
-              <th className="p-3 border text-left">Ca trực</th>
-              <th className="p-3 border text-left">Trạng thái</th>
-              <th className="p-3 border text-left">Người tạo</th>
-              <th className="p-3 border text-left">Chọn ca</th>
-              <th className="p-3 border text-left">Xác nhận</th>
-              <th className="p-3 border text-left">Đã đăng ký</th>
-            </tr>
-          </thead>
-          <tbody>
-            {schedule.length > 0 ? (
-              schedule.map((item) => (
-                <tr
-                  key={item._id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="p-3 border text-gray-700">
-                    {moment(item.date).format("DD/MM/YYYY")}
-                  </td>
-                  <td className="p-3 border capitalize text-gray-700">
-                    {item.shiftName}
-                  </td>
-                  <td className="p-3 border text-gray-700">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        item.status === "Đã xác nhận"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-green-400 text-white-900"
-                      }`}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
-                  <td className="p-3 border text-gray-700">
-                    {item.createdBy?.email || "—"}
-                  </td>
-                  <td className="p-3 border">
-                    <select
-                      className="w-full p-1 border rounded-md text-gray-700 focus:ring-1 focus:ring-teal-500"
-                      value={selectedShifts[item._id] || "morning"}
-                      onChange={(e) =>
-                        handleShiftChange(item._id, e.target.value)
-                      }
-                    >
-                      <option value="full">Cả ngày</option>
-                      <option value="morning">Sáng</option>
-                      <option value="afternoon">Chiều</option>
-                    </select>
-                  </td>
-                  <td className="p-3 border text-center">
-                    {!item.isConfirmed ? (
-                      <button
-                        onClick={() => handleConfirmSchedule(item._id)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
+      {/* Calendar View */}
+      <div className="grid grid-cols-1 sm:grid-cols-7 gap-4 mb-8">
+        {generateWeekDays().map((day, index) => (
+          <div
+            key={index}
+            className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition duration-200"
+          >
+            <h3 className="text-lg font-semibold text-gray-800">
+              {moment(day).format("ddd, DD/MM")}
+            </h3>
+            <div className="mt-2 space-y-2">
+              {schedule
+                .filter(
+                  (item) =>
+                    moment(item.date).format("DD/MM/YYYY") ===
+                    moment(day).format("DD/MM/YYYY")
+                )
+                .map((item) => (
+                  <div
+                    key={item._id}
+                    className={`p-3 rounded-lg border transition-all duration-200 ${
+                      item.isConfirmed
+                        ? "border-green-400 bg-gradient-to-r from-green-50 to-green-100 scale-105 shadow-md"
+                        : selectedIds.includes(item._id)
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">
+                          Ca: {item.shiftName}
+                        </p>
+                        <p
+                          className={`text-xs font-semibold mt-1 px-2 py-1 rounded-full ${getStatusStyles(
+                            item.status
+                          )}`}
+                        >
+                          {item.status}
+                        </p>
+                      </div>
+                      {!item.isConfirmed && (
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(item._id)}
+                          onChange={() => toggleSelectSchedule(item._id)}
+                          className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                      )}
+                    </div>
+                    {!item.isConfirmed && (
+                      <select
+                        className="mt-2 w-full p-2 border rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-blue-500"
+                        value={selectedShifts[item._id] || "morning"}
+                        onChange={(e) =>
+                          handleShiftChange(item._id, e.target.value)
+                        }
                       >
-                        Xác nhận
-                      </button>
-                    ) : (
-                      <span className="text-green-600 text-sm font-medium">
-                        ✅
-                      </span>
+                        <option value="full">Cả ngày</option>
+                        <option value="morning">Sáng</option>
+                        <option value="afternoon">Chiều</option>
+                      </select>
                     )}
-                  </td>
-                  <td className="p-3 border text-gray-700">
-                    {item.shiftName === "full"
-                      ? "Cả ngày"
-                      : item.shiftName === "morning"
-                      ? "Ca sáng"
-                      : "Ca chiều"}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-500">
-                  Không có lịch làm việc trong tuần này.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                    {item.isConfirmed && (
+                      <div className="mt-2 text-sm text-green-600 font-medium flex items-center">
+                        <span className="mr-1"></span> Đã xác nhận
+                      </div>
+                    )}
+                  </div>
+                ))}
+            </div>
+          </div>
+        ))}
       </div>
+
+      {/* Confirm Button */}
+      {selectedIds.length > 0 && (
+        <div className="flex justify-end">
+          <button
+            onClick={handleConfirmSchedules}
+            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200"
+          >
+            Xác nhận {selectedIds.length} ca
+          </button>
+        </div>
+      )}
+
+      {/* No Schedule Message */}
+      {schedule.length === 0 && (
+        <div className="text-center p-8 bg-white rounded-2xl shadow-md">
+          <p className="text-gray-500 text-lg">
+            Không có lịch làm việc trong tuần này.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

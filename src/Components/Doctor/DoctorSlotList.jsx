@@ -1,29 +1,34 @@
 import React, { useEffect, useState } from "react";
 import doctorSlotService from "../../Services/DoctorService/doctorSlotService";
-import { FaArrowLeft, FaArrowRight, FaCalendarAlt } from "react-icons/fa";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import viLocale from "date-fns/locale/vi";
-import { formatInTimeZone } from "date-fns-tz";
-import { parseISO } from "date-fns";
+import { FaCalendarAlt } from "react-icons/fa";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { DateTime } from "luxon";
+import toast, { Toaster } from "react-hot-toast";
 
 const DoctorSlotList = () => {
   const [slots, setSlots] = useState([]);
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(() => {
+    const vnNow = DateTime.now().setZone("Asia/Ho_Chi_Minh");
+    return new Date(vnNow.toISO());
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   const VIETNAM_TIME_ZONE = "Asia/Ho_Chi_Minh";
 
   const fetchSlots = async (date) => {
     setIsLoading(true);
-    const isoDate = formatInTimeZone(date, VIETNAM_TIME_ZONE, "yyyy-MM-dd");
+    const isoDate = DateTime.fromJSDate(date).toISODate();
     try {
       const response = await doctorSlotService.getSlotsByDate(isoDate);
       setSlots(response.data);
+      if (response.data.length === 0) {
+        toast.error("Không có slot khám trong ngày này");
+      }
     } catch (err) {
       console.error("Failed to fetch slots", err);
       setSlots([]);
+      toast.error("Không thể tải danh sách slot khám");
     } finally {
       setIsLoading(false);
     }
@@ -33,153 +38,160 @@ const DoctorSlotList = () => {
     fetchSlots(currentDate);
   }, [currentDate]);
 
-  const handleNextDay = () => {
-    setCurrentDate((prev) => new Date(prev.getTime() + 86400000));
+  const handlePreviousDay = () => {
+    setCurrentDate((prev) => {
+      const newDate = DateTime.fromJSDate(prev)
+        .minus({ days: 1 })
+        .startOf("day");
+      return new Date(newDate.toISO());
+    });
   };
 
-  const handlePrevDay = () => {
-    setCurrentDate((prev) => new Date(prev.getTime() - 86400000));
+  const handleNextDay = () => {
+    setCurrentDate((prev) => {
+      const newDate = DateTime.fromJSDate(prev)
+        .plus({ days: 1 })
+        .startOf("day");
+      return new Date(newDate.toISO());
+    });
+  };
+
+  const handleDateChange = (date) => {
+    const selected = DateTime.fromJSDate(date).setZone("Asia/Ho_Chi_Minh");
+    setCurrentDate(new Date(selected.toISO()));
+    toast.success(
+      `Đã chọn ngày ${DateTime.fromJSDate(date)
+        .setZone(VIETNAM_TIME_ZONE)
+        .setLocale("vi")
+        .toFormat("EEEE, dd/MM/yyyy")}`
+    );
   };
 
   const formatDate = (date) =>
-    formatInTimeZone(date, VIETNAM_TIME_ZONE, "EEEE, dd/MM/yyyy", {
-      locale: viLocale,
-    });
+    DateTime.fromJSDate(date)
+      .setZone(VIETNAM_TIME_ZONE)
+      .setLocale("vi")
+      .toFormat("EEEE, dd/MM/yyyy");
 
-  // ✅ Sửa formatTime để giữ giờ UTC gốc
   const formatTime = (dateStr) => {
-    const date = parseISO(dateStr); // vẫn giữ giờ UTC
-    const hours = date.getUTCHours(); // lấy giờ gốc UTC
-    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+    const date = DateTime.fromISO(dateStr, { zone: "utc" });
+    const hours = date.hour;
+    const minutes = String(date.minute).padStart(2, "0");
     const period = hours < 12 ? "sáng" : "chiều";
     const displayHour = hours.toString().padStart(2, "0");
-
     return `${displayHour}:${minutes} ${period}`;
   };
 
-  return (
-    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={viLocale}>
-      <div className="container mx-auto p-4 sm:p-6 bg-gray-50 min-h-screen">
-        {/* Header chọn ngày */}
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 bg-white p-6 rounded-xl shadow-lg">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={handlePrevDay}
-              className="p-3 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200"
-              aria-label="Ngày trước"
-            >
-              <FaArrowLeft size={20} />
-            </button>
-            <div className="flex items-center space-x-2">
-              <FaCalendarAlt className="text-gray-500" size={20} />
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
-                {formatDate(currentDate)}
-              </h2>
-            </div>
-            <button
-              onClick={handleNextDay}
-              className="p-3 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200"
-              aria-label="Ngày sau"
-            >
-              <FaArrowRight size={20} />
-            </button>
-          </div>
-          <div className="mt-4 sm:mt-0">
-            <DatePicker
-              label="Chọn ngày"
-              value={currentDate}
-              onChange={(newValue) => {
-                if (newValue) setCurrentDate(newValue);
-              }}
-              slotProps={{
-                textField: {
-                  size: "small",
-                  sx: {
-                    "& .MuiInputBase-root": {
-                      borderRadius: "0.75rem",
-                      backgroundColor: "white",
-                      fontSize: "1rem",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                    },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#d1d5db",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3b82f6",
-                    },
-                    "& .MuiInputLabel-root": {
-                      fontSize: "1rem",
-                      color: "#4b5563",
-                    },
-                  },
-                },
-              }}
-            />
-          </div>
-        </div>
+  const getStatusStyles = (status) => {
+    switch (status) {
+      case "Sẵn sàng khám":
+        return "bg-emerald-200 text-emerald-800 border-emerald-400 bg-gradient-to-r from-emerald-100 to-emerald-300 scale-105 shadow-lg";
+      case "Đang xét duyệt":
+        return "bg-amber-200 text-amber-800 border-amber-400 bg-gradient-to-r from-amber-100 to-amber-300";
+      case "Đã hủy":
+        return "bg-red-200 text-red-800 border-red-400 bg-gradient-to-r from-red-100 to-red-300";
+      default:
+        return "bg-gray-200 text-gray-800 border-gray-400 bg-gradient-to-r from-gray-100 to-gray-300";
+    }
+  };
 
-        {/* Slot hiển thị */}
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
-          </div>
-        ) : slots.length > 0 ? (
-          <div className="bg-white shadow-xl rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm sm:text-base text-gray-700">
-                <thead className="bg-blue-600 text-white">
-                  <tr>
-                    <th className="py-4 px-6 text-left font-semibold">STT</th>
-                    <th className="py-4 px-6 text-left font-semibold">
-                      Giờ Bắt Đầu
-                    </th>
-                    <th className="py-4 px-6 text-left font-semibold">
-                      Giờ Kết Thúc
-                    </th>
-                    <th className="py-4 px-6 text-left font-semibold">
-                      Trạng Thái
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {slots.map((slot, index) => (
-                    <tr
-                      key={slot._id}
-                      className="border-b border-gray-200 hover:bg-gray-100 transition-colors duration-150"
-                    >
-                      <td className="py-4 px-6 font-medium">{index + 1}</td>
-                      <td className="py-4 px-6">
-                        {formatTime(slot.startTime)}
-                      </td>
-                      <td className="py-4 px-6">{formatTime(slot.endTime)}</td>
-                      <td className="py-4 px-6">
-                        <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                            slot.status === "Sẵn sàng khám"
-                              ? "bg-green-100 text-green-700"
-                              : slot.status === "Đang xét duyệt"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {slot.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white p-6 rounded-xl shadow-lg text-center">
-            <p className="text-red-600 font-semibold text-lg">
-              Không có slot khám trong ngày này.
-            </p>
-          </div>
-        )}
+  const getSlotBackground = (index) => {
+    const colors = [
+      "bg-blue-50 border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100",
+      "bg-purple-50 border-purple-200 bg-gradient-to-r from-purple-50 to-purple-100",
+      "bg-teal-50 border-teal-200 bg-gradient-to-r from-teal-50 to-teal-100",
+    ];
+    return colors[index % colors.length];
+  };
+
+  return (
+    <div className="p-6 Container mx-auto bg-gradient-to-br  min-h-screen">
+      {/* Toaster for notifications */}
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-2xl shadow-lg">
+        <div className="flex items-center space-x-4">
+          <FaCalendarAlt className="text-gray-600" size={20} />
+          <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            {formatDate(currentDate)}
+          </h2>
+        </div>
+        <div className="flex items-center space-x-3 mt-4 sm:mt-0">
+          <button
+            onClick={handlePreviousDay}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg"
+          >
+            Ngày trước
+          </button>
+          <DatePicker
+            selected={currentDate}
+            onChange={handleDateChange}
+            dateFormat="dd/MM/yyyy"
+            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 bg-white shadow-sm"
+            placeholderText="Chọn ngày"
+          />
+          <button
+            onClick={handleNextDay}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg"
+          >
+            Ngày sau
+          </button>
+        </div>
       </div>
-    </LocalizationProvider>
+
+      {/* Slots Display */}
+      {isLoading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-600"></div>
+        </div>
+      ) : slots.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {slots.map((slot, index) => (
+            <div
+              key={slot._id}
+              className={`p-4 rounded-xl border transition-all duration-200 ${getSlotBackground(
+                index
+              )} hover:shadow-lg`}
+            >
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Slot {index + 1}
+                </h3>
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusStyles(
+                    slot.status
+                  )}`}
+                >
+                  {slot.status}
+                </span>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Bắt đầu:</span>{" "}
+                  {formatTime(slot.startTime)}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Kết thúc:</span>{" "}
+                  {formatTime(slot.endTime)}
+                </p>
+                {slot.status === "Sẵn sàng khám" && (
+                  <div className="flex items-center text-emerald-600 font-medium">
+                    <span className="mr-1">✅</span> Sẵn sàng
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white p-8 rounded-2xl shadow-lg text-center">
+          <p className="text-red-600 font-semibold text-lg">
+            Không có slot khám trong ngày này.
+          </p>
+        </div>
+      )}
+    </div>
   );
 };
 

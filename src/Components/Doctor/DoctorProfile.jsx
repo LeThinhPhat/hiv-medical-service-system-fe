@@ -65,7 +65,7 @@ const DoctorProfile = () => {
         {/* Doctor Info */}
         <div className="col-span-1 bg-blue-500 text-white rounded-lg flex p-4 items-center">
           <img
-            src="https://randomuser.me/api/portraits/women/44.jpg"
+            src="https://www.shutterstock.com/image-vector/male-doctor-smiling-happy-face-600nw-2481032615.jpg"
             alt={`Dr. ${doctor?.userID?.name}`}
             className="w-24 h-24 rounded-full object-cover border-4 border-white"
           />
