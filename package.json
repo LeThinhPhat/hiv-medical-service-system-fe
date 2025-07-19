@@ -26,6 +26,7 @@
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.511.0",
+    "luxon": "^3.7.1",
     "my-project": "file:",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
