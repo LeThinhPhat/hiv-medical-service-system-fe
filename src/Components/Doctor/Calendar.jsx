@@ -2,21 +2,15 @@ import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import doctorScheduleService from "../../Services/DoctorService/doctorScheduleService";
+import { DateTime } from "luxon";
 
 const DoctorWeeklySchedule = () => {
   const [schedules, setSchedules] = useState([]);
 
   const [startDate, setStartDate] = useState(() => {
-    const vnNow = new Date(
-      new Date().toLocaleString("en-US", {
-        timeZone: "Asia/Ho_Chi_Minh",
-      })
-    );
-    const day = vnNow.getDay();
-    const diff = vnNow.getDate() - (day === 0 ? 6 : day - 1); // Start from Monday
-    vnNow.setDate(diff);
-    vnNow.setHours(0, 0, 0, 0);
-    return vnNow;
+    const vnNow = DateTime.now().setZone("Asia/Ho_Chi_Minh");
+    const monday = vnNow.minus({ days: vnNow.weekday - 1 }).startOf("day");
+    return new Date(monday.toISO());
   });
 
   useEffect(() => {
@@ -27,13 +21,16 @@ const DoctorWeeklySchedule = () => {
           console.error("No token found in localStorage");
           return;
         }
-        const end = new Date(startDate);
-        end.setDate(startDate.getDate() + 6);
+
+        const start = DateTime.fromJSDate(startDate).toISODate();
+        const end = DateTime.fromJSDate(startDate)
+          .plus({ days: 6 })
+          .toISODate();
 
         const response = await doctorScheduleService.getScheduleByWeek(
           token,
-          startDate.toISOString().slice(0, 10),
-          end.toISOString().slice(0, 10)
+          start,
+          end
         );
         setSchedules(response.data);
       } catch (err) {
@@ -60,53 +57,44 @@ const DoctorWeeklySchedule = () => {
   }, {});
 
   const days = Array.from({ length: 7 }).map((_, i) => {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + i);
-    date.setHours(0, 0, 0, 0);
+    const date = DateTime.fromJSDate(startDate)
+      .plus({ days: i })
+      .setZone("Asia/Ho_Chi_Minh");
 
-    const key = date.toISOString().slice(0, 10);
+    const key = date.toISODate();
 
-    const isToday =
-      new Date().toLocaleDateString("vi-VN", {
-        timeZone: "Asia/Ho_Chi_Minh",
-      }) ===
-      date.toLocaleDateString("vi-VN", {
-        timeZone: "Asia/Ho_Chi_Minh",
-      });
+    const vnToday = DateTime.now().setZone("Asia/Ho_Chi_Minh").toISODate();
+    const isToday = vnToday === key;
 
-    const label = date.toLocaleDateString("vi-VN", {
-      weekday: "long",
-      day: "2-digit",
-      month: "2-digit",
-      timeZone: "Asia/Ho_Chi_Minh",
-    });
+    const label = date.setLocale("vi").toFormat("cccc - dd/MM");
 
     return { label, key, isToday };
   });
 
   const handlePreviousWeek = () => {
-    const newStart = new Date(startDate);
-    newStart.setDate(startDate.getDate() - 7);
-    setStartDate(newStart);
+    setStartDate((prev) => {
+      const newStart = DateTime.fromJSDate(prev)
+        .minus({ weeks: 1 })
+        .startOf("day");
+      return new Date(newStart.toISO());
+    });
   };
 
   const handleNextWeek = () => {
-    const newStart = new Date(startDate);
-    newStart.setDate(startDate.getDate() + 7);
-    setStartDate(newStart);
+    setStartDate((prev) => {
+      const newStart = DateTime.fromJSDate(prev)
+        .plus({ weeks: 1 })
+        .startOf("day");
+      return new Date(newStart.toISO());
+    });
   };
 
   const handleDateChange = (date) => {
-    const newStart = new Date(
-      new Date(date).toLocaleString("en-US", {
-        timeZone: "Asia/Ho_Chi_Minh",
-      })
-    );
-    const day = newStart.getDay();
-    const diff = newStart.getDate() - (day === 0 ? 6 : day - 1);
-    newStart.setDate(diff);
-    newStart.setHours(0, 0, 0, 0);
-    setStartDate(newStart);
+    const selected = DateTime.fromJSDate(date).setZone("Asia/Ho_Chi_Minh");
+    const monday = selected
+      .minus({ days: selected.weekday - 1 })
+      .startOf("day");
+    setStartDate(new Date(monday.toISO()));
   };
 
   return (
