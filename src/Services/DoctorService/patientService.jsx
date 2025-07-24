@@ -1,4 +1,4 @@
-// Services/patientService.js
+
 import axiosClient from "../api.config"; // Đảm bảo đúng đường dẫn
 
 const patientService = {

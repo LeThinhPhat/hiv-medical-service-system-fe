@@ -359,14 +359,18 @@ const UserList = () => {
             value={formData.address}
             onChange={handleInputChange}
           />
-          <TextField
-            margin="dense"
-            name="gender"
-            label="Giới tính"
-            fullWidth
-            value={formData.gender}
-            onChange={handleInputChange}
-          />
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Giới tính</InputLabel>
+            <Select
+              name="gender"
+              value={formData.gender}
+              onChange={handleInputChange}
+              label="Giới tính"
+            >
+              <MenuItem value="Nam">Nam</MenuItem>
+              <MenuItem value="Nữ">Nữ</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             margin="dense"
             name="dob"
