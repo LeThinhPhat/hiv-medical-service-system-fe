@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import doctorService from "../../Services/ManagerService/doctorService";
 
 const ManagerDoctorList = () => {
@@ -9,15 +10,6 @@ const ManagerDoctorList = () => {
   const [error, setError] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [modalMode, setModalMode] = useState(null); // 'view' or 'update'
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    room: "",
-    specializations: "",
-    degrees: "",
-    experiences: [],
-  });
   const [modalError, setModalError] = useState("");
 
   useEffect(() => {
@@ -33,8 +25,12 @@ const ManagerDoctorList = () => {
         setDoctors(validDoctors);
         setFilteredDoctors(validDoctors);
       } catch (error) {
-        console.error("Không thể tải danh sách bác sĩ:", error);
-        setError("Không thể tải danh sách bác sĩ.");
+        console.error(
+          "Error fetching doctors:",
+          error.response?.data || error.message
+        );
+        setError("Không thể tải danh sách bác sĩ. Vui lòng thử lại sau.");
+        toast.error("Không thể tải danh sách bác sĩ.");
       } finally {
         setLoading(false);
       }
@@ -55,18 +51,40 @@ const ManagerDoctorList = () => {
 
   // Fetch doctor details
   const handleViewDetails = async (id) => {
+    console.log("Clicked View Details for doctor ID:", id);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         setModalError("Vui lòng đăng nhập để xem chi tiết.");
+        setModalMode("view");
+        toast.error("Vui lòng đăng nhập để xem chi tiết.");
         return;
       }
-      const data = await doctorService.getDoctorById(id, token);
-      setSelectedDoctor(data);
+      const response = await doctorService.getDoctorById(id, token); // Include token
+      console.log("Doctor details response:", response);
+      const doctorData = response.data; // Extract the 'data' field
+      if (!doctorData || !doctorData.userID) {
+        throw new Error("Dữ liệu bác sĩ không hợp lệ hoặc không tồn tại.");
+      }
+      setSelectedDoctor(doctorData);
       setModalMode("view");
       setModalError("");
+      toast.success("Đã tải chi tiết bác sĩ!");
     } catch (error) {
-      setModalError("Không thể tải chi tiết bác sĩ.");
+      console.error(
+        "Error fetching doctor details:",
+        error.response?.data || error.message
+      );
+      const errorMessage =
+        error.response?.status === 404
+          ? "Bác sĩ không tồn tại."
+          : error.response?.status === 401
+          ? "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại."
+          : "Không thể tải chi tiết bác sĩ. Vui lòng thử lại.";
+      setModalError(errorMessage);
+      setModalMode("view"); // Open modal to show error
+      setSelectedDoctor(null);
+      toast.error(errorMessage);
     }
   };
 
@@ -80,7 +98,7 @@ const ManagerDoctorList = () => {
       room: doctor.room || "",
       specializations: doctor.specializations || "",
       degrees: doctor.degrees || "",
-      experiences: doctor.experiences || [],
+      experiences: Array.isArray(doctor.experiences) ? doctor.experiences : [],
     });
     setModalMode("update");
     setModalError("");
@@ -100,7 +118,12 @@ const ManagerDoctorList = () => {
     const value = e.target.value;
     setFormData((prev) => ({
       ...prev,
-      experiences: value ? value.split(",").map((exp) => exp.trim()) : [],
+      experiences: value
+        ? value
+            .split(",")
+            .map((exp) => exp.trim())
+            .filter((exp) => exp)
+        : [],
     }));
   };
 
@@ -111,6 +134,7 @@ const ManagerDoctorList = () => {
       const token = localStorage.getItem("token");
       if (!token) {
         setModalError("Vui lòng đăng nhập để cập nhật.");
+        toast.error("Vui lòng đăng nhập để cập nhật.");
         return;
       }
       const updateData = {
@@ -129,7 +153,6 @@ const ManagerDoctorList = () => {
         updateData,
         token
       );
-      // Update local state
       setDoctors((prev) =>
         prev.map((doc) =>
           doc._id === selectedDoctor._id ? { ...doc, ...updateData } : doc
@@ -142,8 +165,18 @@ const ManagerDoctorList = () => {
       );
       setModalMode(null);
       setSelectedDoctor(null);
+      toast.success("Cập nhật bác sĩ thành công!");
     } catch (error) {
-      setModalError("Không thể cập nhật bác sĩ.");
+      console.error(
+        "Error updating doctor:",
+        error.response?.data || error.message
+      );
+      const errorMessage =
+        error.response?.status === 401
+          ? "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại."
+          : "Không thể cập nhật bác sĩ. Vui lòng thử lại.";
+      setModalError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -153,6 +186,16 @@ const ManagerDoctorList = () => {
     setSelectedDoctor(null);
     setModalError("");
   };
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    room: "",
+    specializations: "",
+    degrees: "",
+    experiences: [],
+  });
 
   if (loading) {
     return (
@@ -171,7 +214,7 @@ const ManagerDoctorList = () => {
   }
 
   return (
-    <div className="min-h-screen py-10 px-6">
+    <div className="min-h-screen py-10 px-6 bg-gray-50">
       <div className="container mx-auto">
         <div className="bg-white rounded-2xl shadow-xl">
           <div className="bg-gradient-to-r from-teal-700 to-teal-500 p-6 rounded-t-2xl">
@@ -282,13 +325,13 @@ const ManagerDoctorList = () => {
                       <div className="mt-4 flex gap-2">
                         <button
                           onClick={() => handleViewDetails(doctor._id)}
-                          className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+                          className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors cursor-pointer"
                         >
                           Xem chi tiết
                         </button>
                         <button
                           onClick={() => handleUpdate(doctor)}
-                          className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors"
+                          className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer"
                         >
                           Cập nhật
                         </button>
@@ -302,7 +345,7 @@ const ManagerDoctorList = () => {
       </div>
 
       {/* Modal for View Details and Update */}
-      {modalMode && selectedDoctor && (
+      {modalMode && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto">
             <h3 className="text-2xl font-bold text-teal-600 mb-4">
@@ -311,7 +354,7 @@ const ManagerDoctorList = () => {
             {modalError && (
               <div className="text-red-600 mb-4">{modalError}</div>
             )}
-            {modalMode === "view" ? (
+            {modalMode === "view" && selectedDoctor ? (
               <div className="space-y-2 text-sm text-gray-700">
                 <p>
                   <span className="font-medium text-gray-900">Tên:</span>{" "}
@@ -350,8 +393,20 @@ const ManagerDoctorList = () => {
                   <span className="font-medium text-gray-900">Tạo bởi:</span>{" "}
                   {selectedDoctor.createdBy?.email || "Không rõ"}
                 </p>
+                <p>
+                  <span className="font-medium text-gray-900">Avatar:</span>{" "}
+                  {selectedDoctor.avatarURL ? (
+                    <img
+                      src={selectedDoctor.avatarURL}
+                      alt="Doctor Avatar"
+                      className="w-16 h-16 rounded-full mt-2"
+                    />
+                  ) : (
+                    "Không có"
+                  )}
+                </p>
               </div>
-            ) : (
+            ) : modalMode === "update" ? (
               <form onSubmit={handleUpdateSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
@@ -440,24 +495,26 @@ const ManagerDoctorList = () => {
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
                   >
                     Hủy
                   </button>
                   <button
                     type="submit"
-                    className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700"
+                    className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
                   >
                     Cập nhật
                   </button>
                 </div>
               </form>
+            ) : (
+              <div className="text-gray-700">Không có dữ liệu để hiển thị.</div>
             )}
             {modalMode === "view" && (
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={closeModal}
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
                 >
                   Đóng
                 </button>

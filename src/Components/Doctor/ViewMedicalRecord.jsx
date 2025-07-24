@@ -245,7 +245,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import medicalRecordService from "../../Services/DoctorService/medicalRecordService";
 import createMedicalPersonalService from "../../Services/DoctorService/createMedicalPersonalService";
-import checkoutService from "../../Services/DoctorService/checkoutService"; // ✅ import thêm
+import checkoutService from "../../Services/DoctorService/checkoutService"; //  import thêm check out
 import toast from "react-hot-toast";
 
 const ViewMedicalRecord = () => {
