@@ -17,6 +17,19 @@ const DoctorSchedule = () => {
     return new Date(d.setDate(diff));
   }
 
+  const translateShiftName = (shift) => {
+    switch (shift) {
+      case "full":
+        return "Cả ngày";
+      case "afternoon":
+        return "Chiều";
+      case "morning":
+        return "Sáng";
+      default:
+        return shift;
+    }
+  };
+
   useEffect(() => {
     const fetchSchedule = async () => {
       try {
@@ -133,32 +146,29 @@ const DoctorSchedule = () => {
   };
 
   return (
-    <div className="p-6 Container mx-auto  min-h-screen">
-      {/* Toaster for notifications */}
+    <div className="p-6 Container mx-auto min-h-screen">
       <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
 
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-lg">
         <h1 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">
-          📅 Lịch làm việc: {formatRange()}
+          Lịch làm việc: {formatRange()}
         </h1>
         <div className="flex gap-3">
           <button
             onClick={goToPreviousWeek}
             className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition duration-200"
           >
-            ⬅️ Tuần trước
+            Tuần trước
           </button>
           <button
             onClick={goToNextWeek}
             className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition duration-200"
           >
-            ➡️ Tuần sau
+            Tuần sau
           </button>
         </div>
       </div>
 
-      {/* Calendar View */}
       <div className="grid grid-cols-1 sm:grid-cols-7 gap-4 mb-8">
         {generateWeekDays().map((day, index) => (
           <div
@@ -189,7 +199,7 @@ const DoctorSchedule = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-700">
-                          Ca: {item.shiftName}
+                          Ca: {translateShiftName(item.shiftName)}
                         </p>
                         <p
                           className={`text-xs font-semibold mt-1 px-2 py-1 rounded-full ${getStatusStyles(
@@ -233,7 +243,6 @@ const DoctorSchedule = () => {
         ))}
       </div>
 
-      {/* Confirm Button */}
       {selectedIds.length > 0 && (
         <div className="flex justify-end">
           <button
@@ -245,7 +254,6 @@ const DoctorSchedule = () => {
         </div>
       )}
 
-      {/* No Schedule Message */}
       {schedule.length === 0 && (
         <div className="text-center p-8 bg-white rounded-2xl shadow-md">
           <p className="text-gray-500 text-lg">

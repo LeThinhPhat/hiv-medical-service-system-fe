@@ -121,7 +121,7 @@ const DoctorWeeklySchedule = () => {
   };
 
   return (
-    <div className="p-6 Container mx-auto bg-gradient-to-br from-blue-50 to-gray-100 min-h-screen">
+    <div className="p-6 Container mx-auto bg-gradient-to-br  min-h-screen">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-2xl shadow-sm">
         <div className="flex items-center space-x-4">
