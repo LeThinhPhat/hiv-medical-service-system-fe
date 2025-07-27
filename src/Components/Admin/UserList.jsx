@@ -43,18 +43,20 @@ const roleTranslations = {
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
-    phone: "",
-    address: "",
+    password: "",
+    name: "",
     gender: "None",
     dob: "",
-    role: { name: "CUSTOMER_ROLE" },
+    address: "",
+    phone: "",
+    role: "CUSTOMER_ROLE",
     isVerified: false,
   });
   const [page, setPage] = useState(0);
@@ -63,19 +65,23 @@ const UserList = () => {
   const [filterRole, setFilterRole] = useState("all");
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
-        const data = await UserService.getAllUsers();
-        setUsers(data);
-        setFilteredUsers(data);
+        const [userData, roleData] = await Promise.all([
+          UserService.getAllUsers(),
+          UserService.getAllRoles(),
+        ]);
+        setUsers(userData);
+        setFilteredUsers(userData);
+        setRoles(roleData);
         setLoading(false);
       } catch (error) {
-        console.error("Lỗi khi tải danh sách người dùng", error);
+        console.error("Lỗi khi tải dữ liệu", error);
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -86,10 +92,10 @@ const UserList = () => {
       );
     }
     if (filterRole !== "all") {
-      result = result.filter((user) => user.role.name === filterRole);
+      result = result.filter((user) => user.role?.name === filterRole);
     }
     setFilteredUsers(result);
-    setPage(0); // Reset to first page when filters change
+    setPage(0);
   }, [searchName, filterRole, users]);
 
   const handleOpenDialog = (user = null) => {
@@ -97,25 +103,28 @@ const UserList = () => {
       setIsEditing(true);
       setCurrentUserId(user._id);
       setFormData({
-        name: user.name,
         email: user.email,
-        phone: user.phone,
-        address: user.address,
+        password: "",
+        name: user.name,
         gender: user.gender,
         dob: user.dob.split("T")[0],
-        role: user.role,
+        address: user.address,
+        phone: user.phone,
+        role: user.role?._id ,
         isVerified: user.isVerified,
       });
     } else {
       setIsEditing(false);
+      const defaultRole = roles.find((r) => r.name === "CUSTOMER_ROLE")?._id || "";
       setFormData({
-        name: "",
         email: "",
-        phone: "",
-        address: "",
+        password: "",
+        name: "",
         gender: "None",
         dob: "",
-        role: { name: "CUSTOMER_ROLE" },
+        address: "",
+        phone: "",
+        role: defaultRole,
         isVerified: false,
       });
     }
@@ -129,11 +138,7 @@ const UserList = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === "role") {
-      setFormData({ ...formData, role: { name: value } });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async () => {
@@ -217,9 +222,9 @@ const UserList = () => {
             label="Vai trò"
           >
             <MenuItem value="all">Tất cả</MenuItem>
-            {Object.entries(roleTranslations).map(([key, { label }]) => (
-              <MenuItem key={key} value={key}>
-                {label}
+            {roles.map((role) => (
+              <MenuItem key={role._id} value={role.name}>
+                {roleTranslations[role.name]?.label || role.name}
               </MenuItem>
             ))}
           </Select>
@@ -265,8 +270,8 @@ const UserList = () => {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={roleTranslations[user.role.name]?.label || user.role.name}
-                      color={roleTranslations[user.role.name]?.color || "default"}
+                      label={roleTranslations[user.role?.name]?.label || user.role?.name || "Không xác định"}
+                      color={roleTranslations[user.role?.name]?.color || "default"}
                       size="small"
                     />
                   </TableCell>
@@ -329,18 +334,28 @@ const UserList = () => {
         <DialogContent>
           <TextField
             margin="dense"
-            name="name"
-            label="Tên"
-            fullWidth
-            value={formData.name}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
             name="email"
             label="Email"
             fullWidth
             value={formData.email}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="password"
+            label="Mật khẩu"
+            type="password"
+            fullWidth
+            value={formData.password}
+            onChange={handleInputChange}
+            disabled={isEditing}
+          />
+          <TextField
+            margin="dense"
+            name="name"
+            label="Tên"
+            fullWidth
+            value={formData.name}
             onChange={handleInputChange}
           />
           <TextField
@@ -369,6 +384,7 @@ const UserList = () => {
             >
               <MenuItem value="Nam">Nam</MenuItem>
               <MenuItem value="Nữ">Nữ</MenuItem>
+              <MenuItem value="None">Không xác định</MenuItem>
             </Select>
           </FormControl>
           <TextField
@@ -383,18 +399,18 @@ const UserList = () => {
           />
           <FormControl fullWidth margin="dense">
             <InputLabel>Vai trò</InputLabel>
-            <Select
-              name="role"
-              value={formData.role.name}
-              onChange={handleInputChange}
-              label="Vai trò"
-            >
-              {Object.entries(roleTranslations).map(([key, { label }]) => (
-                <MenuItem key={key} value={key}>
-                  {label}
-                </MenuItem>
-              ))}
-            </Select>
+          <Select
+            name="role"
+            value={formData.role}
+            onChange={handleInputChange}
+            label="Vai trò"
+          >
+            {roles.map((role) => (
+              <MenuItem key={role._id} value={role._id}> 
+                {roleTranslations[role.name]?.label || role.name}
+              </MenuItem>
+            ))}
+          </Select>
           </FormControl>
         </DialogContent>
         <DialogActions>

@@ -26,14 +26,14 @@ const UploadImage = ({ onUploadSuccess }) => {
     const fileName = `${Date.now()}_${image.name}`;
 
     const { data, error } = await supabase.storage
-      .from("skincare")
+      .from("hiv-hospital")
       .upload(fileName, image);
     console.log("Upload data:", data);
     if (error) {
       console.error("Lỗi khi upload:", error);
     } else {
       const { data: publicUrl } = supabase.storage
-        .from("skincare")
+        .from("hiv-hospital")
         .getPublicUrl(fileName);
 
       onUploadSuccess(publicUrl.publicUrl);

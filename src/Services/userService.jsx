@@ -33,6 +33,21 @@ const UserService = {
       throw error;
     }
   },
+
+ createUser: async (userData) => {
+    try {
+      const response = await axiosClient.post("/users", userData);
+      console.log("User created:", response.data);
+      return response.data.data;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      throw error;
+    }
+  },
+    getAllRoles: async () => {
+    const response = await axiosClient.get("/roles");
+    return response.data.data;
+  },
 };
 
 export default UserService;

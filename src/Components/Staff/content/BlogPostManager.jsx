@@ -251,14 +251,16 @@ const BlogPostManager = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Trạng thái
                 </label>
-                <input
-                  type="text"
+                <select
                   name="status"
                   value={form.status}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-700 placeholder-gray-400"
-                  placeholder="Nhập trạng thái"
-                />
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-700"
+                >
+                  <option value="">-- Chọn trạng thái --</option>
+                  <option value="Hiển thị">Hiển thị</option>
+                  <option value="Ẩn">Ẩn</option>
+                </select>
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
