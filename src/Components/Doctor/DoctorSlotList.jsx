@@ -23,7 +23,7 @@ const DoctorSlotList = () => {
       const response = await doctorSlotService.getSlotsByDate(isoDate);
       setSlots(response.data);
       if (response.data.length === 0) {
-        toast.error("Không có slot khám trong ngày này");
+        // toast.error("Không có slot khám trong ngày này");
       }
     } catch (err) {
       console.error("Failed to fetch slots", err);
@@ -106,9 +106,6 @@ const DoctorSlotList = () => {
 
   return (
     <div className="p-6 Container mx-auto bg-gradient-to-br  min-h-screen">
-      {/* Toaster for notifications */}
-      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-2xl shadow-lg">
         <div className="flex items-center space-x-4">
@@ -177,7 +174,7 @@ const DoctorSlotList = () => {
                 </p>
                 {slot.status === "Sẵn sàng khám" && (
                   <div className="flex items-center text-emerald-600 font-medium">
-                    <span className="mr-1">✅</span> Sẵn sàng
+                    <span className="mr-1"></span> Sẵn sàng
                   </div>
                 )}
               </div>
