@@ -18,15 +18,15 @@ const DoctorSidebar = () => {
 
   const menuItems = [
     {
-      section: "Appointments",
+      section: "Danh dách cuộc hẹn",
       items: [
         {
-          label: "Appointments",
+          label: "Danh sách cuộc hẹn",
           icon: <FaCalendarPlus />,
           path: "/doctor/doctorsappoinment",
         },
         {
-          label: "Appointment List",
+          label: "Danh sách bệnh nhân",
           icon: <FaStethoscope />,
           path: "/doctor/appointments",
         },
@@ -48,18 +48,19 @@ const DoctorSidebar = () => {
     //   ],
     // },
     {
-      section: "Doctors",
+      section: "Bác sĩ",
       items: [
-        {
-          label: "Lịch làm việc",
-          icon: <FaCalendarAlt />,
-          path: "/doctor/calendar",
-        },
         {
           label: "Hồ sơ cá nhân",
           icon: <FaUserCircle />,
           path: "/doctor/profile",
         },
+        {
+          label: "Lịch làm việc",
+          icon: <FaCalendarAlt />,
+          path: "/doctor/calendar",
+        },
+
         {
           label: "Ca làm việc",
           icon: <FaBusinessTime />,

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import doctorAppointmentService from "../../Services/DoctorService/doctorAppointmentService";
-import checkoutService from "../../Services/DoctorService/checkoutService"; // ✅ import hàm checkout
+import checkoutService from "../../Services/DoctorService/checkoutService";
 
 const DoctorAppointments = () => {
   const navigate = useNavigate();

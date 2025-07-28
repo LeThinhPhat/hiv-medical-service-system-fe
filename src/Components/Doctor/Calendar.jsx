@@ -4,7 +4,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import doctorScheduleService from "../../Services/DoctorService/doctorScheduleService";
 import { DateTime } from "luxon";
 import toast, { Toaster } from "react-hot-toast";
-import { FaCalendarAlt } from "react-icons/fa";
+import {
+  FaCalendarAlt,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaHourglassHalf,
+} from "react-icons/fa";
 
 const DoctorWeeklySchedule = () => {
   const [schedules, setSchedules] = useState([]);
@@ -65,7 +70,6 @@ const DoctorWeeklySchedule = () => {
     const date = DateTime.fromJSDate(startDate)
       .plus({ days: i })
       .setZone("Asia/Ho_Chi_Minh");
-
     const key = date.toISODate();
     const vnToday = DateTime.now().setZone("Asia/Ho_Chi_Minh").toISODate();
     const isToday = vnToday === key;
@@ -88,7 +92,6 @@ const DoctorWeeklySchedule = () => {
       const newStart = DateTime.fromJSDate(prev)
         .plus({ weeks: 1 })
         .startOf("day");
-
       return new Date(newStart.toISO());
     });
   };
@@ -106,34 +109,50 @@ const DoctorWeeklySchedule = () => {
 
   const getStatusStyles = (status, isPending) => {
     if (isPending) {
-      return "bg-yellow-100 text-yellow-700 border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-200";
+      return "bg-amber-100 text-amber-800 border-amber-300";
     }
     switch (status) {
       case "Đã xác nhận":
-        return "bg-green-100 text-green-700 border-green-200 bg-gradient-to-r from-green-50 to-green-200 scale-105 shadow-sm";
+        return "bg-teal-100 text-teal-800 border-teal-300";
       case "Chưa xác nhận":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-200";
+        return "bg-amber-100 text-amber-800 border-amber-300";
       case "Đã hủy":
-        return "bg-red-100 text-red-700 border-red-200 bg-gradient-to-r from-red-50 to-red-200";
+        return "bg-red-100 text-red-800 border-red-300";
       default:
-        return "bg-gray-100 text-gray-600 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100";
+        return "bg-gray-100 text-gray-600 border-gray-300";
+    }
+  };
+
+  const getStatusIcon = (status, isPending) => {
+    if (isPending) {
+      return <FaHourglassHalf className="mr-2" />;
+    }
+    switch (status) {
+      case "Đã xác nhận":
+        return <FaCheckCircle className="mr-2" />;
+      case "Chưa xác nhận":
+        return <FaHourglassHalf className="mr-2" />;
+      case "Đã hủy":
+        return <FaTimesCircle className="mr-2" />;
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="p-6 Container mx-auto bg-gradient-to-br  min-h-screen">
+    <div className="p-6 container mx-auto bg-gradient-to-br min-h-screen">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-2xl shadow-lg">
         <div className="flex items-center space-x-4">
-          <FaCalendarAlt className="text-gray-500" size={20} />
-          <h2 className="text-2xl font-extrabold text-gray-800 tracking-tight">
+          <FaCalendarAlt className="text-teal-600" size={24} />
+          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
             Lịch Làm Việc Tuần
           </h2>
         </div>
-        <div className="flex items-center space-x-3 mt-4 sm:mt-0">
+        <div className="flex items-center space-x-4 mt-4 sm:mt-0">
           <button
             onClick={handlePreviousWeek}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 shadow-sm hover:shadow-md"
+            className="px-5 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-300 shadow-md hover:shadow-lg"
           >
             Tuần trước
           </button>
@@ -141,12 +160,12 @@ const DoctorWeeklySchedule = () => {
             selected={startDate}
             onChange={handleDateChange}
             dateFormat="dd/MM/yyyy"
-            className="px-4 py-2 border border-gray-200 rounded-lg text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 bg-white shadow-sm"
+            className="px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300 bg-white shadow-md hover:shadow-lg"
             placeholderText="Chọn ngày"
           />
           <button
             onClick={handleNextWeek}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 shadow-sm hover:shadow-md"
+            className="px-5 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-300 shadow-md hover:shadow-lg"
           >
             Tuần sau
           </button>
@@ -154,20 +173,20 @@ const DoctorWeeklySchedule = () => {
       </div>
 
       {/* Schedule Table */}
-      <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-100">
+      <div className="overflow-x-auto rounded-2xl shadow-lg border border-gray-200">
         <table className="w-full border-collapse bg-white">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-200 px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+            <tr className="bg-gradient-to-r from-teal-100 to-indigo-100">
+              <th className="border border-gray-200 px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">
                 Ca / Ngày
               </th>
               {days.map((day) => (
                 <th
                   key={day.key}
-                  className={`border border-gray-200 px-6 py-4 text-center text-sm font-semibold uppercase tracking-wider ${
+                  className={`border border-gray-200 px-6 py-4 text-center text-sm font-bold uppercase tracking-wider ${
                     day.isToday
-                      ? "bg-yellow-50 text-yellow-700 border-2 border-yellow-200"
-                      : "text-gray-700"
+                      ? "bg-gradient-to-r from-amber-100 to-amber-200 text-amber-800 border-2 border-amber-300"
+                      : "text-gray-800"
                   }`}
                 >
                   {day.label}
@@ -185,7 +204,7 @@ const DoctorWeeklySchedule = () => {
                 key={shift}
                 className="hover:bg-gray-50 transition-all duration-200"
               >
-                <td className="border border-gray-200 px-6 py-4 font-semibold text-gray-700 text-sm">
+                <td className="border border-gray-200 px-6 py-4 font-bold text-gray-800 text-sm">
                   {label}
                 </td>
                 {days.map((day) => {
@@ -193,9 +212,9 @@ const DoctorWeeklySchedule = () => {
                     return (
                       <td
                         key={day.key + shift}
-                        className="border border-gray-200 px-6 py-4 text-center bg-blue-50"
+                        className="border border-gray-200 px-6 py-4 text-center bg-indigo-50"
                       >
-                        <span className="text-gray-600 italic text-sm">
+                        <span className="text-indigo-600 italic text-sm">
                           Nghỉ trưa
                         </span>
                       </td>
@@ -208,25 +227,22 @@ const DoctorWeeklySchedule = () => {
                   return (
                     <td
                       key={day.key + shift}
-                      className={`border border-gray-200 px-6 py-4 text-center transition-all duration-300 ${
+                      className={`border border-gray-200 px-6 py-4 text-center transition-all duration-300 transform hover:scale-105 ${
                         slot
                           ? getStatusStyles(slot.status, isPending)
-                          : "bg-red-50 border-red-100"
+                          : "bg-red-50 border-red-200"
                       }`}
                     >
                       {slot ? (
-                        <span
-                          className={`font-medium text-sm inline-flex items-center px-3 py-1 rounded-full ${
-                            isPending ? "text-green-500" : "text-green-600"
-                          }`}
-                        >
-                          {slot.status === "Đã xác nhận" && (
-                            <span className="mr-1"></span>
-                          )}
+                        <span className="font-medium text-sm inline-flex items-center px-3 py-1 rounded-full">
+                          {getStatusIcon(slot.status, isPending)}
                           {slot.status}
                         </span>
                       ) : (
-                        <span className="text-red-500 italic text-sm">OFF</span>
+                        <span className="text-red-600 italic text-sm inline-flex items-center">
+                          <FaTimesCircle className="mr-2" />
+                          OFF
+                        </span>
                       )}
                     </td>
                   );
@@ -239,12 +255,14 @@ const DoctorWeeklySchedule = () => {
 
       {/* No Schedule Message */}
       {schedules.length === 0 && (
-        <div className="mt-4 bg-white p-8 rounded-2xl shadow-sm text-center">
-          <p className="text-red-500 font-semibold text-lg">
+        <div className="mt-6 bg-white p-8 rounded-2xl shadow-lg text-center">
+          {/* <p className="text-red-600 font-semibold text-lg">
             Không có lịch làm việc trong tuần này.
-          </p>
+          </p> */}
         </div>
       )}
+
+      {/* <Toaster /> */}
     </div>
   );
 };

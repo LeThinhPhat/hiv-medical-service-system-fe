@@ -6,29 +6,42 @@ import { DateTime } from "luxon";
 
 const FinishAppointment = () => {
   const [appointments, setAppointments] = useState([]);
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expanded, setExpanded] = useState({});
+  const [searchName, setSearchName] = useState("");
+  const [filterDate, setFilterDate] = useState("");
   const navigate = useNavigate();
 
-  // Format UTC date to Vietnam date (Asia/Ho_Chi_Minh, UTC+7), only date
-  const formatVietnamDate = (utcDateString) => {
+  // Format UTC date into separate date and time components
+  const formatRawDate = (utcDateString) => {
     try {
-      if (!utcDateString) return "N/A";
-      const dateTime = DateTime.fromISO(utcDateString, { zone: "utc" }).setZone(
-        "Asia/Ho_Chi_Minh"
-      );
+      if (!utcDateString) return { date: "N/A", time: "N/A" };
+      const dateTime = DateTime.fromISO(utcDateString, { zone: "utc" });
       if (!dateTime.isValid) {
         console.error("Invalid date:", utcDateString);
-        return "Ngày không hợp lệ";
+        return { date: "Ngày không hợp lệ", time: "N/A" };
       }
-      console.debug(
-        `Converted ${utcDateString} to ${dateTime.toFormat("dd/MM/yyyy")}`
-      );
-      return dateTime.toFormat("dd/MM/yyyy");
+      return {
+        date: dateTime.toFormat("yyyy-MM-dd"),
+        time: dateTime.toFormat("HH:mm"),
+      };
     } catch (error) {
       console.error("Error formatting date:", utcDateString, error);
-      return "Ngày không hợp lệ";
+      return { date: "Ngày không hợp lệ", time: "N/A" };
+    }
+  };
+
+  // Format date for date input (YYYY-MM-DD)
+  const formatDateForInput = (utcDateString) => {
+    try {
+      if (!utcDateString) return "";
+      const dateTime = DateTime.fromISO(utcDateString, { zone: "utc" });
+      if (!dateTime.isValid) return "";
+      return dateTime.toFormat("yyyy-MM-dd");
+    } catch (error) {
+      console.error("Error formatting date for input:", utcDateString, error);
+      return "";
     }
   };
 
@@ -46,17 +59,13 @@ const FinishAppointment = () => {
       }
 
       const res = await appointmentFinishService(token);
-      console.debug("API response:", res.data); // Log API response for debugging
+      console.debug("API response:", res.data);
       if (res.data && Array.isArray(res.data)) {
         const sortedAppointments = res.data.sort(
           (a, b) => new Date(b.startTime) - new Date(a.startTime)
         );
         setAppointments(sortedAppointments);
-        const initialExpanded = sortedAppointments.reduce((acc, appt) => {
-          acc[appt._id] = false;
-          return acc;
-        }, {});
-        setExpanded(initialExpanded);
+        setFilteredAppointments(sortedAppointments);
       } else {
         setError("Không tìm thấy lịch hẹn đã hoàn tất.");
       }
@@ -73,13 +82,25 @@ const FinishAppointment = () => {
     }
   };
 
+  // Filter appointments based on search name and date
+  useEffect(() => {
+    const filtered = appointments.filter((appointment) => {
+      const patientName = appointment.patientID?.userID?.name || "";
+      const appointmentDate = formatDateForInput(appointment.startTime);
+      const matchesName = patientName
+        .toLowerCase()
+        .includes(searchName.toLowerCase());
+      const matchesDate = filterDate
+        ? appointmentDate.startsWith(filterDate)
+        : true;
+      return matchesName && matchesDate;
+    });
+    setFilteredAppointments(filtered);
+  }, [searchName, filterDate, appointments]);
+
   useEffect(() => {
     fetchAppointments();
   }, [navigate]);
-
-  const handleToggleExpand = (id) => {
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
 
   if (loading) {
     return (
@@ -128,12 +149,29 @@ const FinishAppointment = () => {
   }
 
   return (
-    <div className="container mx-auto my-8 px-4 ">
+    <div className="container mx-auto my-8 px-4">
       <h1 className="text-3xl font-bold text-center text-indigo-600 mb-8">
-        Danh Sách Lịch Hẹn Đã Hoàn Tất
+        Danh Sách Bệnh Nhân Đã Khám
       </h1>
 
-      {appointments.length === 0 && (
+      {/* Search and Filter Controls */}
+      <div className="mb-6 flex flex-col sm:flex-row gap-4">
+        <input
+          type="text"
+          placeholder="Tìm kiếm theo tên bệnh nhân..."
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+          className="w-full sm:w-1/2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+        />
+        <input
+          type="date"
+          value={filterDate}
+          onChange={(e) => setFilterDate(e.target.value)}
+          className="w-full sm:w-1/2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+        />
+      </div>
+
+      {filteredAppointments.length === 0 && (
         <div className="text-center bg-gray-50 p-6 rounded-xl shadow-lg">
           <p className="text-gray-500 text-lg font-medium">
             Không tìm thấy lịch hẹn đã hoàn tất.
@@ -147,93 +185,45 @@ const FinishAppointment = () => {
         </div>
       )}
 
-      <div className="grid gap-6">
-        {appointments.map((appointment) => (
-          <div
-            key={appointment._id}
-            className="bg-white shadow-md rounded-xl hover:shadow-xl transition-shadow duration-300"
-            role="region"
-            aria-label={`Lịch hẹn với ${appointment.patientID?.name || "N/A"}`}
-          >
-            <div className="p-6">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-xl font-semibold text-indigo-600">
-                    {appointment.patientID?.name || "N/A"}
-                  </h2>
-                  <p className="text-gray-600 font-medium">
-                    {appointment.serviceID?.name || "N/A"}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {formatVietnamDate(appointment.startTime)}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleToggleExpand(appointment._id)}
-                  className="w-8 h-8 flex items-center justify-center bg-indigo-100 text-indigo-600 hover:bg-indigo-200 hover:text-indigo-800 rounded-full transition-colors duration-200 text-lg font-semibold"
-                  aria-label={expanded[appointment._id] ? "Thu gọn" : "Mở rộng"}
-                >
-                  {expanded[appointment._id] ? "−" : "+"}
-                </button>
-              </div>
-              {expanded[appointment._id] && (
-                <>
-                  <hr className="my-4 border-gray-200" />
-                  <ul className="space-y-3 text-gray-700">
-                    <li>
-                      <strong>Bệnh nhân:</strong>{" "}
-                      {appointment.patientID?.name || "N/A"}
-                    </li>
-                    <li>
-                      <strong>CMND/CCCD:</strong>{" "}
-                      {appointment.patientID?.personalID || "N/A"}
-                    </li>
-                    <li>
-                      <strong>Bác sĩ:</strong>{" "}
-                      {appointment.updatedBy?.email || "N/A"}
-                    </li>
-                    <li>
-                      <strong>Dịch vụ:</strong>{" "}
-                      {appointment.serviceID?.name || "N/A"}
-                    </li>
-                    <li>
-                      <strong>Giá:</strong>{" "}
-                      {appointment.serviceID?.price
-                        ? `${appointment.serviceID.price.toLocaleString(
-                            "vi-VN"
-                          )} VND`
-                        : "N/A"}
-                    </li>
-                    <li>
-                      <strong>Thời lượng:</strong>{" "}
-                      {appointment.serviceID?.durationMinutes
-                        ? `${appointment.serviceID.durationMinutes} phút`
-                        : "N/A"}
-                    </li>
-                    <li>
-                      <strong>Ngày bắt đầu:</strong>{" "}
-                      {formatVietnamDate(appointment.startTime)}
-                    </li>
-                    <li>
-                      <strong>Ngày tạo:</strong>{" "}
-                      {formatVietnamDate(appointment.createdAt)}
-                    </li>
-                    <li>
-                      <strong>Trạng thái:</strong>{" "}
-                      <span className="text-green-600 font-medium">
-                        {appointment.status || "N/A"}
-                      </span>
-                    </li>
-                    <li>
-                      <strong>Raw startTime:</strong>{" "}
-                      {appointment.startTime || "N/A"} {/* Debugging */}
-                    </li>
-                  </ul>
-                </>
-              )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredAppointments.map((appointment) => {
+          const startTime = formatRawDate(appointment.startTime);
+          const createdAt = formatRawDate(appointment.createdAt);
+          return (
+            <div
+              key={appointment._id}
+              className="bg-white rounded-xl shadow-md p-4 flex flex-col items-center text-center"
+            >
+              <h2 className="text-lg font-semibold text-indigo-600">
+                {appointment.patientID?.userID?.name || "Không có bệnh nhân"}
+              </h2>
+              <p className="text-gray-600 font-medium">
+                Dịch vụ: {appointment.serviceID?.name || "N/A"}
+              </p>
+              <p className="text-gray-600">
+                Giá:{" "}
+                {appointment.serviceID?.price?.toLocaleString("vi-VN") || "N/A"}{" "}
+                VND
+              </p>
+              <p className="text-gray-600">
+                Thời lượng: {appointment.serviceID?.durationMinutes || "N/A"}{" "}
+                phút
+              </p>
+              <p className="text-sm font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded mt-2">
+                Thời gian bắt đầu: {startTime.date} {startTime.time}
+              </p>
+              <p className="text-sm text-gray-500">
+                Trạng thái: {appointment.status || "N/A"}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Ngày đặt lịch: {createdAt.date} {createdAt.time}
+              </p>
+              <p className="text-xs text-gray-400">
+                Cập nhật bởi: {appointment.updatedBy?.email || "N/A"}
+              </p>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <Toaster />
     </div>
