@@ -81,9 +81,13 @@ const BlogList = () => {
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
                   {post.title}
                 </h3>
-                <p className="text-gray-600 mb-4">{post.content}</p>
+                <p className="text-gray-600 mb-4">
+                  {post.content.length > 100
+                    ? post.content.substring(0, 100) + "..."
+                    : post.content}
+                </p>
                 <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
-                  <span>{post.createdBy.email}</span>
+                  {/* <span>{post.createdBy.email}</span> */}
                   <span>{post.date}</span>
                 </div>
                 <Link

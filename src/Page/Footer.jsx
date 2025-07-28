@@ -1,78 +1,140 @@
 import React from "react";
+import { FaFacebookF, FaInstagram, FaMapMarkerAlt } from "react-icons/fa";
+import { SiZalo } from "react-icons/si";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 text-gray-800 mt-10 border-t">
-      <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Cột 1 */}
+    <footer className="bg-blue-50 text-gray-700 mt-12 border-t border-blue-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Cột 1: Công ty */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Công ty</h2>
-          <ul className="space-y-2 text-sm">
+          <h2 className="text-xl font-bold text-gray-800 mb-6">Công Ty</h2>
+          <ul className="space-y-3 text-sm font-medium">
             <li>
-              <a href="#" className="hover:underline">
+              <Link
+                to="/about"
+                className="hover:text-blue-400 transition-colors duration-300"
+              >
                 Giới thiệu
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <Link
+                to="/careers"
+                className="hover:text-blue-400 transition-colors duration-300"
+              >
                 Tuyển dụng
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <Link
+                to="/contact"
+                className="hover:text-blue-400 transition-colors duration-300"
+              >
                 Liên hệ
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
 
-        {/* Cột 2 */}
+        {/* Cột 2: Hỗ trợ */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Hỗ trợ</h2>
-          <ul className="space-y-2 text-sm">
+          <h2 className="text-xl font-bold text-gray-800 mb-6">Hỗ Trợ</h2>
+          <ul className="space-y-3 text-sm font-medium">
             <li>
-              <a href="#" className="hover:underline">
+              <Link
+                to="/warranty"
+                className="hover:text-blue-400 transition-colors duration-300"
+              >
                 Chính sách bảo hành
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <Link
+                to="/returns"
+                className="hover:text-blue-400 transition-colors duration-300"
+              >
                 Chính sách đổi trả
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/guide"
+                className="hover:text-blue-400 transition-colors duration-300"
+              >
+                Hướng dẫn mua hàng
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Cột 3: Kết nối với chúng tôi */}
+        <div>
+          <h2 className="text-xl font-bold text-gray-800 mb-6">
+            Kết Nối Với Chúng Tôi
+          </h2>
+          <ul className="space-y-4 text-sm font-medium">
+            <li>
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 hover:text-blue-400 transition-colors duration-300"
+              >
+                <FaFacebookF
+                  className="text-blue-400 hover:text-blue-500"
+                  size={20}
+                />
+                <span>Facebook</span>
               </a>
             </li>
             <li>
-              <a href="#" className="hover:underline">
-                Hướng dẫn mua hàng
+              <a
+                href="https://zalo.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 hover:text-blue-400 transition-colors duration-300"
+              >
+                <SiZalo
+                  className="text-blue-400 hover:text-blue-500"
+                  size={20}
+                />
+                <span>Zalo</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 hover:text-blue-400 transition-colors duration-300"
+              >
+                <FaInstagram
+                  className="text-blue-400 hover:text-blue-500"
+                  size={20}
+                />
+                <span>Instagram</span>
               </a>
             </li>
           </ul>
         </div>
 
-        {/* Cột 3 */}
+        {/* Cột 4: Địa chỉ */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Kết nối với chúng tôi</h2>
-          <ul className="space-y-2 text-sm">
-            <li>
-              <a href="#" className="hover:underline">
-                Facebook
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:underline">
-                Zalo
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:underline">
-                Instagram
-              </a>
-            </li>
-          </ul>
+          <h2 className="text-xl font-bold text-gray-800 mb-6">Địa Chỉ</h2>
+          <div className="flex items-start space-x-2 text-sm font-medium text-gray-600">
+            <FaMapMarkerAlt className="text-blue-400 mt-1" size={20} />
+            <p>
+              Đại Học FPT, Khu Công Nghệ Cao, <br />
+              TP. Hồ Chí Minh, Việt Nam
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="text-center text-sm text-gray-500 py-4 border-t">
-        © {new Date().getFullYear()} Golden Age. All rights reserved.
+      <div className="text-center text-sm text-gray-500 py-6 border-t border-blue-100 bg-blue-50">
+        © {new Date().getFullYear()} GoldenAge. All rights reserved.
       </div>
     </footer>
   );

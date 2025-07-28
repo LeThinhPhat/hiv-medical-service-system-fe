@@ -71,13 +71,14 @@ import ServicesPage from "../Page/ServicesPage";
 import SuccessWalletPage from "../Components/Customer/SuccessWalletPage";
 import FinishAppointment from "../Components/Doctor/FinishAppointment";
 import CreateDoctor from "../Components/Manager/CreateDoctor";
+import FacilityInfos from "../Page/FacilityInfos";
 const Router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
       { path: "", element: <Homepage /> },
-      { path: "about", element: <About /> },
+      { path: "about", element: <FacilityInfos /> },
       { path: "services", element: <ServicesPage /> },
       { path: "blogs", element: <BlogList /> },
       { path: "blogs/:id", element: <BlogDetail /> },

@@ -8,9 +8,17 @@ import {
   CardMedia,
   Button,
   CircularProgress,
-  Fade,
   Tooltip,
 } from "@mui/material";
+import {
+  Person as PersonIcon,
+  LocalHospital,
+  School,
+  Event,
+  Phone,
+  CheckCircle,
+  Cancel,
+} from "@mui/icons-material";
 import docService from "../../Services/CusService/docterListService";
 
 const DetailDoctor = () => {
@@ -30,13 +38,13 @@ const DetailDoctor = () => {
       try {
         setLoading(true);
         const data = await docService.getDoctorById(id);
-        console.log("Doctor data:", data);
         setDoctor({
           id: data._id,
           name: data.userID?.name || "Unknown",
           phone: data.userID?.phone || "N/A",
           room: data.room || "N/A",
-          avatarURL: data.avatarURL,
+          avatarURL:
+            data.avatarURL || "https://via.placeholder.com/120?text=Doctor",
           experiences: data.experiences || [],
           degrees: data.degrees || "N/A",
           specializations: data.specializations || "Không có chuyên khoa",
@@ -44,26 +52,26 @@ const DetailDoctor = () => {
           createdAt: new Date(data.createdAt).toLocaleDateString(),
         });
       } catch (err) {
-        setError("Không thể tải thông tin bác sĩ. Vui lòng thử lại sau.",err);
+        setError("Không thể tải thông tin bác sĩ. Vui lòng thử lại sau.");
       } finally {
         setLoading(false);
       }
     };
     fetchDoctorDetails();
   }, [id]);
-  console.log("Doctor state:", doctor);
+
   if (loading) {
     return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fa", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <CircularProgress size={48} />
+      <Box className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <CircularProgress size={48} sx={{ color: "#60A5FA" }} />
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fa", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Typography variant="h6" color="error.main">
+      <Box className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Typography className="text-red-500 text-lg font-semibold">
           {error}
         </Typography>
       </Box>
@@ -72,8 +80,8 @@ const DetailDoctor = () => {
 
   if (!doctor) {
     return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fa", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Typography variant="h6" color="text.secondary">
+      <Box className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Typography className="text-gray-600 text-lg font-semibold">
           Không tìm thấy thông tin bác sĩ.
         </Typography>
       </Box>
@@ -81,151 +89,142 @@ const DetailDoctor = () => {
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fa", py: 6 }}>
+    <Box className="min-h-screen bg-blue-50 py-12">
       <Container maxWidth="lg">
-        {/* Header Section */}
-        <Box sx={{ mb: 6, textAlign: "center" }}>
+        <Box className="mb-10 text-center">
           <Typography
-            variant="h3"
-            fontWeight={700}
-            color="primary.main"
-            sx={{ mb: 1, fontSize: { xs: "2rem", md: "3rem" } }}
+            variant="h4"
+            className="text-3xl sm:text-4xl font-bold text-blue-700"
           >
-            Thông tin chi tiết bác sĩ
+            Thông Tin Bác Sĩ
           </Typography>
         </Box>
 
-        {/* Main Content */}
-        <Fade in timeout={800}>
-          <Paper
-            elevation={3}
-            sx={{
-              p: { xs: 3, md: 4 },
-              borderRadius: 3,
-              bgcolor: "white",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-            }}
-          >
-            <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4 }}>
-              {/* Doctor Image */}
-              <Box sx={{ flex: { xs: "1 0 100%", md: "0 0 300px" }, display: "flex", justifyContent: "center" }}>
-                <CardMedia
-                  component="img"
-                  image={doctor.avatarURL}
-                  alt={doctor.name}
-                  sx={{
-                    width: { xs: "100%", md: 300 },
-                    height: { xs: 200, md: 300 },
-                    borderRadius: 3,
-                    objectFit: "cover",
-                    border: "2px solid #e0e0e0",
-                  }}
-                />
+        <Paper
+          elevation={3}
+          className="p-6 sm:p-8 rounded-2xl bg-white shadow-lg"
+        >
+          <Box className="flex flex-col md:flex-row gap-8">
+            {/* Avatar */}
+            <Box className="flex justify-center md:w-1/3">
+              <CardMedia
+                component="img"
+                image={doctor.avatarURL}
+                alt={doctor.name}
+                className="w-full max-w-[280px] h-[300px] rounded-2xl object-cover border-4 border-blue-100 shadow"
+              />
+            </Box>
+
+            {/* Info */}
+            <Box className="flex-1 text-gray-700">
+              <Typography className="text-2xl font-bold text-blue-800 mb-4">
+                {doctor.name}
+              </Typography>
+
+              <Box className="space-y-3 text-base">
+                <Typography>
+                  <LocalHospital className="text-blue-600 mr-2" />
+                  <strong>Chuyên khoa:</strong> {doctor.specializations}
+                </Typography>
+
+                <Typography>
+                  <Phone className="text-green-600 mr-2" />
+                  <strong>Số điện thoại:</strong> {doctor.phone}
+                </Typography>
+
+                <Typography>
+                  <strong>Phòng:</strong> {doctor.room}
+                </Typography>
+
+                <Typography>
+                  <School className="text-purple-600 mr-2" />
+                  <strong>Bằng cấp:</strong> {doctor.degrees}
+                </Typography>
+
+                <Typography>
+                  <strong>Kinh nghiệm:</strong>{" "}
+                  {doctor.experiences.length > 0
+                    ? doctor.experiences.join(", ")
+                    : "Chưa cập nhật"}
+                </Typography>
+
+                <Typography>
+                  {doctor.isActive ? (
+                    <CheckCircle className="text-green-500 mr-2" />
+                  ) : (
+                    <Cancel className="text-red-500 mr-2" />
+                  )}
+                  <strong>Trạng thái:</strong>{" "}
+                  {doctor.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
+                </Typography>
+
+                <Typography>
+                  <Event className="text-pink-500 mr-2" />
+                  <strong>Ngày tham gia:</strong> {doctor.createdAt}
+                </Typography>
               </Box>
 
-              {/* Doctor Details */}
-              <Box sx={{ flex: 1 }}>
-                <Typography
-                  variant="h4"
-                  fontWeight={600}
-                  color="text.primary"
-                  sx={{ mb: 3 }}
-                >
-                  Bác sĩ {doctor.name}
-                </Typography>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>Chuyên khoa:</strong> {doctor.specializations}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>Phòng:</strong> {doctor.room}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>Kinh nghiệm:</strong>{" "}
-                    {doctor.experiences.length > 0 ? doctor.experiences.join(", ") : "N/A"}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>Bằng cấp:</strong> {doctor.degrees}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>Trạng thái:</strong>{" "}
-                    {doctor.isActive ? "Đang hoạt động" : "Không hoạt động"}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>Ngày tham gia:</strong> {doctor.createdAt}
-                  </Typography>
-                </Box>
-
-                {/* Action Buttons */}
-                <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
-                  {token ? (
-                    <Button
-                      component={Link}
-                      to={`/book/${doctor.id}`}
-                      variant="contained"
-                      color="primary"
-                      sx={{
-                        px: 4,
-                        py: 1.5,
-                        borderRadius: 2,
-                        textTransform: "none",
-                        fontWeight: 600,
-                        "&:hover": {
-                          bgcolor: "primary.dark",
-                          transform: "translateY(-2px)",
-                          transition: "all 0.2s ease",
-                        },
-                      }}
-                    >
-                      Đặt lịch khám
-                    </Button>
-                  ) : (
-                    <Tooltip title="Vui lòng đăng nhập để đặt lịch khám">
-                      <span>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          disabled
-                          sx={{
-                            px: 4,
-                            py: 1.5,
-                            borderRadius: 2,
-                            textTransform: "none",
-                            fontWeight: 600,
-                            opacity: 0.6,
-                          }}
-                        >
-                          Đặt lịch khám
-                        </Button>
-                      </span>
-                    </Tooltip>
-                  )}
-
+              {/* Actions */}
+              <Box className="flex flex-wrap gap-4 mt-8">
+                {token ? (
                   <Button
                     component={Link}
-                    to="/booking"
-                    variant="outlined"
-                    color="primary"
+                    to={`/book/${doctor.id}`}
+                    variant="contained"
+                    className="rounded-full"
                     sx={{
+                      background: "linear-gradient(to right, #3B82F6, #9333EA)",
+                      textTransform: "none",
+                      fontWeight: "bold",
                       px: 4,
                       py: 1.5,
-                      borderRadius: 2,
-                      textTransform: "none",
-                      fontWeight: 600,
                       "&:hover": {
-                        bgcolor: "#f0f0f0",
-                        transform: "translateY(-2px)",
-                        transition: "all 0.2s ease",
+                        background:
+                          "linear-gradient(to right, #2563EB, #7E22CE)",
                       },
                     }}
                   >
-                    Quay lại danh sách bác sĩ
+                    Đặt lịch khám
                   </Button>
-                </Box>
+                ) : (
+                  <Tooltip title="Vui lòng đăng nhập để đặt lịch khám">
+                    <span>
+                      <Button
+                        disabled
+                        variant="contained"
+                        className="rounded-full opacity-60"
+                        sx={{ textTransform: "none", px: 4, py: 1.5 }}
+                      >
+                        Đặt lịch khám
+                      </Button>
+                    </span>
+                  </Tooltip>
+                )}
+
+                <Button
+                  component={Link}
+                  to="/booking"
+                  variant="outlined"
+                  className="rounded-full"
+                  sx={{
+                    borderColor: "#3B82F6",
+                    color: "#3B82F6",
+                    textTransform: "none",
+                    px: 4,
+                    py: 1.5,
+                    "&:hover": {
+                      backgroundColor: "#EFF6FF",
+                      borderColor: "#2563EB",
+                      color: "#2563EB",
+                    },
+                  }}
+                >
+                  Quay lại danh sách
+                </Button>
               </Box>
             </Box>
-          </Paper>
-        </Fade>
+          </Box>
+        </Paper>
       </Container>
     </Box>
   );
