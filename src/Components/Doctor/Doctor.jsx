@@ -1,9 +1,9 @@
 import React from "react";
-
+import FinishAppointment from "./FinishAppointment";
 const Doctor = () => {
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Chào mừng đến với Doctor!</h1>
+      <FinishAppointment />
     </div>
   );
 };

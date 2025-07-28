@@ -1,61 +1,67 @@
+import axios from "axios";
 
-import axiosClient from "../api.config"; 
+const API_URL = "http://localhost:3000/drugs";
+
+// Lấy tất cả thuốc
+const getAllDrugs = async (token) => {
+  const response = await axios.get(API_URL, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    },
+  });
+  return response.data.data;
+};
+
+// Lấy 1 thuốc theo ID
+const getDrugById = async (token, id) => {
+  const response = await axios.get(`${API_URL}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    },
+  });
+  return response.data.data;
+};
+
+// Tạo thuốc mới
+const createDrug = async (token, data) => {
+  const response = await axios.post(API_URL, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
+
+// Cập nhật thuốc theo ID
+const updateDrug = async (token, id, data) => {
+  const response = await axios.patch(`${API_URL}/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
+
+// Xoá thuốc
+const deleteDrug = async (token, id) => {
+  const response = await axios.delete(`${API_URL}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
 
 const drugsManagerService = {
-  // ✅ Lấy tất cả thuốc
-  getAllDrugs: async () => {
-    try {
-      const response = await axiosClient.get("/drugs");
-      return response.data.data;
-    } catch (error) {
-      console.error("Error fetching drugs:", error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  // ✅ Lấy thuốc theo ID
-  getDrugById: async (id) => {
-    try {
-      const response = await axiosClient.get(`/drugs/${id}`);
-      return response.data.data;
-    } catch (error) {
-      console.error("Error fetching drug by ID:", error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  // ✅ Tạo thuốc mới
-  createDrug: async (data) => {
-    try {
-      const response = await axiosClient.post("/drugs", data);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating drug:", error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  // ✅ Cập nhật thuốc theo ID
-  updateDrug: async (id, data) => {
-    try {
-      const response = await axiosClient.patch(`/drugs/${id}`, data);
-      return response.data;
-    } catch (error) {
-      console.error("Error updating drug:", error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  // ✅ Xoá thuốc
-  deleteDrug: async (id) => {
-    try {
-      const response = await axiosClient.delete(`/drugs/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error deleting drug:", error.response?.data || error.message);
-      throw error;
-    }
-  },
+  getAllDrugs,
+  getDrugById,
+  createDrug,
+  updateDrug,
+  deleteDrug,
 };
 
 export default drugsManagerService;

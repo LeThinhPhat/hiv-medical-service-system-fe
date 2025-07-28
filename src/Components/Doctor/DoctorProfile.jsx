@@ -77,35 +77,35 @@ const DoctorProfile = () => {
             </p>
             <p className="text-sm mt-1">Phòng: {doctor?.room}</p>
             <p className="text-sm mt-1">Email: {doctor?.userID?.email}</p>
-            <div className="flex items-center text-yellow-400 mt-1">
+            {/* <div className="flex items-center text-yellow-400 mt-1">
               {[...Array(5)].map((_, i) => (
                 <FaStar key={i} className="mr-1" />
               ))}
             </div>
-            <p className="text-sm">2896 đánh giá</p>
+            <p className="text-sm">2896 đánh giá</p> */}
           </div>
         </div>
 
         {/* Stats */}
         <div className="bg-white p-6 rounded-lg flex flex-col items-center justify-center">
           <FaUserMd className="text-4xl text-blue-500 mb-2" />
-          <h2 className="text-2xl font-bold text-blue-600">3605</h2>
+          <h2 className="text-2xl font-bold text-blue-600">000</h2>
           <p className="text-sm text-gray-600">Bệnh nhân</p>
-          <span className="text-xs mt-1 text-blue-500">68% cao</span>
+          <span className="text-xs mt-1 text-blue-500">00% cao</span>
         </div>
 
         <div className="bg-white p-6 rounded-lg flex flex-col items-center justify-center">
           <FaLungs className="text-4xl text-red-400 mb-2" />
-          <h2 className="text-2xl font-bold text-red-500">507</h2>
+          <h2 className="text-2xl font-bold text-red-500">000</h2>
           <p className="text-sm text-gray-600">Ca phẫu thuật</p>
-          <span className="text-xs mt-1 text-red-500">26% cao</span>
+          <span className="text-xs mt-1 text-red-500">00% cao</span>
         </div>
 
         <div className="bg-white p-6 rounded-lg flex flex-col items-center justify-center">
           <FaStarHalfAlt className="text-4xl text-green-400 mb-2" />
-          <h2 className="text-2xl font-bold text-green-600">2896</h2>
+          <h2 className="text-2xl font-bold text-green-600">0000</h2>
           <p className="text-sm text-gray-600">Đánh giá</p>
-          <span className="text-xs mt-1 text-green-600">30% cao</span>
+          <span className="text-xs mt-1 text-green-600">00% cao</span>
         </div>
       </div>
 

@@ -1,9 +1,10 @@
-import React from 'react';
+import React from "react";
+import UserList from "./UserList";
 
 const Admin = () => {
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Chào mừng đến với Admin!</h1>    
+    <div style={{ padding: "20px" }}>
+      <UserList />
     </div>
   );
 };
