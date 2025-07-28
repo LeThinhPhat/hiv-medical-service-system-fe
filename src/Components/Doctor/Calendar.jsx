@@ -40,7 +40,7 @@ const DoctorWeeklySchedule = () => {
         );
         setSchedules(response.data);
         if (response.data.length === 0) {
-          toast.error("Không có lịch làm việc trong tuần này");
+          // toast.error("Không có lịch làm việc trong tuần này");
         }
       } catch (err) {
         console.error("Lỗi khi lấy lịch:", err);
@@ -255,14 +255,14 @@ const DoctorWeeklySchedule = () => {
 
       {/* No Schedule Message */}
       {schedules.length === 0 && (
-        <div className="mt-6 bg-white p-8 rounded-2xl shadow-lg text-center">
+        <div className="">
           {/* <p className="text-red-600 font-semibold text-lg">
             Không có lịch làm việc trong tuần này.
           </p> */}
         </div>
       )}
-
-      {/* <Toaster /> */}
+      {/* 
+      <Toaster /> */}
     </div>
   );
 };
