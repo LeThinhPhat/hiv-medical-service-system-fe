@@ -45,11 +45,11 @@ const navItems = [
     label: "Content",
     icon: <FaComments className="text-xl" />,
     path: "/staff/content",
-    hasDropdown: true,
-    subItems: [
-      { label: "Bài viết", path: "/staff/content/posts" },
-      { label: "Thông báo", path: "/staff/content/notifications" },
-    ],
+    // hasDropdown: true,
+    // subItems: [
+    //   { label: "Bài viết", path: "/staff/content/posts" },
+    //   { label: "Thông báo", path: "/staff/content/notifications" },
+    // ],
   },
 ];
 
