@@ -1,22 +1,34 @@
+
 import React, { useEffect, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
+import { Visibility, Edit, Delete, Add } from "@mui/icons-material";
 import ARVmanagementService from "../../Services/ManagerService/ARVmanagement";
-import { Visibility, Edit, Delete } from "@mui/icons-material";
+import CreateRegimenDialog from "./CreateRegimenDialog";
 
 const ARVManagement = () => {
   const [regimens, setRegimens] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedRegimen, setSelectedRegimen] = useState(null);
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
 
   useEffect(() => {
     const fetchRegimens = async () => {
       try {
         const data = await ARVmanagementService.getRegiments();
-        setRegimens(data.data);
+        console.log("API Response:", data); // Debug the response
+        if (data && Array.isArray(data.data)) {
+          setRegimens(data.data.filter((r) => r && r._id)); // Filter out invalid entries
+        } else {
+          console.error("Invalid API response format:", data);
+          toast.error("Dữ liệu phác đồ không hợp lệ!");
+          setRegimens([]);
+        }
       } catch (error) {
         console.error("Lỗi lấy danh sách phác đồ:", error);
         toast.error(`Lỗi lấy danh sách phác đồ: ${error.message}`);
+        setRegimens([]);
       }
     };
     fetchRegimens();
@@ -25,8 +37,11 @@ const ARVManagement = () => {
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
   const filteredRegimens = regimens.filter((r) =>
-    [r.name, r.description].some((field) =>
-      field.toLowerCase().includes(searchTerm.toLowerCase())
+    r &&
+    [r.name || "", r.description || ""].some((field) =>
+      field && typeof field === "string"
+        ? field.toLowerCase().includes(searchTerm.toLowerCase())
+        : false
     )
   );
 
@@ -40,15 +55,72 @@ const ARVManagement = () => {
     setSelectedRegimen(null);
   };
 
-  const handleDelete = (id) => {
-    const updated = regimens.filter((r) => r._id !== id);
-    setRegimens(updated);
-    toast.success("Đã xóa phác đồ!");
+  const handleDelete = async (id) => {
+    try {
+      await ARVmanagementService.deleteRegiment(id);
+      setRegimens((prev) => prev.filter((r) => r._id !== id));
+      toast.success("Đã xóa phác đồ!");
+    } catch (error) {
+      console.error("Lỗi khi xóa phác đồ:", error);
+      toast.error(`Lỗi khi xóa phác đồ: ${error.message}`);
+    }
   };
 
   const truncateText = (text, maxLength = 50) => {
+    if (!text || typeof text !== "string") return "";
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + "...";
+  };
+
+  const handleOpenCreateDialog = () => {
+    setOpenCreateDialog(true);
+  };
+
+  const handleCloseCreateDialog = () => {
+    setOpenCreateDialog(false);
+  };
+
+  const handleCreateRegimen = async (newRegimen) => {
+    try {
+      const response = await ARVmanagementService.createRegiment(newRegimen);
+      if (response.data && response.data._id) {
+        setRegimens((prev) => [...prev, response.data]);
+        toast.success("Đã thêm phác đồ mới!");
+      } else {
+        throw new Error("Invalid regimen data returned");
+      }
+      handleCloseCreateDialog();
+    } catch (error) {
+      console.error("Lỗi khi tạo phác đồ:", error);
+      toast.error(`Lỗi khi tạo phác đồ: ${error.message}`);
+    }
+  };
+
+  const handleOpenEditDialog = (regimen) => {
+    setSelectedRegimen(regimen);
+    setOpenEditDialog(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setOpenEditDialog(false);
+    setSelectedRegimen(null);
+  };
+
+  const handleUpdateRegimen = async (updatedRegimen) => {
+    try {
+      console.log("Updating regimen:", updatedRegimen);
+      const response = await ARVmanagementService.updateRegiment(updatedRegimen._id, updatedRegimen);
+      if (response.data && response.data._id) 
+        setRegimens((prev) =>
+          prev.map((r) => (r._id === updatedRegimen._id ? response.data : r))
+        );
+        toast.success("Đã cập nhật phác đồ!");
+     
+      handleCloseEditDialog();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật phác đồ:", error);
+      toast.error(`Lỗi khi cập nhật phác đồ: ${error.message}`);
+    }
   };
 
   return (
@@ -57,23 +129,22 @@ const ARVManagement = () => {
         position="top-right"
         toastOptions={{
           duration: 4000,
-          success: {
-            style: {
-              background: "#2dd4bf",
-              color: "#fff",
-            },
-          },
-          error: {
-            style: {
-              background: "#f87171",
-              color: "#fff",
-            },
-          },
+          success: { style: { background: "#2dd4bf", color: "#fff" } },
+          error: { style: { background: "#f87171", color: "#fff" } },
         }}
       />
-      <h1 className="text-3xl font-bold text-teal-600 mb-6">
-        Quản Lý Phác Đồ ARV
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-teal-600">
+          Quản Lý Phác Đồ ARV
+        </h1>
+        <button
+          onClick={handleOpenCreateDialog}
+          className="flex items-center bg-teal-600 text-white rounded-lg px-4 py-2 hover:bg-teal-700 transition-colors"
+        >
+          <Add fontSize="small" className="mr-2" />
+          Thêm Phác Đồ
+        </button>
+      </div>
 
       <div className="bg-white p-4 rounded-2xl shadow-lg mb-6">
         <input
@@ -97,12 +168,12 @@ const ARVManagement = () => {
               className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow"
             >
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                {regimen.name}
+                {regimen.name || "Không có tên"}
               </h3>
               <p className="text-sm text-gray-700 mb-1">
                 <span className="font-medium">Loại:</span>{" "}
                 <span className="inline-block bg-teal-100 text-teal-800 px-2 py-1 rounded-full text-xs">
-                  {regimen.regimenType}
+                  {regimen.regimenType || "Không xác định"}
                 </span>
               </p>
               <p className="text-sm text-gray-700 mb-1">
@@ -122,9 +193,7 @@ const ARVManagement = () => {
                   <Visibility fontSize="small" />
                 </button>
                 <button
-                  onClick={() =>
-                    toast.error("Chức năng sửa chưa được triển khai!")
-                  }
+                  onClick={() => handleOpenEditDialog(regimen)}
                   className="text-blue-600 hover:text-blue-700"
                   title="Sửa"
                 >
@@ -143,59 +212,57 @@ const ARVManagement = () => {
         </div>
       )}
 
-      {/* Xem chi tiết */}
-      {openDialog && (
+      {openDialog && selectedRegimen && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-2xl">
             <h2 className="text-xl font-bold text-teal-600 mb-4">
               Chi tiết phác đồ
             </h2>
-            {selectedRegimen && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {selectedRegimen.name}
-                  </h3>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Loại:</span>{" "}
-                    {selectedRegimen.regimenType}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Mô tả:</span>{" "}
-                    {selectedRegimen.description}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Tác dụng phụ:</span>{" "}
-                    {selectedRegimen.sideEffects}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    Tiêu chí áp dụng:
-                  </h4>
-                  <ul className="pl-4 space-y-1 text-sm text-gray-700 list-disc">
-                    {selectedRegimen.criteria.map((c) => (
-                      <li key={c._id}>
-                        {c.test_type} {c.operator} {c.value}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    Thuốc sử dụng:
-                  </h4>
-                  <ul className="pl-4 space-y-1 text-sm text-gray-700 list-disc">
-                    {selectedRegimen.drugs.map((d) => (
-                      <li key={d._id}>
-                        {d.drugId.genericName} - {d.dosage} (
-                        {d.frequency.join(", ")})
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {selectedRegimen.name || "Không có tên"}
+                </h3>
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Loại:</span>{" "}
+                  {selectedRegimen.regimenType || "Không xác định"}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Mô tả:</span>{" "}
+                  {selectedRegimen.description || "Không có mô tả"}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Tác dụng phụ:</span>{" "}
+                  {selectedRegimen.sideEffects || "Không có tác dụng phụ"}
+                </p>
               </div>
-            )}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">
+                  Tiêu chí áp dụng:
+                </h4>
+                <ul className="pl-4 space-y-1 text-sm text-gray-700 list-disc">
+                  {(selectedRegimen.criteria || []).map((c) => (
+                    <li key={c._id}>
+                      {c.test_type} {c.operator} {c.value}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">
+                  Thuốc sử dụng:
+                </h4>
+                <ul className="pl-4 space-y-1 text-sm text-gray-700 list-disc">
+                  {(selectedRegimen.drugs || []).map((d) => (
+                    <li key={d._id}>
+                      {(d.drugId && d.drugId.genericName) || "Không xác định"} -{" "}
+                      {d.dosage || "Không có liều lượng"} (
+                      {(d.frequency || []).join(", ") || "Không có tần suất"})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
             <div className="flex justify-end mt-6">
               <button
                 onClick={handleCloseDialog}
@@ -207,8 +274,23 @@ const ARVManagement = () => {
           </div>
         </div>
       )}
+
+      <CreateRegimenDialog
+        open={openCreateDialog}
+        onClose={handleCloseCreateDialog}
+        onCreate={handleCreateRegimen}
+      />
+
+      <CreateRegimenDialog
+        open={openEditDialog}
+        onClose={handleCloseEditDialog}
+        onCreate={handleUpdateRegimen}
+        initialData={selectedRegimen}
+        isEditMode={true}
+      />
     </div>
   );
 };
 
 export default ARVManagement;
+

@@ -25,7 +25,7 @@ const PatientInfo = ({ patient, user, walletBalance }) => {
   const [formValues, setFormValues] = useState({
     name: user.name || "",
     email: user.email || "",
-    contactPhones: patient.contactPhones || "",
+    phone : patient.contactPhones || "",
     gender: user.gender || "",
     address: user.address || "",
     personalID: patient.personalID || "",

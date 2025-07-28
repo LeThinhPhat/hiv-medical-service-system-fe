@@ -247,10 +247,10 @@ const ProfileEditor = ({ user, editMode, setEditMode, formValues, handleChange, 
       
       <Grid container spacing={3}>
         {[
-          { 
+         {
             label: "Số điện thoại", 
-            value: formValues.contactPhones, 
-            key: "contactPhones", 
+            value: Array.isArray(formValues.phone) ? formValues.phone.join(", ") : formValues.phone, 
+            key: "phone", 
             icon: <PhoneIcon sx={{ color: "#0277bd" }} /> 
           },
           { 

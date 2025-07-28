@@ -103,7 +103,7 @@ const TreatmentPlanPage = () => {
               {isExpanded && (
                 <div className="mt-4 text-gray-700 text-sm">
                   <p><strong> Ghi chú:</strong> {regiment.note || "Không có ghi chú"}</p>
-                  <p><strong> Ngày kê:</strong> {data?.createdAt ? new Date(data.createdAt).toLocaleDateString() : "N/A"}</p>
+                  <p><strong>Ngày kê:</strong> {data?.createdAt ? new Date(data.createdAt).toLocaleDateString("vi-VN") : "N/A"}</p>
                   <p><strong> Loại:</strong> {data?.baseRegimentID?.regimenType || "N/A"}</p>
                   <p><strong> Tác dụng phụ:</strong> {data?.baseRegimentID?.sideEffects || "N/A"}</p>
                 <p><strong>Ngày tái khám:  </strong> 
