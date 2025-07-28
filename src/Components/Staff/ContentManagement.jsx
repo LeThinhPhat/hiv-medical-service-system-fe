@@ -5,42 +5,64 @@ import FacilityInfoManager from "./content/FacilityInfoManager";
 
 const ContentManagement = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b  px-4 py-8 sm:px-6 lg:px-8">
-      <div className="Container mx-auto">
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-8">
+    <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        <h1
+          className="text-3xl font-extrabold text-gray-900 tracking-tight mb-10 text-center"
+          role="heading"
+          aria-level="1"
+        >
           Quản lý Nội dung
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="space-y-12">
           {/* Facility Info Section */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-gray-200/50 animate-in fade-in">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <span className="text-blue-500">🏢</span> Thông tin cơ sở
+          <section
+            className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-gray-200/50 transition-all duration-300 animate-in fade-in"
+            aria-labelledby="facility-info-heading"
+          >
+            <h2
+              id="facility-info-heading"
+              className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3"
+            >
+              Thông tin cơ sở
             </h2>
-            <div className="border-t border-gray-200/30 pt-4">
+            <div className="pt-2">
               <FacilityInfoManager />
             </div>
-          </div>
+          </section>
 
-          {/* Blog Post Section */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-gray-200/50 animate-in fade-in">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <span className="text-blue-500">📝</span> Bài viết Blog
+          {/* Blog Post Section - Enlarged */}
+          <section
+            className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-12 border border-gray-200/50 transition-all duration-300 animate-in fade-in scale-105"
+            aria-labelledby="blog-post-heading"
+          >
+            <h2
+              id="blog-post-heading"
+              className="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-3"
+            >
+              Bài viết Blog
             </h2>
-            <div className="border-t border-gray-200/30 pt-4">
+            <div className="pt-4">
               <BlogPostManager />
             </div>
-          </div>
+          </section>
 
           {/* Educational Document Section */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-gray-200/50 animate-in fade-in">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <span className="text-blue-500">📚</span> Tài liệu hướng dẫn
+          <section
+            className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-gray-200/50 transition-all duration-300 animate-in fade-in"
+            aria-labelledby="educational-document-heading"
+          >
+            <h2
+              id="educational-document-heading"
+              className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3"
+            >
+              Tài liệu hướng dẫn
             </h2>
-            <div className="border-t border-gray-200/30 pt-4">
+            <div className="pt-2">
               <EducationalDocumentManager />
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>

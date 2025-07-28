@@ -1,10 +1,9 @@
-import React from 'react';
-
+import React from "react";
+import Dashboard from "../Staff/DashBoard";
 const Staff = () => {
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Chào mừng đến với Staff!</h1>
-      
+    <div style={{ padding: "20px" }}>
+      <Dashboard />
     </div>
   );
 };
