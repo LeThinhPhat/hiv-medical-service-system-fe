@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import {
-  IconButton,
-  Menu as MuiMenu,
-  MenuItem
-} from "@mui/material";
+import { IconButton, Menu as MuiMenu, MenuItem } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import AssignmentIcon from "@mui/icons-material/Assignment";
@@ -41,11 +37,21 @@ const Header = () => {
         </div>
 
         <nav className="hidden md:flex space-x-6 text-gray-700 text-sm font-medium">
-          <Link to="/" className="hover:text-blue-700 transition">Trang chủ</Link>
-          <Link to="/about" className="hover:text-blue-700 transition">Giới thiệu</Link>
-          <Link to="/booking" className="hover:text-blue-700 transition">Đặt lịch khám</Link>
-          <Link to="/services" className="hover:text-blue-700 transition">Các dịch vụ</Link>
-          <Link to="/blogs" className="hover:text-blue-700 transition">Blogs</Link>
+          <Link to="/" className="hover:text-blue-700 transition">
+            Trang chủ
+          </Link>
+          <Link to="/about" className="hover:text-blue-700 transition">
+            Giới thiệu
+          </Link>
+          <Link to="/booking" className="hover:text-blue-700 transition">
+            Đặt lịch khám
+          </Link>
+          <Link to="/services" className="hover:text-blue-700 transition">
+            Các dịch vụ
+          </Link>
+          <Link to="/blogs" className="hover:text-blue-700 transition">
+            Blogs
+          </Link>
         </nav>
 
         <div className="md:hidden">
@@ -57,7 +63,10 @@ const Header = () => {
         <div className="hidden md:flex items-center space-x-3">
           {token && (
             <div className="flex items-center space-x-1 text-sm font-medium text-blue-600">
-              <AccountBalanceWalletIcon fontSize="small" sx={{ color: "#3B82F6" }} />
+              <AccountBalanceWalletIcon
+                fontSize="small"
+                sx={{ color: "#3B82F6" }}
+              />
               <span>{walletBalance.toLocaleString("vi-VN")} ₫</span>
             </div>
           )}
@@ -102,12 +111,44 @@ const Header = () => {
       {menuOpen && (
         <div className="md:hidden px-4 pb-4">
           <nav className="flex flex-col space-y-2 text-gray-700 text-sm font-medium">
-            <Link to="/" onClick={toggleMenu} className="hover:text-yellow-700">Trang chủ</Link>
-            <Link to="/about" onClick={toggleMenu} className="hover:text-yellow-700">Giới thiệu</Link>
-            <Link to="/booking" onClick={toggleMenu} className="hover:text-yellow-700">Đặt lịch khám</Link>
-            <Link to="/news" onClick={toggleMenu} className="hover:text-yellow-700">Tin tức</Link>
-            <Link to="/blogs" onClick={toggleMenu} className="hover:text-yellow-700">Blogs</Link>
-            <Link to="/test" onClick={toggleMenu} className="hover:text-yellow-700">Test</Link>
+            <Link to="/" onClick={toggleMenu} className="hover:text-yellow-700">
+              Trang chủ
+            </Link>
+            <Link
+              to="/about"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
+              Giới thiệu
+            </Link>
+            <Link
+              to="/booking"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
+              Đặt lịch khám
+            </Link>
+            <Link
+              to="/news"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
+              Tin tức
+            </Link>
+            <Link
+              to="/blogs"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
+              Blogs
+            </Link>
+            <Link
+              to="/test"
+              onClick={toggleMenu}
+              className="hover:text-yellow-700"
+            >
+              Test
+            </Link>
 
             {token && (
               <Link to="/treatment-plan" onClick={toggleMenu}>
@@ -119,7 +160,10 @@ const Header = () => {
 
             {token && (
               <div className="flex items-center space-x-1 mt-2 text-sm font-medium text-blue-600">
-                <AccountBalanceWalletIcon fontSize="small" sx={{ color: "#3B82F6" }} />
+                <AccountBalanceWalletIcon
+                  fontSize="small"
+                  sx={{ color: "#3B82F6" }}
+                />
                 <span>{walletBalance.toLocaleString("vi-VN")} ₫</span>
               </div>
             )}
