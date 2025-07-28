@@ -94,19 +94,20 @@ const AnonymousAppointments = () => {
     setCurrentPageOther(1);
   };
 
-const filteredAppointments = appointments.filter((item) => {
-  const appointmentDate = item.rawDate || dayjs(item.date).format("YYYY-MM-DD"); // Ưu tiên dùng rawDate
-  const email = item.createdBy?.email?.toLowerCase() || "";
-  const status = item.status?.toLowerCase() || "";
+  const filteredAppointments = appointments.filter((item) => {
+    const appointmentDate =
+      item.rawDate || dayjs(item.date).format("YYYY-MM-DD"); // Ưu tiên dùng rawDate
+    const email = item.createdBy?.email?.toLowerCase() || "";
+    const status = item.status?.toLowerCase() || "";
 
-  const matchesDate = !searchDate || appointmentDate === searchDate;
-  const matchesEmail =
-    !searchEmail || email.includes(searchEmail.toLowerCase());
-  const matchesStatus =
-    !filterStatus || status === filterStatus.toLowerCase();
+    const matchesDate = !searchDate || appointmentDate === searchDate;
+    const matchesEmail =
+      !searchEmail || email.includes(searchEmail.toLowerCase());
+    const matchesStatus =
+      !filterStatus || status === filterStatus.toLowerCase();
 
-  return matchesDate && matchesEmail && matchesStatus;
-});
+    return matchesDate && matchesEmail && matchesStatus;
+  });
 
   const pendingAppointments = filteredAppointments.filter(
     (item) => item.status === "Đang xét duyệt"
@@ -371,7 +372,7 @@ const filteredAppointments = appointments.filter((item) => {
         ) : (
           <>
             <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <span className="text-blue-500">⏳</span> Cuộc Hẹn Đang Chờ Xét
+              <span className="text-blue-500"></span> Cuộc Hẹn Đang Chờ Xét
               Duyệt
             </h2>
             {pendingAppointments.length > 0 ? (
@@ -391,7 +392,7 @@ const filteredAppointments = appointments.filter((item) => {
             )}
 
             <h2 className="text-xl font-semibold text-gray-800 mt-8 mb-4 flex items-center gap-2">
-              <span className="text-blue-500">📋</span> Các Cuộc Hẹn Khác
+              <span className="text-blue-500"></span> Các Cuộc Hẹn Khác
             </h2>
             {otherAppointments.length > 0 ? (
               renderTable(

@@ -248,8 +248,8 @@ const DoctorSlot = () => {
         <h3 className="text-xl font-bold text-gray-800 mb-4">
           Lịch chi tiết ngày {moment(date).format("DD/MM/YYYY")}
         </h3>
-        {renderSlotList(dailySlots.morning, "Buổi Sáng (07:00 - 12:00)")}
-        {renderSlotList(dailySlots.afternoon, "Buổi Chiều (12:00 - 20:00)")}
+        {renderSlotList(dailySlots.morning, "Buổi Sáng (07:00 - 11:00)")}
+        {renderSlotList(dailySlots.afternoon, "Buổi Chiều (13:00 - 18:00)")}
       </div>
 
       {/* Modal */}
