@@ -30,77 +30,124 @@ const Header = () => {
   const handleProfileMenuClose = () => setAnchorEl(null);
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-        <div className="text-2xl font-bold text-blue-700">
-          <Link to="/">GoldenAge</Link>
+    <header className="bg-white shadow-lg sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <div className="text-3xl font-extrabold text-blue-600 hover:text-blue-800 transition-colors duration-300">
+          <Link to="/">HIV Medical</Link>
         </div>
 
-        <nav className="hidden md:flex space-x-6 text-gray-700 text-sm font-medium">
-          <Link to="/" className="hover:text-blue-700 transition">
+        <nav className="hidden md:flex items-center space-x-8 text-gray-600 text-base font-semibold">
+          <Link
+            to="/"
+            className="hover:text-blue-600 hover:scale-105 transition-all duration-300"
+          >
             Trang chủ
           </Link>
-          <Link to="/about" className="hover:text-blue-700 transition">
+          <Link
+            to="/about"
+            className="hover:text-blue-600 hover:scale-105 transition-all duration-300"
+          >
             Giới thiệu
           </Link>
-          <Link to="/booking" className="hover:text-blue-700 transition">
+          <Link
+            to="/booking"
+            className="hover:text-blue-600 hover:scale-105 transition-all duration-300"
+          >
             Đặt lịch khám
           </Link>
-          <Link to="/services" className="hover:text-blue-700 transition">
+          <Link
+            to="/services"
+            className="hover:text-blue-600 hover:scale-105 transition-all duration-300"
+          >
             Các dịch vụ
           </Link>
-          <Link to="/blogs" className="hover:text-blue-700 transition">
+          <Link
+            to="/blogs"
+            className="hover:text-blue-600 hover:scale-105 transition-all duration-300"
+          >
             Blogs
           </Link>
         </nav>
 
         <div className="md:hidden">
-          <button onClick={toggleMenu} className="text-blue-700">
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          <button
+            onClick={toggleMenu}
+            className="text-blue-600 hover:text-blue-800 transition-colors duration-300"
+          >
+            {menuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
 
-        <div className="hidden md:flex items-center space-x-3">
+        <div className="hidden md:flex items-center space-x-4">
           {token && (
-            <div className="flex items-center space-x-1 text-sm font-medium text-blue-600">
+            <div className="flex items-center space-x-2 text-sm font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors duration-300">
               <AccountBalanceWalletIcon
                 fontSize="small"
-                sx={{ color: "#3B82F6" }}
+                sx={{ color: "#60A5FA" }}
               />
               <span>{walletBalance.toLocaleString("vi-VN")} ₫</span>
             </div>
           )}
 
           {token && (
-            <IconButton component={Link} to="/treatment-plan">
-              <AssignmentIcon fontSize="large" sx={{ color: "#3B82F6" }} />
+            <IconButton
+              component={Link}
+              to="/treatment-plan"
+              className="hover:bg-blue-100 transition-colors duration-300"
+            >
+              <AssignmentIcon fontSize="large" sx={{ color: "#60A5FA" }} />
             </IconButton>
           )}
 
           {token && (
-            <IconButton component={Link} to="/profile">
-              <PersonSearchIcon fontSize="large" sx={{ color: "#3B82F6" }} />
+            <IconButton
+              component={Link}
+              to="/profile"
+              className="hover:bg-blue-100 transition-colors duration-300"
+            >
+              <PersonSearchIcon fontSize="large" sx={{ color: "#60A5FA" }} />
             </IconButton>
           )}
 
-          <IconButton onClick={handleProfileMenuOpen}>
-            <AccountCircleIcon fontSize="large" sx={{ color: "#3B82F6" }} />
+          <IconButton
+            onClick={handleProfileMenuOpen}
+            className="hover:bg-blue-100 transition-colors duration-300"
+          >
+            <AccountCircleIcon fontSize="large" sx={{ color: "#60A5FA" }} />
           </IconButton>
 
           <MuiMenu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleProfileMenuClose}
+            PaperProps={{
+              sx: { mt: 1, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" },
+            }}
           >
             {token ? (
-              <MenuItem onClick={logout}>Đăng xuất</MenuItem>
+              <MenuItem
+                onClick={logout}
+                className="hover:bg-blue-50 transition-colors duration-200"
+              >
+                Đăng xuất
+              </MenuItem>
             ) : (
               <>
                 <MenuItem onClick={handleProfileMenuClose}>
-                  <Link to="/signin">Đăng nhập</Link>
+                  <Link
+                    to="/signin"
+                    className="w-full text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                  >
+                    Đăng nhập
+                  </Link>
                 </MenuItem>
                 <MenuItem onClick={handleProfileMenuClose}>
-                  <Link to="/register">Đăng ký</Link>
+                  <Link
+                    to="/register"
+                    className="w-full text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                  >
+                    Đăng ký
+                  </Link>
                 </MenuItem>
               </>
             )}
@@ -109,60 +156,64 @@ const Header = () => {
       </div>
 
       {menuOpen && (
-        <div className="md:hidden px-4 pb-4">
-          <nav className="flex flex-col space-y-2 text-gray-700 text-sm font-medium">
-            <Link to="/" onClick={toggleMenu} className="hover:text-yellow-700">
+        <div className="md:hidden px-4 pb-6 bg-gray-50">
+          <nav className="flex flex-col space-y-3 text-gray-600 text-base font-semibold">
+            <Link
+              to="/"
+              onClick={toggleMenu}
+              className="hover:text-blue-600 hover:scale-105 transition-all duration-300 py-2"
+            >
               Trang chủ
             </Link>
             <Link
               to="/about"
               onClick={toggleMenu}
-              className="hover:text-yellow-700"
+              className="hover:text-blue-600 hover:scale-105 transition-all duration-300 py-2"
             >
               Giới thiệu
             </Link>
             <Link
               to="/booking"
               onClick={toggleMenu}
-              className="hover:text-yellow-700"
+              className="hover:text-blue-600 hover:scale-105 transition-all duration-300 py-2"
             >
               Đặt lịch khám
             </Link>
             <Link
               to="/news"
               onClick={toggleMenu}
-              className="hover:text-yellow-700"
+              className="hover:text-blue-600 hover:scale-105 transition-all duration-300 py-2"
             >
               Tin tức
             </Link>
             <Link
               to="/blogs"
               onClick={toggleMenu}
-              className="hover:text-yellow-700"
+              className="hover:text-blue-600 hover:scale-105 transition-all duration-300 py-2"
             >
               Blogs
             </Link>
             <Link
               to="/test"
               onClick={toggleMenu}
-              className="hover:text-yellow-700"
+              className="hover:text-blue-600 hover:scale-105 transition-all duration-300 py-2"
             >
               Test
             </Link>
 
             {token && (
               <Link to="/treatment-plan" onClick={toggleMenu}>
-                <button className="w-full text-left px-4 py-2 text-blue-600 hover:underline">
+                <button className="w-full text-left px-4 py-2 text-blue-600 font-semibold hover:bg-blue-100 rounded-lg transition-colors duration-300">
                   Xem lộ trình điều trị
                 </button>
               </Link>
             )}
 
             {token && (
-              <div className="flex items-center space-x-1 mt-2 text-sm font-medium text-blue-600">
+              <div className="flex items-center space-x-2 text-sm font-semibold text-blue-600 bg-blue-100 px-4 py-2 rounded-lg">
                 <AccountBalanceWalletIcon
                   fontSize="small"
-                  sx={{ color: "#3B82F6" }}
+                  sx={{ color: "#60A5FA" }}
                 />
                 <span>{walletBalance.toLocaleString("vi-VN")} ₫</span>
               </div>
@@ -174,19 +225,19 @@ const Header = () => {
                   logout();
                   toggleMenu();
                 }}
-                className="bg-red-500 w-full text-white px-4 py-2 rounded mt-2"
+                className="bg-red-500 w-full text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-300 mt-4"
               >
                 Đăng xuất
               </button>
             ) : (
               <>
                 <Link to="/signin" onClick={toggleMenu}>
-                  <button className="bg-yellow-500 w-full text-white px-4 py-2 rounded mt-2">
+                  <button className="bg-blue-500 w-full text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-300 mt-4">
                     Đăng nhập
                   </button>
                 </Link>
                 <Link to="/register" onClick={toggleMenu}>
-                  <button className="border border-yellow-500 w-full text-yellow-500 px-4 py-2 rounded mt-1">
+                  <button className="border border-blue-500 w-full text-blue-500 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-300 mt-2">
                     Đăng ký
                   </button>
                 </Link>
