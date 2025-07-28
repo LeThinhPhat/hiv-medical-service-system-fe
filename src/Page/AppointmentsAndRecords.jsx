@@ -11,9 +11,18 @@ import {
   ListItemSecondaryAction,
   Button,
   Pagination,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import PaymentIcon from "@mui/icons-material/Payment";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import CancelIcon from "@mui/icons-material/Cancel";
+import AppointmentService from "../Services/CusService/AppointmentService";
 
 export const AppointmentStatusChip = ({ status }) => {
   const getStatusColor = (status) => {
@@ -24,12 +33,10 @@ export const AppointmentStatusChip = ({ status }) => {
         return { color: "error", bgcolor: "#ffebee", textColor: "#d32f2f", borderColor: "#d32f2f" };
       case "Đang xét duyệt":
         return { color: "default", bgcolor: "#f5f5f5", textColor: "#616161", borderColor: "#616161" };
-      case "Hoàn tất đặt lịch":
+      case "Đã đặt lịch và đã được duyệt":
         return { color: "success", bgcolor: "#e8f5e8", textColor: "#2e7d32", borderColor: "#2e7d32" };
       case "Hủy bởi người khách hàng":
-        return { color: "error", bgcolor: "#ffcccb", textColor: "#b71c1c", borderColor: "#b71c1c" };
       case "Hủy bởi nhân viên":
-        return { color: "error", bgcolor: "#ffcdd2", textColor: "#c62828", borderColor: "#c62828" };
       case "Đã hủy & hoàn tiền bởi nhân viên":
         return { color: "info", bgcolor: "#e0f7fa", textColor: "#0277bd", borderColor: "#0277bd" };
       case "Hoàn tất quá trình khám":
@@ -39,15 +46,16 @@ export const AppointmentStatusChip = ({ status }) => {
     }
   };
 
-  const statusInfo = getStatusColor(status);
+  const displayStatus = status && status.includes("Hủy") ? "Đã hoàn tiền" : status;
+
   return (
     <Chip 
-      label={status || "Đang xử lý"} 
+      label={displayStatus || "Đang xử lý"} 
       size="small"
       sx={{ 
-        bgcolor: statusInfo.bgcolor,
-        color: statusInfo.textColor,
-        border: `1px solid ${statusInfo.borderColor}`,
+        bgcolor: getStatusColor(status).bgcolor,
+        color: getStatusColor(status).textColor,
+        border: `1px solid ${getStatusColor(status).borderColor}`,
         fontWeight: "500"
       }} 
     />
@@ -56,6 +64,10 @@ export const AppointmentStatusChip = ({ status }) => {
 
 export const AppointmentsSection = ({ appointments, loadingAppointments, handlePayment, formatDate, formatTime }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [openCancelDialog, setOpenCancelDialog] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [toast, setToast] = useState({ open: false, message: "", severity: "success" });
   const appointmentsPerPage = 5;
 
   // Sort appointments by startTime (most recent first)
@@ -72,6 +84,47 @@ export const AppointmentsSection = ({ appointments, loadingAppointments, handleP
   // Handle page change
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
+  };
+
+  // Handle cancel dialog open
+  const handleOpenCancelDialog = (appointment) => {
+    setSelectedAppointment(appointment);
+    setCancelReason("");
+    setOpenCancelDialog(true);
+  };
+
+  // Handle cancel dialog close
+  const handleCloseCancelDialog = () => {
+    setOpenCancelDialog(false);
+    setSelectedAppointment(null);
+    setCancelReason("");
+  };
+
+  // Handle cancel appointment
+  const handleCancelAppointment = async () => {
+    try {
+      await AppointmentService.cancelAppointmentByPatient(selectedAppointment._id, cancelReason);
+      setToast({
+        open: true,
+        message: "Hủy cuộc hẹn và hoàn tiền thành công!",
+        severity: "success",
+      });
+      handleCloseCancelDialog();
+      // Optionally, refresh appointments list here
+      window.location.reload(); // Simple way to refresh data, consider using state management instead
+    } catch (error) {
+      setToast({
+        open: true,
+        message: "Hủy cuộc hẹn thất bại. Vui lòng thử lại.",
+        severity: "error",
+      });
+      console.error(error);
+    }
+  };
+
+  // Handle toast close
+  const handleCloseToast = () => {
+    setToast({ ...toast, open: false });
   };
 
   return (
@@ -145,34 +198,65 @@ export const AppointmentsSection = ({ appointments, loadingAppointments, handleP
                   }
                 />
                 <ListItemSecondaryAction sx={{ top: 16, transform: "none" }}>
-                  {ap.status === "Chờ thanh toán" ? (
-                    <Button 
-                      variant="contained" 
-                      startIcon={<PaymentIcon />} 
-                      onClick={() => handlePayment(ap)} 
-                      sx={{ 
-                        bgcolor: "#0277bd",
-                        "&:hover": { bgcolor: "#01579b" },
-                        borderRadius: 2,
-                        textTransform: "none",
-                        fontWeight: 500
-                      }}
-                    >
-                      Thanh toán
-                    </Button>
-                  ) : ap.status !== "Thanh toán thất bại" ? (
-                    <Chip
-                      label="Đã thanh toán"
-                      size="small"
-                      sx={{
-                        bgcolor: "#e8f5e8",
-                        color: "#2e7d32",
-                        border: "1px solid #2e7d32",
-                        fontWeight: "500",
-                        borderRadius: 2,
-                      }}
-                    />
-                  ) : null}
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    {ap.status === "Chờ thanh toán" ? (
+                      <Button 
+                        variant="contained" 
+                        startIcon={<PaymentIcon />} 
+                        onClick={() => handlePayment(ap)} 
+                        sx={{ 
+                          bgcolor: "#0277bd",
+                          "&:hover": { bgcolor: "#01579b" },
+                          borderRadius: 2,
+                          textTransform: "none",
+                          fontWeight: 500
+                        }}
+                      >
+                        Thanh toán
+                      </Button>
+                    ) : ap.status === "Thanh toán thất bại" ? null : ap.status.toLowerCase().includes("hủy") ? (
+                      <Chip
+                        label="Đã hoàn tiền"
+                        size="small"
+                        sx={{
+                          bgcolor: "#e0f7fa",
+                          color: "#0277bd",
+                          border: "1px solid #0277bd",
+                          fontWeight: "500",
+                          borderRadius: 2,
+                        }}
+                      />
+                    ) : (
+                      <Chip
+                        label="Đã thanh toán"
+                        size="small"
+                        sx={{
+                          bgcolor: "#e8f5e8",
+                          color: "#2e7d32",
+                          border: "1px solid #2e7d32",
+                          fontWeight: "500",
+                          borderRadius: 2,
+                        }}
+                      />
+                    )}
+                    {(ap.status === "Đang xét duyệt" || ap.status === "Đã đặt lịch và đã được duyệt") && (
+                      <Button 
+                        variant="outlined" 
+                        startIcon={<CancelIcon />} 
+                        onClick={() => handleOpenCancelDialog(ap)} 
+                        sx={{ 
+                          color: "#b71c1c",
+                          borderColor: "#b71c1c",
+                          "&:hover": { borderColor: "#b71c1c", bgcolor: "#ffcccb" },
+                          borderRadius: 2,
+                          textTransform: "none",
+                          fontWeight: 500
+                        }}
+                      >
+                        Hủy
+                      </Button>
+                    )}
+                  </Box>
                 </ListItemSecondaryAction>
               </ListItem>
             ))}
@@ -204,6 +288,66 @@ export const AppointmentsSection = ({ appointments, loadingAppointments, handleP
           )}
         </>
       )}
+
+      <Dialog
+        open={openCancelDialog}
+        onClose={handleCloseCancelDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ bgcolor: "#0277bd", color: "white" }}>
+          Hủy cuộc hẹn
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            {selectedAppointment?.status === "Đang xét duyệt"
+              ? "Khi bạn hủy, bạn chỉ sẽ được hoàn 80% số tiền. Bạn có chắc chắn muốn hủy không?"
+              : selectedAppointment?.status === "Đã đặt lịch và đã được duyệt"
+              ? "Bạn sẽ không được hoàn tiền. Bạn có chắc chắn muốn hủy không?"
+              : "Vui lòng nhập lý do hủy cuộc hẹn:"}
+          </Typography>
+          <TextField
+            label="Lý do hủy"
+            multiline
+            rows={4}
+            fullWidth
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            sx={{ "& .MuiOutlinedInput-root": { "&.Mui-focused fieldset": { borderColor: "#0277bd" } } }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={handleCloseCancelDialog} 
+            sx={{ color: "#0277bd" }}
+          >
+            Hủy bỏ
+          </Button>
+          <Button 
+            variant="contained"
+            onClick={handleCancelAppointment}
+            sx={{ bgcolor: "#b71c1c", "&:hover": { bgcolor: "#c62828" } }}
+            disabled={!cancelReason.trim()}
+          >
+            Xác nhận hủy
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={6000}
+        onClose={handleCloseToast}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseToast}
+          severity={toast.severity}
+          sx={{ width: "100%" }}
+        >
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 };

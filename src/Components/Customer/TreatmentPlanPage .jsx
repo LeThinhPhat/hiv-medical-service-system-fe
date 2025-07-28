@@ -102,11 +102,15 @@ const TreatmentPlanPage = () => {
 
               {isExpanded && (
                 <div className="mt-4 text-gray-700 text-sm">
-                  <p><strong>📝 Ghi chú:</strong> {regiment.note || "Không có ghi chú"}</p>
-                  <p><strong>📆 Ngày kê:</strong> {data?.createdAt ? new Date(data.createdAt).toLocaleDateString() : "N/A"}</p>
-                  <p><strong>💊 Loại:</strong> {data?.baseRegimentID?.regimenType || "N/A"}</p>
-                  <p><strong>⚠️ Tác dụng phụ:</strong> {data?.baseRegimentID?.sideEffects || "N/A"}</p>
-
+                  <p><strong> Ghi chú:</strong> {regiment.note || "Không có ghi chú"}</p>
+                  <p><strong> Ngày kê:</strong> {data?.createdAt ? new Date(data.createdAt).toLocaleDateString() : "N/A"}</p>
+                  <p><strong> Loại:</strong> {data?.baseRegimentID?.regimenType || "N/A"}</p>
+                  <p><strong> Tác dụng phụ:</strong> {data?.baseRegimentID?.sideEffects || "N/A"}</p>
+                <p><strong>Ngày tái khám:  </strong> 
+                      {data?.treatmentID?.followUpDate
+                      ? new Date(data.treatmentID.followUpDate).toLocaleDateString("vi-VN")
+                      : "N/A"}
+                  </p>
                   <h3 className="font-semibold mt-3">Thuốc được kê:</h3>
                   {Array.isArray(data?.customDrugs) && data.customDrugs.length > 0 ? (
                     <ul className="list-disc ml-5 mt-1">

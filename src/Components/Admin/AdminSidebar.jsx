@@ -10,11 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 const menuItems = [
-  { text: "Dashboard", icon: <HomeIcon className="w-6 h-6" />, path: "/admin" },
   { text: "Users", icon: <UsersIcon className="w-6 h-6" />, path: "/admin/users" },
-  { text: "Categories", icon: <ClipboardDocumentListIcon className="w-6 h-6" />, path: "/admin/categories" },
-  { text: "Inventory", icon: <ArchiveBoxIcon className="w-6 h-6" />, path: "/admin/inventory" },
-  { text: "Events", icon: <CalendarDaysIcon className="w-6 h-6" />, path: "/admin/events" },
   { text: "Logout", icon: <ArrowLeftOnRectangleIcon className="w-6 h-6" />, path: "/signin", isLogout: true },
 ];
 

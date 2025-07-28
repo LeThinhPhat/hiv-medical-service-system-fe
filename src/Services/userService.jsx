@@ -44,6 +44,18 @@ const UserService = {
       throw error;
     }
   },
+    deleteUser: async (userId) => {
+    try {
+      const response = await axiosClient.delete(`/users/${userId}`);
+      console.log("User deleted:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      throw error;
+    }
+  },
+  
+
     getAllRoles: async () => {
     const response = await axiosClient.get("/roles");
     return response.data.data;
