@@ -30,7 +30,10 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import UserService from "../../Services/userService";
+import UploadImage from "../../Services/UploadImage";
 
 const roleTranslations = {
   ADMIN_ROLE: { label: "Quản trị viên", color: "error" },
@@ -46,8 +49,10 @@ const UserList = () => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -58,7 +63,9 @@ const UserList = () => {
     phone: "",
     role: "CUSTOMER_ROLE",
     isVerified: false,
+    avatarURL: "",
   });
+  const [errors, setErrors] = useState({});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchName, setSearchName] = useState("");
@@ -98,6 +105,51 @@ const UserList = () => {
     setPage(0);
   }, [searchName, filterRole, users]);
 
+  const validateForm = () => {
+    const newErrors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9]{10,11}$/;
+    const today = new Date();
+    const dob = new Date(formData.dob);
+
+    if (!formData.email) {
+      newErrors.email = "Email là bắt buộc";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Email không hợp lệ";
+    }
+
+    if (!isEditing && !formData.password) {
+      newErrors.password = "Mật khẩu là bắt buộc";
+    } else if (!isEditing && formData.password.length < 6) {
+      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+
+    if (!formData.name) {
+      newErrors.name = "Tên là bắt buộc";
+    } else if (formData.name.length < 2) {
+      newErrors.name = "Tên phải có ít nhất 2 ký tự";
+    }
+
+    if (!formData.phone) {
+      newErrors.phone = "Số điện thoại là bắt buộc";
+    } else if (!phoneRegex.test(formData.phone)) {
+      newErrors.phone = "Số điện thoại không hợp lệ (10-11 số)";
+    }
+
+    if (!formData.address) {
+      newErrors.address = "Địa chỉ là bắt buộc";
+    }
+
+    if (!formData.dob) {
+      newErrors.dob = "Ngày sinh là bắt buộc";
+    } else if (dob >= today) {
+      newErrors.dob = "Ngày sinh phải nhỏ hơn ngày hiện tại";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleOpenDialog = (user = null) => {
     if (user) {
       setIsEditing(true);
@@ -110,8 +162,9 @@ const UserList = () => {
         dob: user.dob.split("T")[0],
         address: user.address,
         phone: user.phone,
-        role: user.role?._id ,
+        role: user.role?._id,
         isVerified: user.isVerified,
+        avatarURL: user.avatarURL || "",
       });
     } else {
       setIsEditing(false);
@@ -126,46 +179,87 @@ const UserList = () => {
         phone: "",
         role: defaultRole,
         isVerified: false,
+        avatarURL: "",
       });
     }
+    setErrors({});
     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setCurrentUserId(null);
+    setErrors({});
+  };
+
+  const handleOpenDeleteDialog = (user) => {
+    setUserToDelete(user);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setUserToDelete(null);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    // Clear error for the field when user starts typing
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleUploadSuccess = (url) => {
+    setFormData({ ...formData, avatarURL: url });
   };
 
   const handleSubmit = async () => {
+    if (!validateForm()) {
+      toast.error("Vui lòng kiểm tra lại các trường dữ liệu!");
+      return;
+    }
+
     try {
       if (isEditing) {
-        const updatedUser = await UserService.updateUser(currentUserId, formData);
+        const updateData = {
+          email: formData.email,
+          name: formData.name,
+          gender: formData.gender,
+          dob: formData.dob,
+          address: formData.address,
+          phone: formData.phone,
+          role: formData.role,
+          avatarURL: formData.avatarURL,
+        };
+        const updatedUser = await UserService.updateUser(currentUserId, updateData);
         setUsers(
           users.map((user) =>
             user._id === currentUserId ? { ...user, ...updatedUser } : user
           )
         );
+        toast.success("Cập nhật người dùng thành công!");
       } else {
-        const newUser = await UserService.createUser(formData);
+        const createData = { ...formData };
+        const newUser = await UserService.createUser(createData);
         setUsers([...users, newUser]);
+        toast.success("Thêm người dùng thành công!");
       }
       handleCloseDialog();
     } catch (error) {
       console.error("Lỗi khi lưu người dùng", error);
+      toast.error("Lỗi khi lưu người dùng!");
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async () => {
     try {
-      await UserService.deleteUser(id);
-      setUsers(users.filter((user) => user._id !== id));
+      await UserService.deleteUser(userToDelete._id);
+      setUsers(users.filter((user) => user._id !== userToDelete._id));
+      handleCloseDeleteDialog();
+      toast.success("Xóa người dùng thành công!");
     } catch (error) {
       console.error("Lỗi khi xóa người dùng", error);
+      toast.error("Lỗi khi xóa người dùng!");
     }
   };
 
@@ -196,6 +290,7 @@ const UserList = () => {
 
   return (
     <Box p={4}>
+      <ToastContainer />
       <Typography variant="h4" gutterBottom>
         Danh sách người dùng
       </Typography>
@@ -304,7 +399,7 @@ const UserList = () => {
                       <IconButton onClick={() => handleOpenDialog(user)}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton onClick={() => handleDelete(user._id)}>
+                      <IconButton onClick={() => handleOpenDeleteDialog(user)}>
                         <DeleteIcon />
                       </IconButton>
                     </Stack>
@@ -339,6 +434,8 @@ const UserList = () => {
             fullWidth
             value={formData.email}
             onChange={handleInputChange}
+            error={!!errors.email}
+            helperText={errors.email}
           />
           <TextField
             margin="dense"
@@ -349,6 +446,8 @@ const UserList = () => {
             value={formData.password}
             onChange={handleInputChange}
             disabled={isEditing}
+            error={!!errors.password}
+            helperText={errors.password}
           />
           <TextField
             margin="dense"
@@ -357,6 +456,8 @@ const UserList = () => {
             fullWidth
             value={formData.name}
             onChange={handleInputChange}
+            error={!!errors.name}
+            helperText={errors.name}
           />
           <TextField
             margin="dense"
@@ -365,6 +466,8 @@ const UserList = () => {
             fullWidth
             value={formData.phone}
             onChange={handleInputChange}
+            error={!!errors.phone}
+            helperText={errors.phone}
           />
           <TextField
             margin="dense"
@@ -373,7 +476,15 @@ const UserList = () => {
             fullWidth
             value={formData.address}
             onChange={handleInputChange}
+            error={!!errors.address}
+            helperText={errors.address}
           />
+          <UploadImage onUploadSuccess={handleUploadSuccess} />
+          {formData.avatarURL && (
+            <Box mt={1}>
+              <Typography variant="body2">URL ảnh: {formData.avatarURL}</Typography>
+            </Box>
+          )}
           <FormControl fullWidth margin="dense">
             <InputLabel>Giới tính</InputLabel>
             <Select
@@ -382,8 +493,8 @@ const UserList = () => {
               onChange={handleInputChange}
               label="Giới tính"
             >
-              <MenuItem value="Nam">Nam</MenuItem>
-              <MenuItem value="Nữ">Nữ</MenuItem>
+              <MenuItem value="Male">Nam</MenuItem>
+              <MenuItem value="Female">Nữ</MenuItem>
               <MenuItem value="None">Không xác định</MenuItem>
             </Select>
           </FormControl>
@@ -396,27 +507,59 @@ const UserList = () => {
             InputLabelProps={{ shrink: true }}
             value={formData.dob}
             onChange={handleInputChange}
+            error={!!errors.dob}
+            helperText={errors.dob}
           />
           <FormControl fullWidth margin="dense">
             <InputLabel>Vai trò</InputLabel>
-          <Select
-            name="role"
-            value={formData.role}
-            onChange={handleInputChange}
-            label="Vai trò"
-          >
-            {roles.map((role) => (
-              <MenuItem key={role._id} value={role._id}> 
-                {roleTranslations[role.name]?.label || role.name}
-              </MenuItem>
-            ))}
-          </Select>
+            <Select
+              name="role"
+              value={formData.role}
+              onChange={handleInputChange}
+              label="Vai trò"
+            >
+              {roles.map((role) => (
+                <MenuItem key={role._id} value={role._id}>
+                  {roleTranslations[role.name]?.label || role.name}
+                </MenuItem>
+              ))}
+            </Select>
           </FormControl>
+          {!isEditing && (
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Xác minh</InputLabel>
+              <Select
+                name="isVerified"
+                value={formData.isVerified}
+                onChange={handleInputChange}
+                label="Xác minh"
+              >
+                <MenuItem value={true}>Đã xác minh</MenuItem>
+                <MenuItem value={false}>Chưa xác minh</MenuItem>
+              </Select>
+            </FormControl>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Hủy</Button>
           <Button onClick={handleSubmit} variant="contained">
             {isEditing ? "Cập nhật" : "Thêm"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Bạn có chắc chắn muốn xóa người dùng{" "}
+            <strong>{userToDelete?.name}</strong>? Hành động này không thể hoàn tác.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog}>Hủy</Button>
+          <Button onClick={handleDelete} variant="contained" color="error">
+            Xóa
           </Button>
         </DialogActions>
       </Dialog>

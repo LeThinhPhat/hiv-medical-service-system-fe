@@ -21,7 +21,6 @@ const ServiceCard = ({ service }) => (
   </div>
 );
 
-
 const ServicesPage = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,19 +67,23 @@ const ServicesPage = () => {
     );
   }
 
+  const filteredServices = services
+    .filter((service) => service.name !== 'Đăng Kí Khám Ẩn Danh')
+    .reverse(); // Reverse the filtered services list
+
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
           Danh sách dịch vụ
         </h2>
-        {services.length === 0 ? (
+        {filteredServices.length === 0 ? (
           <p className="text-center text-gray-500 text-lg">
             Không có dịch vụ nào.
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service) => (
+            {filteredServices.map((service) => (
               <ServiceCard key={service._id} service={service} />
             ))}
           </div>

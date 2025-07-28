@@ -13,16 +13,28 @@ const STATUS_OPTIONS = [
   { value: "", label: "Tất Cả" },
   { value: "Chờ thanh toán", label: "Chờ thanh toán" },
   { value: "Hoàn tất đặt lịch", label: "Hoàn tất đặt lịch" },
-  { value: "cancelled", label: "Đã Hủy" },
+  { value: "Đã Hủy", label: "Đã Hủy" },
   { value: "Khách hàng đã checkin", label: "Khách hàng đã checkin" },
   { value: "Khách hàng đã checkout", label: "Khách hàng đã checkout" },
   { value: "Thanh toán thất bại", label: "Thanh toán thất bại" },
+  { value: "Hủy bởi người khách hàng", label: "Hủy bởi người khách hàng" },
+  { value: "Hủy bởi nhân viên", label: "Hủy bởi nhân viên" },
+  { value: "Đã hủy & hoàn tiền bởi nhân viên", label: "Đã hủy & hoàn tiền bởi nhân viên" },
+  { value: "Hoàn tất quá trình khám", label: "Hoàn tất quá trình khám" },
+  { value: "Không đến khám", label: "Không đến khám" },
+  { value: "Khách hàng hủy lịch hẹn", label: "Khách hàng hủy lịch hẹn" },
 ];
 
 const NON_CANCELLABLE_STATUSES = [
-  "khách hàng đã checkout",
   "khách hàng đã checkin",
   "thanh toán thất bại",
+  "hủy bởi người khách hàng",
+  "hủy bởi nhân viên",
+  "đã hủy & hoàn tiền bởi nhân viên",
+  "hoàn tất quá trình khám",
+  "khách hàng đã checkout",
+  "không đến khám",
+  "khách hàng hủy lịch hẹn",
 ];
 
 const PENDING_STATUS = "đang xét duyệt";

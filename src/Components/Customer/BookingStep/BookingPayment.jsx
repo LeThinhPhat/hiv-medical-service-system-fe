@@ -148,7 +148,7 @@ const BookingPaymentPage = () => {
             <InfoRow icon={PersonIcon} label="Bệnh nhân:" value={appointment.patientID?.userID?.name || appointment.patientID?.name} />
             <InfoRow icon={PersonIcon} label="CCCD:" value={appointment.patientID.personalID} />
             <InfoRow icon={PersonIcon} label="SĐT:" value={info?.phone || "Không có"} />
-            <InfoRow icon={MedicalServicesIcon} label="Bác sĩ:" value={appointment.doctorID.userID?.name} />
+            <InfoRow icon={MedicalServicesIcon} label="Bác sĩ:" value={appointment.doctorSlotID[0].doctorID?.userID?.name} />
             <InfoRow icon={EventIcon} label="Ngày:" value={formatDate(appointment.date)} />
             <InfoRow
               icon={EventIcon}

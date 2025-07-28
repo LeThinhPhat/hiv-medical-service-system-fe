@@ -51,6 +51,17 @@ const appointmentService = {
       throw error;
     }
   },
+ cancelAppointmentByPatient: async (appoinmentId, reason) => {
+    try {
+     
+      console.log("Canceling appointment with:", appoinmentId, reason);
+      const response = await axiosClient.post("/appointments/cancle/appointment/patient", {appoinmentId, reason});
+      return response.data;
+    } catch (error) {
+      console.error("Error canceling appointment by patient:", error);
+      throw error;
+    }
+  },
 };
 
 export default appointmentService;
