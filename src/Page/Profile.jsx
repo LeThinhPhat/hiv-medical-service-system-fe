@@ -89,7 +89,7 @@ const Profile = () => {
 
     const updatedPatient = {
       ...patient,
-      contactPhones: formValues.contactPhones,
+      phone: formValues.contactPhones,
       personalID: formValues.personalID,
     };
 
