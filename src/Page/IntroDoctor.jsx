@@ -21,7 +21,7 @@ const IntroDoctor = () => {
         const response = await docService.getAllDoctors();
         const data = Array.isArray(response.data) ? response.data : response;
 
-        const mappedDoctors = data.slice(0, 4).map((doctor) => ({
+        const mappedDoctors = data.slice(0, 3).map((doctor) => ({
           id: doctor._id,
           name:
             doctor.userID?.name ||

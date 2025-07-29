@@ -89,14 +89,14 @@ const BookingConfirmPage = () => {
       toast.success(
         <>
           <b>Đặt lịch thành công!</b>
-          <br />
+          {/* <br />
           Bệnh nhân: {info.name} <br />
           CCCD: {info.cccd} <br />
           SĐT: {info.phone} <br />
           Bác sĩ: {doctor.userID?.name} <br />
           Ngày: {formatDate(date)}, {formatTime(slot.startTime)} -{" "}
           {formatTime(slot.endTime)}
-          <br />
+          <br /> */}
           Dịch vụ: {serviceName}
         </>
       );
